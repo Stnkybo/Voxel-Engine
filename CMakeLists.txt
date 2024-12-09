@@ -1,0 +1,22 @@
+cmake_minimum_required(VERSION 3.30)
+
+project(SDL3PRJ)
+
+find_package(fmt REQUIRED)
+find_package(glad CONFIG REQUIRED)
+find_package(SDL3 CONFIG REQUIRED)
+
+set(CMAKE_CXX_STANDARD 23)
+
+add_executable(SDL3PRJ main.cpp
+        Window.cpp
+        Window.h
+)
+
+
+target_link_libraries(SDL3PRJ
+        PRIVATE
+        fmt::fmt
+        glad::glad
+        SDL3::SDL3
+        )

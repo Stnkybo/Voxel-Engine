@@ -1,0 +1,69 @@
+Package: vcpkg-cmake-config
+Version: 2024-05-23
+Architecture: x64-mingw-dynamic
+Multi-Arch: same
+Abi: e89650206d1fec0584d59ef5aacf14acd03f3fcda08da110e7d9642f32673629
+Status: install ok installed
+
+Package: vcpkg-cmake
+Version: 2024-04-23
+Architecture: x64-mingw-dynamic
+Multi-Arch: same
+Abi: a1b8cca0639b031ef4b24e28ed0a721800c34579a2bdc1b05819e8c93f685ce7
+Status: install ok installed
+
+Package: fmt
+Version: 11.0.2
+Port-Version: 1
+Depends: vcpkg-cmake, vcpkg-cmake-config
+Architecture: x64-mingw-dynamic
+Multi-Arch: same
+Abi: 5e3596a76134c8dd80ecbda40c8a1465b20315d2f16706e8ee733de398419b53
+Description: {fmt} is an open-source formatting library providing a fast and safe alternative to C stdio and C++ iostreams.
+Status: install ok installed
+
+Package: egl-registry
+Version: 2024-01-25
+Architecture: x64-mingw-dynamic
+Multi-Arch: same
+Abi: 11881e9e6a1e6647b68ec50d19adfda3126722e297b25d481c98029fcc4853a2
+Description: EGL API and Extension Registry
+Status: install ok installed
+
+Package: opengl-registry
+Version: 2024-02-10
+Port-Version: 1
+Depends: egl-registry
+Architecture: x64-mingw-dynamic
+Multi-Arch: same
+Abi: 4d9977be3019477f031e80052c97cac802c448e194a562cfb07fb4e8b3ddfa18
+Description: OpenGL, OpenGL ES, and OpenGL ES-SC API and Extension Registry
+Status: install ok installed
+
+Package: glad
+Version: 0.1.36
+Depends: egl-registry, opengl-registry, vcpkg-cmake, vcpkg-cmake-config
+Architecture: x64-mingw-dynamic
+Multi-Arch: same
+Abi: 171dd71a7477d3a44b0de67d99ff7e9826b8b6aede80c901ac099782f5f0204b
+Description: Multi-Language Vulkan/GL/GLES/EGL/GLX/WGL Loader-Generator based on the official specs.
+Default-Features: loader
+Status: install ok installed
+
+Package: glad
+Feature: loader
+Architecture: x64-mingw-dynamic
+Multi-Arch: same
+Description: Generate loader logic.
+Status: install ok installed
+
+Package: sdl3
+Version: 3.1.6-preview
+Port-Version: 2
+Depends: vcpkg-cmake, vcpkg-cmake-config
+Architecture: x64-mingw-dynamic
+Multi-Arch: same
+Abi: 95f66d42dd23e4ec46d1d4e34c09bb19c19c838a57744ec02912e8b29aaed5b6
+Description: Simple DirectMedia Layer is a cross-platform development library designed to provide low level access to audio, keyboard, mouse, joystick, and graphics hardware via OpenGL and Direct3D.
+Status: install ok installed
+
