@@ -3,7 +3,7 @@
 Detecting compiler hash for triplet x64-mingw-dynamic...
 Compiler found: C:/Program Files/JetBrains/CLion 2024.3/bin/mingw/bin/g++.exe
 All requested packages are currently installed.
-Total install time: 300 ns
+Total install time: 400 ns
 The package fmt provides CMake targets:
 
     find_package(fmt CONFIG REQUIRED)
@@ -25,12 +25,6 @@ sdl3 provides CMake targets:
   target_link_libraries(main PRIVATE SDL3::SDL3)
 
 -- Running vcpkg install - done
--- Configuring done (1.3s)
+-- Configuring done (1.2s)
 -- Generating done (0.0s)
-CMake Warning:
-  Manually-specified variables were not used by the project:
-
-    CMAKE_TOOLCHAIN_FILE
-
-
 -- Build files have been written to: C:/Users/Lamad/CLionProjects/SDL3PRJ/cmake-build-debug

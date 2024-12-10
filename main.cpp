@@ -1,42 +1,47 @@
 #include <iostream>
-#include <glad/glad.h>
 #include <SDL3/SDL.h>
 
+#include "Mesh.h"
+#include "Renderer.h"
+#include "Triangle.h"
 #include "Window.h"
 
 int main() {
 
-    auto result = Window::init();
-    if (!result) {
-        SDL_LogCritical(SDL_LOG_CATEGORY_ERROR, result.error());
-    }
+    bool quit = false;
 
-    {
-        try {
-            Window window("Window Title");
-            bool isRunning = true;
+    SDL_Window *window = SDL_CreateWindow("Triangle Example", 800, 600, 0);
 
-            while (isRunning) {
-               std::optional<SDL_Event> event;
-                while ((event = Window::pollEvents()))
-                    switch (event->type) {
-                        case SDL_EventType::SDL_EVENT_QUIT:
-                            isRunning = false;
-                            break;
-                    }
+    Renderer renderer(SDL_CreateRenderer(window, NULL));
+
+#define vertLen 3
+
+    // Create a triangle
+    const auto *triangle = new Triangle;
+
+    // Add triangle to mesh so that it will be drawn
+
+    auto mesh = new Mesh();
+    mesh->addTriangle(*triangle);
+
+    renderer.addMesh(*mesh);
 
 
-                // RENDER HERE
+    while (!quit) {
+        SDL_Event ev;
+        while (SDL_PollEvent(&ev) != 0) {
+            switch(ev.type) {
+                case SDL_EVENT_QUIT:
+                    quit = true;
+                break;
             }
-        } catch (const std::exception& e) {
-            SDL_LogCritical(SDL_LOG_CATEGORY_ERROR, e.what());
         }
 
-
-
+        // REnders
+        renderer.render();
     }
 
-    Window::quit();
-
+    SDL_DestroyWindow(window);
+    SDL_Quit();
     return 0;
 }

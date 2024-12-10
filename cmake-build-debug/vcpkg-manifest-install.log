@@ -1,7 +1,7 @@
 Detecting compiler hash for triplet x64-mingw-dynamic...
 Compiler found: C:/Program Files/JetBrains/CLion 2024.3/bin/mingw/bin/g++.exe
 All requested packages are currently installed.
-Total install time: 300 ns
+Total install time: 400 ns
 The package fmt provides CMake targets:
 
     find_package(fmt CONFIG REQUIRED)

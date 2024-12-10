@@ -11,11 +11,17 @@ set(CMAKE_CXX_STANDARD 23)
 add_executable(SDL3PRJ main.cpp
         Window.cpp
         Window.h
+        Triangle.cpp
+        Triangle.h
+        Renderer.cpp
+        Renderer.h
+        Mesh.cpp
+        Mesh.h
 )
 
 
 target_link_libraries(SDL3PRJ
-        PRIVATE
+        PUBLIC
         fmt::fmt
         glad::glad
         SDL3::SDL3
