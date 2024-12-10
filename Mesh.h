@@ -13,12 +13,14 @@ class Mesh {
 
 public:
 
-
+    // Faze out in favor of the stuff below
     std::vector<Triangle> m_triangles;
 
-    explicit Mesh() {
+    std::vector<SDL_Vertex> m_vertices;
+    std::vector<SDL_Vertex> m_points;
+    std::vector<SDL_Texture*> m_texture;
 
-    }
+    explicit Mesh() = default;
 
     void addTriangle(const Triangle &triangle) {
         m_triangles.push_back(triangle);

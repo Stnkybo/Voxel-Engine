@@ -12,7 +12,8 @@ int main() {
 
     SDL_Window *window = SDL_CreateWindow("Triangle Example", 800, 600, 0);
 
-    Renderer renderer(SDL_CreateRenderer(window, NULL));
+    Renderer renderer(SDL_CreateRenderer(window, nullptr));
+
 
 #define vertLen 3
 
@@ -33,11 +34,20 @@ int main() {
             switch(ev.type) {
                 case SDL_EVENT_QUIT:
                     quit = true;
-                break;
+                    break;
+
+                case SDL_EVENT_KEY_DOWN: {
+                    const SDL_Keycode keycode = SDL_GetKeyFromScancode(ev.key.scancode, ev.key.mod, false);
+                        if (keycode == 'a' || keycode == 'A') {
+                            std::cout << "A" << std::endl;
+                        }
+                    }
+                    break;
+                default: ;
             }
         }
 
-        // REnders
+        // Renderers
         renderer.render();
     }
 

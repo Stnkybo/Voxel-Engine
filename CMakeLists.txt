@@ -8,7 +8,7 @@ find_package(SDL3 CONFIG REQUIRED)
 
 set(CMAKE_CXX_STANDARD 23)
 
-add_executable(SDL3PRJ main.cpp
+add_executable(${PROJECT_NAME} main.cpp
         Window.cpp
         Window.h
         Triangle.cpp
@@ -17,10 +17,11 @@ add_executable(SDL3PRJ main.cpp
         Renderer.h
         Mesh.cpp
         Mesh.h
+        Cube.cpp
+        Cube.h
 )
 
-
-target_link_libraries(SDL3PRJ
+target_link_libraries(${PROJECT_NAME}
         PUBLIC
         fmt::fmt
         glad::glad
