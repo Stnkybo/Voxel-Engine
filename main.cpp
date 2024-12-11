@@ -5,8 +5,7 @@
 #include "Engine/Game.h"
 
 int main() {
-    Game *game;
-    game = new Game("Triangle Example", 800, 600);
+    const auto game = new Game("Triangle Example", 800, 600);
 
     game->onStart();
     while (game->isRunning) {
