@@ -57,45 +57,69 @@ build CMakeFiles/SDL3PRJ.dir/main.cpp.obj: CXX_COMPILER__SDL3PRJ_unscanned_Debug
   OBJECT_DIR = CMakeFiles\SDL3PRJ.dir
   OBJECT_FILE_DIR = CMakeFiles\SDL3PRJ.dir
 
-build CMakeFiles/SDL3PRJ.dir/Window.cpp.obj: CXX_COMPILER__SDL3PRJ_unscanned_Debug C$:/Users/Lamad/CLionProjects/SDL3PRJ/Window.cpp || cmake_object_order_depends_target_SDL3PRJ
+build CMakeFiles/SDL3PRJ.dir/Engine/Window.cpp.obj: CXX_COMPILER__SDL3PRJ_unscanned_Debug C$:/Users/Lamad/CLionProjects/SDL3PRJ/Engine/Window.cpp || cmake_object_order_depends_target_SDL3PRJ
   DEFINES = -DFMT_SHARED
-  DEP_FILE = CMakeFiles\SDL3PRJ.dir\Window.cpp.obj.d
+  DEP_FILE = CMakeFiles\SDL3PRJ.dir\Engine\Window.cpp.obj.d
   FLAGS = -g -std=gnu++23 -fdiagnostics-color=always
   INCLUDES = -isystem C:/Users/Lamad/CLionProjects/SDL3PRJ/cmake-build-debug/vcpkg_installed/x64-mingw-dynamic/include
   OBJECT_DIR = CMakeFiles\SDL3PRJ.dir
-  OBJECT_FILE_DIR = CMakeFiles\SDL3PRJ.dir
+  OBJECT_FILE_DIR = CMakeFiles\SDL3PRJ.dir\Engine
 
-build CMakeFiles/SDL3PRJ.dir/Triangle.cpp.obj: CXX_COMPILER__SDL3PRJ_unscanned_Debug C$:/Users/Lamad/CLionProjects/SDL3PRJ/Triangle.cpp || cmake_object_order_depends_target_SDL3PRJ
+build CMakeFiles/SDL3PRJ.dir/Engine/Triangle.cpp.obj: CXX_COMPILER__SDL3PRJ_unscanned_Debug C$:/Users/Lamad/CLionProjects/SDL3PRJ/Engine/Triangle.cpp || cmake_object_order_depends_target_SDL3PRJ
   DEFINES = -DFMT_SHARED
-  DEP_FILE = CMakeFiles\SDL3PRJ.dir\Triangle.cpp.obj.d
+  DEP_FILE = CMakeFiles\SDL3PRJ.dir\Engine\Triangle.cpp.obj.d
   FLAGS = -g -std=gnu++23 -fdiagnostics-color=always
   INCLUDES = -isystem C:/Users/Lamad/CLionProjects/SDL3PRJ/cmake-build-debug/vcpkg_installed/x64-mingw-dynamic/include
   OBJECT_DIR = CMakeFiles\SDL3PRJ.dir
-  OBJECT_FILE_DIR = CMakeFiles\SDL3PRJ.dir
+  OBJECT_FILE_DIR = CMakeFiles\SDL3PRJ.dir\Engine
 
-build CMakeFiles/SDL3PRJ.dir/Renderer.cpp.obj: CXX_COMPILER__SDL3PRJ_unscanned_Debug C$:/Users/Lamad/CLionProjects/SDL3PRJ/Renderer.cpp || cmake_object_order_depends_target_SDL3PRJ
+build CMakeFiles/SDL3PRJ.dir/Engine/Renderer.cpp.obj: CXX_COMPILER__SDL3PRJ_unscanned_Debug C$:/Users/Lamad/CLionProjects/SDL3PRJ/Engine/Renderer.cpp || cmake_object_order_depends_target_SDL3PRJ
   DEFINES = -DFMT_SHARED
-  DEP_FILE = CMakeFiles\SDL3PRJ.dir\Renderer.cpp.obj.d
+  DEP_FILE = CMakeFiles\SDL3PRJ.dir\Engine\Renderer.cpp.obj.d
   FLAGS = -g -std=gnu++23 -fdiagnostics-color=always
   INCLUDES = -isystem C:/Users/Lamad/CLionProjects/SDL3PRJ/cmake-build-debug/vcpkg_installed/x64-mingw-dynamic/include
   OBJECT_DIR = CMakeFiles\SDL3PRJ.dir
-  OBJECT_FILE_DIR = CMakeFiles\SDL3PRJ.dir
+  OBJECT_FILE_DIR = CMakeFiles\SDL3PRJ.dir\Engine
 
-build CMakeFiles/SDL3PRJ.dir/Mesh.cpp.obj: CXX_COMPILER__SDL3PRJ_unscanned_Debug C$:/Users/Lamad/CLionProjects/SDL3PRJ/Mesh.cpp || cmake_object_order_depends_target_SDL3PRJ
+build CMakeFiles/SDL3PRJ.dir/Engine/Mesh.cpp.obj: CXX_COMPILER__SDL3PRJ_unscanned_Debug C$:/Users/Lamad/CLionProjects/SDL3PRJ/Engine/Mesh.cpp || cmake_object_order_depends_target_SDL3PRJ
   DEFINES = -DFMT_SHARED
-  DEP_FILE = CMakeFiles\SDL3PRJ.dir\Mesh.cpp.obj.d
+  DEP_FILE = CMakeFiles\SDL3PRJ.dir\Engine\Mesh.cpp.obj.d
   FLAGS = -g -std=gnu++23 -fdiagnostics-color=always
   INCLUDES = -isystem C:/Users/Lamad/CLionProjects/SDL3PRJ/cmake-build-debug/vcpkg_installed/x64-mingw-dynamic/include
   OBJECT_DIR = CMakeFiles\SDL3PRJ.dir
-  OBJECT_FILE_DIR = CMakeFiles\SDL3PRJ.dir
+  OBJECT_FILE_DIR = CMakeFiles\SDL3PRJ.dir\Engine
 
-build CMakeFiles/SDL3PRJ.dir/Cube.cpp.obj: CXX_COMPILER__SDL3PRJ_unscanned_Debug C$:/Users/Lamad/CLionProjects/SDL3PRJ/Cube.cpp || cmake_object_order_depends_target_SDL3PRJ
+build CMakeFiles/SDL3PRJ.dir/Engine/Cube.cpp.obj: CXX_COMPILER__SDL3PRJ_unscanned_Debug C$:/Users/Lamad/CLionProjects/SDL3PRJ/Engine/Cube.cpp || cmake_object_order_depends_target_SDL3PRJ
   DEFINES = -DFMT_SHARED
-  DEP_FILE = CMakeFiles\SDL3PRJ.dir\Cube.cpp.obj.d
+  DEP_FILE = CMakeFiles\SDL3PRJ.dir\Engine\Cube.cpp.obj.d
   FLAGS = -g -std=gnu++23 -fdiagnostics-color=always
   INCLUDES = -isystem C:/Users/Lamad/CLionProjects/SDL3PRJ/cmake-build-debug/vcpkg_installed/x64-mingw-dynamic/include
   OBJECT_DIR = CMakeFiles\SDL3PRJ.dir
-  OBJECT_FILE_DIR = CMakeFiles\SDL3PRJ.dir
+  OBJECT_FILE_DIR = CMakeFiles\SDL3PRJ.dir\Engine
+
+build CMakeFiles/SDL3PRJ.dir/Entities/Player.cpp.obj: CXX_COMPILER__SDL3PRJ_unscanned_Debug C$:/Users/Lamad/CLionProjects/SDL3PRJ/Entities/Player.cpp || cmake_object_order_depends_target_SDL3PRJ
+  DEFINES = -DFMT_SHARED
+  DEP_FILE = CMakeFiles\SDL3PRJ.dir\Entities\Player.cpp.obj.d
+  FLAGS = -g -std=gnu++23 -fdiagnostics-color=always
+  INCLUDES = -isystem C:/Users/Lamad/CLionProjects/SDL3PRJ/cmake-build-debug/vcpkg_installed/x64-mingw-dynamic/include
+  OBJECT_DIR = CMakeFiles\SDL3PRJ.dir
+  OBJECT_FILE_DIR = CMakeFiles\SDL3PRJ.dir\Entities
+
+build CMakeFiles/SDL3PRJ.dir/Entities/Entity.cpp.obj: CXX_COMPILER__SDL3PRJ_unscanned_Debug C$:/Users/Lamad/CLionProjects/SDL3PRJ/Entities/Entity.cpp || cmake_object_order_depends_target_SDL3PRJ
+  DEFINES = -DFMT_SHARED
+  DEP_FILE = CMakeFiles\SDL3PRJ.dir\Entities\Entity.cpp.obj.d
+  FLAGS = -g -std=gnu++23 -fdiagnostics-color=always
+  INCLUDES = -isystem C:/Users/Lamad/CLionProjects/SDL3PRJ/cmake-build-debug/vcpkg_installed/x64-mingw-dynamic/include
+  OBJECT_DIR = CMakeFiles\SDL3PRJ.dir
+  OBJECT_FILE_DIR = CMakeFiles\SDL3PRJ.dir\Entities
+
+build CMakeFiles/SDL3PRJ.dir/Engine/Game.cpp.obj: CXX_COMPILER__SDL3PRJ_unscanned_Debug C$:/Users/Lamad/CLionProjects/SDL3PRJ/Engine/Game.cpp || cmake_object_order_depends_target_SDL3PRJ
+  DEFINES = -DFMT_SHARED
+  DEP_FILE = CMakeFiles\SDL3PRJ.dir\Engine\Game.cpp.obj.d
+  FLAGS = -g -std=gnu++23 -fdiagnostics-color=always
+  INCLUDES = -isystem C:/Users/Lamad/CLionProjects/SDL3PRJ/cmake-build-debug/vcpkg_installed/x64-mingw-dynamic/include
+  OBJECT_DIR = CMakeFiles\SDL3PRJ.dir
+  OBJECT_FILE_DIR = CMakeFiles\SDL3PRJ.dir\Engine
 
 
 # =============================================================================
@@ -105,7 +129,7 @@ build CMakeFiles/SDL3PRJ.dir/Cube.cpp.obj: CXX_COMPILER__SDL3PRJ_unscanned_Debug
 #############################################
 # Link the executable SDL3PRJ.exe
 
-build SDL3PRJ.exe: CXX_EXECUTABLE_LINKER__SDL3PRJ_Debug CMakeFiles/SDL3PRJ.dir/main.cpp.obj CMakeFiles/SDL3PRJ.dir/Window.cpp.obj CMakeFiles/SDL3PRJ.dir/Triangle.cpp.obj CMakeFiles/SDL3PRJ.dir/Renderer.cpp.obj CMakeFiles/SDL3PRJ.dir/Mesh.cpp.obj CMakeFiles/SDL3PRJ.dir/Cube.cpp.obj | vcpkg_installed/x64-mingw-dynamic/debug/lib/libfmtd.dll.a vcpkg_installed/x64-mingw-dynamic/debug/lib/libglad.a vcpkg_installed/x64-mingw-dynamic/debug/lib/libSDL3.dll.a
+build SDL3PRJ.exe: CXX_EXECUTABLE_LINKER__SDL3PRJ_Debug CMakeFiles/SDL3PRJ.dir/main.cpp.obj CMakeFiles/SDL3PRJ.dir/Engine/Window.cpp.obj CMakeFiles/SDL3PRJ.dir/Engine/Triangle.cpp.obj CMakeFiles/SDL3PRJ.dir/Engine/Renderer.cpp.obj CMakeFiles/SDL3PRJ.dir/Engine/Mesh.cpp.obj CMakeFiles/SDL3PRJ.dir/Engine/Cube.cpp.obj CMakeFiles/SDL3PRJ.dir/Entities/Player.cpp.obj CMakeFiles/SDL3PRJ.dir/Entities/Entity.cpp.obj CMakeFiles/SDL3PRJ.dir/Engine/Game.cpp.obj | vcpkg_installed/x64-mingw-dynamic/debug/lib/libfmtd.dll.a vcpkg_installed/x64-mingw-dynamic/debug/lib/libglad.a vcpkg_installed/x64-mingw-dynamic/debug/lib/libSDL3.dll.a
   FLAGS = -g
   LINK_LIBRARIES = vcpkg_installed/x64-mingw-dynamic/debug/lib/libfmtd.dll.a  vcpkg_installed/x64-mingw-dynamic/debug/lib/libglad.a  vcpkg_installed/x64-mingw-dynamic/debug/lib/libSDL3.dll.a  -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
   OBJECT_DIR = CMakeFiles\SDL3PRJ.dir

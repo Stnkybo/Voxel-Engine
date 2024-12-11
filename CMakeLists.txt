@@ -9,16 +9,22 @@ find_package(SDL3 CONFIG REQUIRED)
 set(CMAKE_CXX_STANDARD 23)
 
 add_executable(${PROJECT_NAME} main.cpp
-        Window.cpp
-        Window.h
-        Triangle.cpp
-        Triangle.h
-        Renderer.cpp
-        Renderer.h
-        Mesh.cpp
-        Mesh.h
-        Cube.cpp
-        Cube.h
+        Engine/Window.cpp
+        Engine/Window.h
+        Engine/Triangle.cpp
+        Engine/Triangle.h
+        Engine/Renderer.cpp
+        Engine/Renderer.h
+        Engine/Mesh.cpp
+        Engine/Mesh.h
+        Engine/Cube.cpp
+        Engine/Cube.h
+        Entities/Player.cpp
+        Entities/Player.h
+        Entities/Entity.cpp
+        Entities/Entity.h
+        Engine/Game.cpp
+        Engine/Game.h
 )
 
 target_link_libraries(${PROJECT_NAME}

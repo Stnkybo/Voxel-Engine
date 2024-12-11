@@ -4,6 +4,8 @@
 
 #ifndef RENDERER_H
 #define RENDERER_H
+#include <iostream>
+#include <ostream>
 #include <vector>
 
 #include "Mesh.h"
@@ -20,14 +22,19 @@ class Renderer {
 
         for (const Mesh& mesh : m_meshes) {
             for (Triangle t : mesh.m_triangles) {
-                SDL_RenderGeometry(renderer, NULL, t.vert, vertLen, NULL, 0);
+                SDL_RenderGeometry(renderer, nullptr, t.vert, vertLen, nullptr, 0);
             }
         }
     }
 
 public:
     explicit Renderer(SDL_Renderer *renderer) {
-        this->renderer = renderer;
+        if (renderer == nullptr) {
+            std::cout << "uh oh rendero!" << std::endl;
+        }
+        else {
+            this->renderer = renderer;
+        }
 }
     ~Renderer() {
         SDL_DestroyRenderer(renderer);
