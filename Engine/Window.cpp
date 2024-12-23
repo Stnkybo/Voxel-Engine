@@ -3,6 +3,9 @@
 //
 
 #include "Window.h"
+
+#include <iostream>
+
 #include "stdexcept"
 
 Window::Window(const std::string &title, int width, int height, SDL_WindowFlags flags)
@@ -10,6 +13,11 @@ Window::Window(const std::string &title, int width, int height, SDL_WindowFlags 
 
     if (!m_window)
         throw std::runtime_error(SDL_GetError());
+}
+
+Window::~Window() {
+    std::cout << " Window Destroyed" << std::endl;
+
 }
 
 std::expected<void, const char *> Window::init() {

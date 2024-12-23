@@ -17,6 +17,8 @@ class Window {
 public:
     explicit Window(const std::string & title, int width = 800, int height = 600, SDL_WindowFlags flags = (SDL_WindowFlags) 0);
 
+    ~Window();
+
     static std::expected<void, const char *> init();
     static void quit();
 

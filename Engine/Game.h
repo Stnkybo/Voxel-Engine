@@ -6,21 +6,30 @@
 #define GAME_H
 #include <SDL3/SDL.h>
 
-#include "Renderer.h"
+
+#include "Shader.h"
+#include "Camera/Camera.h"
+#include "Rendering/Cube.h"
 
 
 class Game {
     SDL_Window *m_window;
-    Renderer *m_renderer;
+    Camera *camera;
+    float deltaTime = 0.0f;
+    float lastFrame = 0.0f;
+    Shader *ourShader;
+    std::vector<Cube> m_cubes;
 
-    public:
-    bool isRunning;
+public:
+    bool isRunning = true;
 
     Game(const char *title, int width, int height);
 
     ~Game();
 
     void handleEvents();
+
+    void processMouseMotion(SDL_Event &event);
 
     void onStart();
 

@@ -1,3 +1,0 @@
-C:/Users/Lamad/CLionProjects/SDL3PRJ/cmake-build-debug/CMakeFiles/SDL3PRJ.dir
-C:/Users/Lamad/CLionProjects/SDL3PRJ/cmake-build-debug/CMakeFiles/edit_cache.dir
-C:/Users/Lamad/CLionProjects/SDL3PRJ/cmake-build-debug/CMakeFiles/rebuild_cache.dir
