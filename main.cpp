@@ -1,5 +1,4 @@
 #include <iostream>
-#include <SDL3/SDL.h>
 
 
 #include "Config.h"

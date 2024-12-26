@@ -18,11 +18,24 @@
 Game::Game(const char* title, int width, int height) {
     if (SDL_INIT_STATUS_INITIALIZED) {
         std::cout << "Initializing SDL - OK" << std::endl;
+
+
+        // Set OpenGL version (e.g., 3.3 Core)
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 6);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+
+        // Enable double buffering
+        SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+
+        // Set the depth buffer size (optional but recommended for 3D rendering)
+        SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+
+        bool fuck = false;
         m_window = SDL_CreateWindow(title, width, height, SDL_WINDOW_OPENGL);
         if (m_window == nullptr) {
             std::cerr << "Failed to create window: " << SDL_GetError() << std::endl;
-            SDL_Quit();
-            return;
+            fuck = true;
         }
 
         // Create OpenGL Context
@@ -30,8 +43,7 @@ Game::Game(const char* title, int width, int height) {
         if (!glContext) {
             std::cerr << "Failed to create OpenGL context: " << SDL_GetError() << std::endl;
             SDL_DestroyWindow(m_window);
-            SDL_Quit();
-            return;
+            fuck = true;
         }
 
         // Load OpenGL Functions using GLAD
@@ -39,8 +51,11 @@ Game::Game(const char* title, int width, int height) {
             std::cerr << "Failed to initialize GLAD" << std::endl;
             SDL_GL_DestroyContext(glContext);
             SDL_DestroyWindow(m_window);
-            SDL_Quit();
-            return;
+            fuck = true;
+        }
+
+        if (fuck) {
+            clean();
         }
 
         std::cout << "OpenGL Version: " << glGetString(GL_VERSION) << std::endl;
@@ -54,6 +69,8 @@ Game::Game(const char* title, int width, int height) {
 Game::~Game() {
     clean();
 }
+
+
 
 void Game::handleEvents() {
     cout << "Events" << endl;
@@ -69,6 +86,12 @@ void Game::handleEvents() {
                 if (keycode == SDLK_ESCAPE) {
                     isRunning = false;
                 }
+                if (keycode == SDLK_SPACE) {
+                    Shader *tempShader = ourShader;
+                    ourShader = otherShader;
+                    otherShader = tempShader;
+
+                }
             }
             break;
             default: ;
@@ -79,13 +102,13 @@ void Game::handleEvents() {
         const Uint8* keyState = reinterpret_cast<const Uint8 *>(SDL_GetKeyboardState(nullptr));
 
         if (keyState[SDL_SCANCODE_W])
-            camera->processKeyboard(CameraMovement::FORWARD, deltaTime);
+            camera->ProcessKeyboard(FORWARD, m_deltaTime);
         if (keyState[SDL_SCANCODE_S])
-            camera->processKeyboard(CameraMovement::BACKWARD, deltaTime);
+            camera->ProcessKeyboard(BACKWARD, m_deltaTime);
         if (keyState[SDL_SCANCODE_A])
-            camera->processKeyboard(CameraMovement::LEFT, deltaTime);
+            camera->ProcessKeyboard(LEFT, m_deltaTime);
         if (keyState[SDL_SCANCODE_D])
-            camera->processKeyboard(CameraMovement::RIGHT, deltaTime);
+            camera->ProcessKeyboard(RIGHT, m_deltaTime);
 
 
     }
@@ -97,7 +120,7 @@ void Game::processMouseMotion(SDL_Event& event) {
         float yOffset = event.motion.yrel; // Relative y motion
 
         // Process mouse movement in the camera
-        camera->processMouseMovement(xOffset, yOffset);
+        camera->ProcessMouseMovement(xOffset, yOffset);
     }
 }
 
@@ -108,7 +131,8 @@ void Game::onStart() {
     Cube cube;
     m_cubes.emplace_back(cube);
 
-    ourShader = new Shader("./Shaders/modelShader.vs", "./Shaders/modelShader.fs");
+    ourShader = new Shader("./Shaders/modelShader.vert", "./Shaders/modelShader.frag");
+    otherShader = new Shader("./Shaders/shader.vert", "./Shaders/shader.frag");
 
 
     camera = new Camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -117,11 +141,8 @@ void Game::onStart() {
 
 void Game::update() {
     cout << "Update" << endl;
-    float currentFrame = SDL_GetTicks() / 1000.0f;
-    deltaTime = currentFrame - lastFrame;
-    lastFrame = currentFrame;
-
-    printf("Camera Vec3: %f, %f, %f\n", camera->position.x, camera->position.y, camera->position.z);
+    m_deltaTime = (SDL_GetTicks() - m_lastTick) * (60.0f / 1000.0f);
+    m_lastTick = SDL_GetTicks();
 
 }
 
@@ -135,8 +156,8 @@ void Game::render() {
     cout << "Shader used" << endl;
 
     // Get camera matrices
-    glm::mat4 view = camera->getViewMatrix();
-    glm::mat4 projection = camera->getProjectionMatrix(static_cast<float>(WIDTH) / static_cast<float>(HEIGHT));
+    glm::mat4 view = camera->GetViewMatrix();
+    glm::mat4 projection = camera->GetProjectionMatrix(static_cast<float>(WIDTH) / static_cast<float>(HEIGHT));
     ourShader->setMat4("projection", projection);
     ourShader->setMat4("view", view);
 
@@ -156,10 +177,6 @@ void Game::render() {
         cout << "Cube Drawn" << endl;
     }
 
-    //ourModel->Draw(ourShader);
-
-    // Use view and projection matrices in your shader
-    // ...
 
     cout << "swap Windoww " << endl;
     if (!SDL_GL_SwapWindow(m_window)) {

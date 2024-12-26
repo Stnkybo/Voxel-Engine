@@ -15,9 +15,10 @@
 class Game {
     SDL_Window *m_window;
     Camera *camera;
-    float deltaTime = 0.0f;
-    float lastFrame = 0.0f;
+    float m_deltaTime = 0.0f;
+    float m_lastTick = 0.0f;
     Shader *ourShader;
+    Shader *otherShader;
     std::vector<Cube> m_cubes;
 
 public:
