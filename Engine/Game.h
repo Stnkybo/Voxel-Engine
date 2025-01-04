@@ -4,6 +4,7 @@
 
 #ifndef GAME_H
 #define GAME_H
+#include <imgui.h>
 #include <SDL3/SDL.h>
 
 
@@ -29,6 +30,7 @@ class Game {
     std::vector<Cube> m_cubes;
     bool show_another_window;
     SDL_GLContext m_glContext;
+    ImGuiIO* m_imguiIO;
 
 public:
     bool isRunning = true;

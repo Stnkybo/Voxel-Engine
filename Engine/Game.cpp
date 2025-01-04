@@ -18,8 +18,9 @@
 #include "Camera/Camera.h"
 #include "Rendering/Cube.h"
 
+void imguiUI(ImGuiIO& io);
 
-Game::Game(const char* title, int width, int height) {
+Game::Game(const char* title, int width, int height): m_imguiIO() {
     if (SDL_INIT_STATUS_INITIALIZED) {
         std::cout << "Initializing SDL - OK" << std::endl;
 
@@ -53,9 +54,12 @@ Game::Game(const char* title, int width, int height) {
         // Setup Dear ImGui context
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
-        ImGuiIO& io = ImGui::GetIO(); (void)io;
-        io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-        io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+        ImGuiIO &imguiIO = ImGui::GetIO();
+        (void) imguiIO;
+        imguiIO.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
+        imguiIO.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad; // Enable Gamepad Controls
+
+        m_imguiIO = &imguiIO;
 
         // Setup Dear ImGui style
         ImGui::StyleColorsDark();
@@ -68,7 +72,7 @@ Game::Game(const char* title, int width, int height) {
         ImGui_ImplOpenGL3_Init();
 
         // Load OpenGL Functions using GLAD
-        if (!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress)) {
+        if (!gladLoadGLLoader((GLADloadproc) SDL_GL_GetProcAddress)) {
             std::cerr << "Failed to initialize GLAD" << std::endl;
             SDL_GL_DestroyContext(m_glContext);
             SDL_DestroyWindow(m_window);
@@ -87,11 +91,7 @@ Game::Game(const char* title, int width, int height) {
         std::cout << "OpenGL Version: " << glGetString(GL_VERSION) << std::endl;
         glEnable(GL_BLEND);
         glEnable(GL_DEPTH_TEST);
-
-
-
-    }
-    else {
+    } else {
         isRunning = false;
     }
 }
@@ -105,6 +105,10 @@ Game::~Game() {
 void Game::handleEvents() {
     SDL_Event ev;
     while (SDL_PollEvent(&ev) != 0) {
+
+        // This Allows Imgui to handle events
+        ImGui_ImplSDL3_ProcessEvent(&ev);
+
         switch(ev.type) {
             case SDL_EVENT_QUIT:
                 isRunning = false;
@@ -125,6 +129,17 @@ void Game::handleEvents() {
 
                     // Toggle Mouse cursor
                     SDL_SetWindowRelativeMouseMode(m_window, !SDL_GetWindowRelativeMouseMode(m_window));
+
+                }
+                if (keycode == SDLK_1) {
+
+                    //Enable window
+                    show_another_window = true;
+
+                }if (keycode == SDLK_R) {
+
+                    //Test
+                    camera->Position = glm::vec3(0.0f, 0.0f, 3.0f);
 
                 }
             }
@@ -229,6 +244,7 @@ void Game::render() {
 
     if (show_another_window)
     {
+        imguiUI(*m_imguiIO);
         ImGui::Begin("Another Window", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
         ImGui::Text("FPS: %i | %f ms\n", frames, 1000.0 / static_cast<double>(frames));
         if (ImGui::Button("Close Me"))
@@ -257,4 +273,28 @@ void Game::clean() {
     SDL_DestroyWindow(m_window);
     SDL_Quit();
     std::cout << "Cleaning up..." << std::endl;
+}
+
+void imguiUI(ImGuiIO& io) {
+    {
+        ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+        static float f = 0.0f;
+        static int counter = 0;
+
+        ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
+
+        ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
+
+        ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+        ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+
+        if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
+            counter++;
+        ImGui::SameLine();
+        ImGui::Text("counter = %d", counter);
+
+        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+        ImGui::End();
+    }
+
 }
