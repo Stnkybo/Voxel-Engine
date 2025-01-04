@@ -9,7 +9,6 @@ int main() {
 
     game->onStart();
     while (game->isRunning) {
-        cout << "Is Running" << endl;
         game->handleEvents();
         game->update();
         game->render();

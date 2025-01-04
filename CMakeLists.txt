@@ -5,6 +5,7 @@ project(SDL3PRJ)
 find_package(fmt REQUIRED)
 find_package(glad CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
+find_package(imgui CONFIG REQUIRED)
 find_package(SDL3 CONFIG REQUIRED)
 
 set(CMAKE_CXX_STANDARD 23)
@@ -28,6 +29,7 @@ add_executable(${PROJECT_NAME} main.cpp
         Engine/Shader.h
         Engine/Rendering/Mesh.hpp
         Engine/Rendering/Model.hpp
+        Temp/imgui_impl_sdl3.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}
@@ -35,5 +37,6 @@ target_link_libraries(${PROJECT_NAME}
         fmt::fmt
         glad::glad
         glm::glm
+        imgui::imgui
         SDL3::SDL3
         )

@@ -5,6 +5,10 @@
 #include "Game.h"
 #include <SDL3/SDL.h>
 #include <glad/glad.h>
+#include <imgui.h>
+#include <imgui_impl_sdl3.h>
+#include <imgui_impl_opengl3.h>
+
 
 #include <iostream>
 #include <ostream>
@@ -33,24 +37,46 @@ Game::Game(const char* title, int width, int height) {
 
         bool fuck = false;
         m_window = SDL_CreateWindow(title, width, height, SDL_WINDOW_OPENGL);
+
         if (m_window == nullptr) {
             std::cerr << "Failed to create window: " << SDL_GetError() << std::endl;
             fuck = true;
         }
 
         // Create OpenGL Context
-        SDL_GLContext glContext = SDL_GL_CreateContext(m_window);
-        if (!glContext) {
+        m_glContext = SDL_GL_CreateContext(m_window);
+        if (!m_glContext) {
             std::cerr << "Failed to create OpenGL context: " << SDL_GetError() << std::endl;
             SDL_DestroyWindow(m_window);
             fuck = true;
         }
+        // Setup Dear ImGui context
+        IMGUI_CHECKVERSION();
+        ImGui::CreateContext();
+        ImGuiIO& io = ImGui::GetIO(); (void)io;
+        io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+        io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+
+        // Setup Dear ImGui style
+        ImGui::StyleColorsDark();
+        //ImGui::StyleColorsLight();
+
+        // Setup Platform/Renderer backends
+        ImGui_ImplSDL3_InitForOpenGL(m_window, m_glContext);
+
+        //Might cause errors
+        ImGui_ImplOpenGL3_Init();
 
         // Load OpenGL Functions using GLAD
         if (!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress)) {
             std::cerr << "Failed to initialize GLAD" << std::endl;
-            SDL_GL_DestroyContext(glContext);
+            SDL_GL_DestroyContext(m_glContext);
             SDL_DestroyWindow(m_window);
+            fuck = true;
+        }
+
+        if (!ImGui::CreateContext()) {
+            std::cerr << "Failed to create ImGui context" << std::endl;
             fuck = true;
         }
 
@@ -59,6 +85,10 @@ Game::Game(const char* title, int width, int height) {
         }
 
         std::cout << "OpenGL Version: " << glGetString(GL_VERSION) << std::endl;
+        glEnable(GL_BLEND);
+        glEnable(GL_DEPTH_TEST);
+
+
 
     }
     else {
@@ -73,7 +103,6 @@ Game::~Game() {
 
 
 void Game::handleEvents() {
-    cout << "Events" << endl;
     SDL_Event ev;
     while (SDL_PollEvent(&ev) != 0) {
         switch(ev.type) {
@@ -90,6 +119,12 @@ void Game::handleEvents() {
                     Shader *tempShader = ourShader;
                     ourShader = otherShader;
                     otherShader = tempShader;
+
+                }
+                if (keycode == SDLK_TAB) {
+
+                    // Toggle Mouse cursor
+                    SDL_SetWindowRelativeMouseMode(m_window, !SDL_GetWindowRelativeMouseMode(m_window));
 
                 }
             }
@@ -112,6 +147,8 @@ void Game::handleEvents() {
 
 
     }
+
+
 }
 void Game::processMouseMotion(SDL_Event& event) {
     // Mouse motion event
@@ -128,6 +165,8 @@ void Game::onStart() {
     cout << "onStart" << endl;
     SDL_SetWindowRelativeMouseMode(m_window, true);
 
+    show_another_window = true;
+
     Cube cube;
     m_cubes.emplace_back(cube);
 
@@ -140,20 +179,25 @@ void Game::onStart() {
 }
 
 void Game::update() {
-    cout << "Update" << endl;
-    m_deltaTime = (SDL_GetTicks() - m_lastTick) * (60.0f / 1000.0f);
+    m_deltaTime = (SDL_GetTicks() - m_lastTick);
     m_lastTick = SDL_GetTicks();
+    unprocessedTime += m_deltaTime;
+    frameCounter += m_deltaTime;
+
+    while (unprocessedTime > FRAME_TIME)
+    {
+        unprocessedTime -= FRAME_TIME;
+    }
+
 
 }
 
 void Game::render() {
-    cout << "Render" << endl;
     // Render
     glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     ourShader->use();
-    cout << "Shader used" << endl;
 
     // Get camera matrices
     glm::mat4 view = camera->GetViewMatrix();
@@ -174,19 +218,42 @@ void Game::render() {
         } else {
             cout << "cubeMesh is nullptr!" << endl;
         }
-        cout << "Cube Drawn" << endl;
     }
 
 
-    cout << "swap Windoww " << endl;
+    // Text
+    // Start the Dear ImGui frame
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplSDL3_NewFrame();
+    ImGui::NewFrame();
+
+    if (show_another_window)
+    {
+        ImGui::Begin("Another Window", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
+        ImGui::Text("FPS: %i | %f ms\n", frames, 1000.0 / static_cast<double>(frames));
+        if (ImGui::Button("Close Me"))
+            show_another_window = false;
+        ImGui::End();
+    }
+
+
+    SDL_RenderPresent(m_renderer);
+
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
     if (!SDL_GL_SwapWindow(m_window)) {
         cout << "SDL_GL_SwapWindow error: "<< SDL_GetError() << endl;
         isRunning = false;
     }
-    cout << "Windoww swapped" << endl;
 }
 
 void Game::clean() {
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplSDL3_Shutdown();
+    ImGui::DestroyContext();
+
+    SDL_GL_DestroyContext(m_glContext);
     SDL_DestroyWindow(m_window);
     SDL_Quit();
     std::cout << "Cleaning up..." << std::endl;
