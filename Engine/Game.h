@@ -16,8 +16,8 @@
 
 class Game {
     SDL_Window *m_window;
-    SDL_Renderer *m_renderer;
-    Camera *camera;
+    SDL_Renderer *m_renderer{};
+    Camera *camera{};
 
     const double FRAME_TIME = 1.0f / 60.0f;
     Uint64  m_lastTick = 0.0f;
@@ -25,10 +25,10 @@ class Game {
     double frameCounter = 0;
     int frames = 0;
 
-    Shader *ourShader;
-    Shader *otherShader;
+    Shader *ourShader{};
+    Shader *otherShader{};
     std::vector<Cube> m_cubes;
-    bool show_another_window;
+    bool show_another_window{};
     SDL_GLContext m_glContext;
     ImGuiIO* m_imguiIO;
 

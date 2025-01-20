@@ -20,8 +20,8 @@
 
 void imguiUI(ImGuiIO& io);
 
-Game::Game(const char* title, int width, int height): m_imguiIO() {
-    if (SDL_INIT_STATUS_INITIALIZED) {
+Game::Game(const char* title, const int width, const int height): m_imguiIO() {
+    if constexpr (SDL_INIT_STATUS_INITIALIZED) {
         std::cout << "Initializing SDL - OK" << std::endl;
 
 
@@ -72,7 +72,7 @@ Game::Game(const char* title, int width, int height): m_imguiIO() {
         ImGui_ImplOpenGL3_Init();
 
         // Load OpenGL Functions using GLAD
-        if (!gladLoadGLLoader((GLADloadproc) SDL_GL_GetProcAddress)) {
+        if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(SDL_GL_GetProcAddress))) {
             std::cerr << "Failed to initialize GLAD" << std::endl;
             SDL_GL_DestroyContext(m_glContext);
             SDL_DestroyWindow(m_window);
@@ -91,8 +91,6 @@ Game::Game(const char* title, int width, int height): m_imguiIO() {
         std::cout << "OpenGL Version: " << glGetString(GL_VERSION) << std::endl;
         glEnable(GL_BLEND);
         glEnable(GL_DEPTH_TEST);
-    } else {
-        isRunning = false;
     }
 }
 
@@ -221,8 +219,8 @@ void Game::update() {
     const Uint32 currentTick = SDL_GetTicks();
     m_deltaTime = currentTick - m_lastTick;;
     m_lastTick = currentTick;
-    unprocessedTime += m_deltaTime;
-    frameCounter += m_deltaTime;
+    //unprocessedTime += m_deltaTime;
+    //frameCounter += m_deltaTime;
 
 }
 
@@ -297,8 +295,8 @@ void Game::clean() const {
 void Game::imguiUI(const ImGuiIO& io) {
     {
         ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-        static float f = 0.0f;
-        static int counter = 0;
+
+        //static int counter = 0;
 
         ImGui::Begin("Debug Menu");                          // Create a window called "Hello, world!" and append into it.
 
@@ -306,7 +304,7 @@ void Game::imguiUI(const ImGuiIO& io) {
 
         ImGui::Text("Camera Pos %.3f, %.3f, %.3f ", camera->Position.x, camera->Position.y, camera->Position.z);               // Display some text (you can use a format strings too)
         ImGui::SliderFloat("Camera Speed", &camera->MovementSpeed, 1.0f, 25.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-        ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+        ImGui::ColorEdit3("clear color", reinterpret_cast<float *>(&clear_color)); // Edit 3 floats representing a color
 
         // if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
         //     counter++;
