@@ -145,6 +145,7 @@ void Game::handleEvents() {
 
                 }
             }
+
             break;
             default: ;
         }
@@ -153,6 +154,10 @@ void Game::handleEvents() {
         if (!eventStates["MenuMode"]) {
             processMouseMotion(ev);
         }
+
+
+
+    }
 
         const auto* keyState = reinterpret_cast<const Uint8 *>(SDL_GetKeyboardState(nullptr));
 
@@ -164,10 +169,6 @@ void Game::handleEvents() {
             camera->ProcessKeyboard(LEFT, m_deltaTime);
         if (keyState[SDL_SCANCODE_D])
             camera->ProcessKeyboard(RIGHT, m_deltaTime);
-
-
-    }
-
 
 }
 void Game::processMouseMotion(const SDL_Event& event) const {
