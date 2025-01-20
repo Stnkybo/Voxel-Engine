@@ -133,6 +133,7 @@ void Game::handleEvents() {
                     eventStates["MenuMode"] = !eventStates["MenuMode"];
 
                 }
+
                 if (keycode == SDLK_1) {
 
                     //Enable window
@@ -141,7 +142,7 @@ void Game::handleEvents() {
                 }if (keycode == SDLK_R) {
 
                     //Test
-                    camera->Position = glm::vec3(0.0f, 0.0f, 3.0f);
+                    camera->Position = glm::vec3(0.0f, 5.0f, 10.0f);
 
                 }
             }
@@ -169,6 +170,13 @@ void Game::handleEvents() {
             camera->ProcessKeyboard(LEFT, m_deltaTime);
         if (keyState[SDL_SCANCODE_D])
             camera->ProcessKeyboard(RIGHT, m_deltaTime);
+        if (keyState[SDL_SCANCODE_LSHIFT]) {
+
+            camera->MovementSpeed = 20.0f;
+        }
+        else {
+            camera->MovementSpeed = 5.0f;
+        }
 
 }
 void Game::processMouseMotion(const SDL_Event& event) const {
@@ -205,7 +213,7 @@ void Game::onStart() {
     otherShader = new Shader("./Shaders/shader.vert", "./Shaders/shader.frag");
 
 
-    camera = new Camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    camera = new Camera(glm::vec3(0.0f, 5.0f, 10.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
 }
 
@@ -292,8 +300,9 @@ void Game::imguiUI(const ImGuiIO& io) {
         static float f = 0.0f;
         static int counter = 0;
 
-        ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
+        ImGui::Begin("Debug Menu");                          // Create a window called "Hello, world!" and append into it.
 
+        ImGui::Text("Cube Count %d ", m_cubes.size());               // Display some text (you can use a format strings too)
 
         ImGui::Text("Camera Pos %.3f, %.3f, %.3f ", camera->Position.x, camera->Position.y, camera->Position.z);               // Display some text (you can use a format strings too)
         ImGui::SliderFloat("Camera Speed", &camera->MovementSpeed, 1.0f, 25.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
