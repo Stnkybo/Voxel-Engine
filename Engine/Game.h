@@ -5,6 +5,7 @@
 #ifndef GAME_H
 #define GAME_H
 #include <imgui.h>
+#include <unordered_map>
 #include <SDL3/SDL.h>
 
 
@@ -19,9 +20,8 @@ class Game {
     Camera *camera;
 
     const double FRAME_TIME = 1.0f / 60.0f;
-    double  m_deltaTime = 0.0f;
-    double  m_lastTick = 0.0f;
-    double unprocessedTime = 0;
+    Uint64  m_lastTick = 0.0f;
+    Uint64 unprocessedTime = 0;
     double frameCounter = 0;
     int frames = 0;
 
@@ -33,6 +33,9 @@ class Game {
     ImGuiIO* m_imguiIO;
 
 public:
+    unordered_map<std::string, bool> eventStates;
+
+    Uint64  m_deltaTime = 0;
     bool isRunning = true;
 
     Game(const char *title, int width, int height);
@@ -41,7 +44,7 @@ public:
 
     void handleEvents();
 
-    void processMouseMotion(SDL_Event &event);
+    void processMouseMotion(const SDL_Event &event) const;
 
     void onStart();
 
@@ -49,7 +52,9 @@ public:
 
     void render();
 
-    void clean();
+    void clean() const;
+
+    void imguiUI(const ImGuiIO& io);
 };
 
 

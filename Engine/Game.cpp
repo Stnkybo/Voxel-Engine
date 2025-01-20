@@ -130,11 +130,13 @@ void Game::handleEvents() {
                     // Toggle Mouse cursor
                     SDL_SetWindowRelativeMouseMode(m_window, !SDL_GetWindowRelativeMouseMode(m_window));
 
+                    eventStates["MenuMode"] = !eventStates["MenuMode"];
+
                 }
                 if (keycode == SDLK_1) {
 
                     //Enable window
-                    show_another_window = true;
+                    show_another_window = !show_another_window;
 
                 }if (keycode == SDLK_R) {
 
@@ -147,9 +149,12 @@ void Game::handleEvents() {
             default: ;
         }
 
-        processMouseMotion(ev);
 
-        const Uint8* keyState = reinterpret_cast<const Uint8 *>(SDL_GetKeyboardState(nullptr));
+        if (!eventStates["MenuMode"]) {
+            processMouseMotion(ev);
+        }
+
+        const auto* keyState = reinterpret_cast<const Uint8 *>(SDL_GetKeyboardState(nullptr));
 
         if (keyState[SDL_SCANCODE_W])
             camera->ProcessKeyboard(FORWARD, m_deltaTime);
@@ -165,11 +170,11 @@ void Game::handleEvents() {
 
 
 }
-void Game::processMouseMotion(SDL_Event& event) {
+void Game::processMouseMotion(const SDL_Event& event) const {
     // Mouse motion event
     if (event.type == SDL_EVENT_MOUSE_MOTION) {
-        float xOffset = event.motion.xrel; // Relative x motion
-        float yOffset = event.motion.yrel; // Relative y motion
+        const float xOffset = event.motion.xrel; // Relative x motion
+        const float yOffset = event.motion.yrel; // Relative y motion
 
         // Process mouse movement in the camera
         camera->ProcessMouseMovement(xOffset, yOffset);
@@ -182,8 +187,18 @@ void Game::onStart() {
 
     show_another_window = true;
 
-    Cube cube;
-    m_cubes.emplace_back(cube);
+    for (int i = 0; i < 10; i++) {
+        for (int j = 0; j < 10; j++) {
+            const auto newCube = new Cube(i-5,0,j-5);
+            m_cubes.emplace_back(*newCube);
+        }
+    }
+
+    for (int i = 0; i < 10; i++) {
+        const auto newCube = new Cube(0,i+1,0);
+        m_cubes.emplace_back(*newCube);
+    }
+
 
     ourShader = new Shader("./Shaders/modelShader.vert", "./Shaders/modelShader.frag");
     otherShader = new Shader("./Shaders/shader.vert", "./Shaders/shader.frag");
@@ -194,16 +209,11 @@ void Game::onStart() {
 }
 
 void Game::update() {
-    m_deltaTime = (SDL_GetTicks() - m_lastTick);
-    m_lastTick = SDL_GetTicks();
+    const Uint32 currentTick = SDL_GetTicks();
+    m_deltaTime = currentTick - m_lastTick;;
+    m_lastTick = currentTick;
     unprocessedTime += m_deltaTime;
     frameCounter += m_deltaTime;
-
-    while (unprocessedTime > FRAME_TIME)
-    {
-        unprocessedTime -= FRAME_TIME;
-    }
-
 
 }
 
@@ -222,7 +232,7 @@ void Game::render() {
 
     // Draw cubes
     // render the loaded model
-    glm::mat4 model = glm::mat4(1.0f);
+    auto model = glm::mat4(1.0f);
     model = translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
     model = scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
     ourShader->setMat4("model", model);
@@ -245,11 +255,11 @@ void Game::render() {
     if (show_another_window)
     {
         imguiUI(*m_imguiIO);
-        ImGui::Begin("Another Window", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
-        ImGui::Text("FPS: %i | %f ms\n", frames, 1000.0 / static_cast<double>(frames));
-        if (ImGui::Button("Close Me"))
-            show_another_window = false;
-        ImGui::End();
+        // ImGui::Begin("Another Window", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
+        // ImGui::Text("FPS: %i | %f ms\n", frames, 1000.0 / static_cast<double>(frames));
+        // if (ImGui::Button("Close Me"))
+        //     show_another_window = false;
+        // ImGui::End();
     }
 
 
@@ -264,7 +274,7 @@ void Game::render() {
     }
 }
 
-void Game::clean() {
+void Game::clean() const {
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplSDL3_Shutdown();
     ImGui::DestroyContext();
@@ -275,7 +285,7 @@ void Game::clean() {
     std::cout << "Cleaning up..." << std::endl;
 }
 
-void imguiUI(ImGuiIO& io) {
+void Game::imguiUI(const ImGuiIO& io) {
     {
         ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
         static float f = 0.0f;
@@ -283,17 +293,20 @@ void imguiUI(ImGuiIO& io) {
 
         ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
 
-        ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
 
-        ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+        ImGui::Text("Camera Pos %.3f, %.3f, %.3f ", camera->Position.x, camera->Position.y, camera->Position.z);               // Display some text (you can use a format strings too)
+        ImGui::SliderFloat("Camera Speed", &camera->MovementSpeed, 1.0f, 25.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
         ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
 
-        if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-            counter++;
-        ImGui::SameLine();
-        ImGui::Text("counter = %d", counter);
+        // if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
+        //     counter++;
+        // ImGui::SameLine();
+        // ImGui::Text("counter = %d", counter);
 
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+        ImGui::Text("Application TIME  (%d ms), Delta: (%d ms)", SDL_GetTicks(), m_deltaTime);
+        if (ImGui::Button("Close Me"))
+            show_another_window = false;
         ImGui::End();
     }
 

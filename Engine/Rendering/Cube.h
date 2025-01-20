@@ -11,7 +11,7 @@ class Cube {
 public:
     Mesh* cubeMesh;
 
-    Cube() {
+    Cube(int x, int y, int z) {
         // Declare a vector for vertices
         std::vector<Vertex> vertices;
 
@@ -22,7 +22,7 @@ public:
                 for (int k = 0; k < 2; k++) {
                     counter++;
                     Vertex vertex{};
-                    vertex.Position = glm::vec3(i, j, k);
+                    vertex.Position = glm::vec3(i + x, j + y, k + z);
                     vertex.Normal = glm::vec3(0.0f, 0.0f, 0.0f);
                     vertex.TexCoords = glm::vec2(0.0f, 0.0f);
                     vertex.Tangent = glm::vec3(0.0f, 0.0f, 0.0f);
