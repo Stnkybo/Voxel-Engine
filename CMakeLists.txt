@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.30)
 
 project(SDL3PRJ)
 
+find_package(assimp CONFIG REQUIRED)
 find_package(fmt REQUIRED)
 find_package(glad CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
@@ -34,6 +35,7 @@ add_executable(${PROJECT_NAME} main.cpp
 
 target_link_libraries(${PROJECT_NAME}
         PUBLIC
+        assimp::assimp
         fmt::fmt
         glad::glad
         glm::glm

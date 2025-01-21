@@ -9,15 +9,17 @@
 
 class Entity {
 public:
-    Entity(double position_x, double position_y)
+    Entity(float position_x, float position_y, float position_z)
         : positionX(position_x),
-          positionY(position_y) {
+          positionY(position_y),
+          positionZ(position_z) {
     }
     ~Entity() {}
 
 private:
-    double positionX;
-    double positionY;
+    float positionX;
+    float positionY;
+    float positionZ;
     //Collider m_collider;
 
 };

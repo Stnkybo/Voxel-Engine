@@ -135,7 +135,7 @@ void Game::handleEvents() {
                 if (keycode == SDLK_1) {
 
                     //Enable window
-                    show_another_window = !show_another_window;
+                    m_boolDebugMenu = !m_boolDebugMenu;
 
                 }if (keycode == SDLK_R) {
 
@@ -192,10 +192,10 @@ void Game::onStart() {
     cout << "onStart" << endl;
     SDL_SetWindowRelativeMouseMode(m_window, true);
 
-    show_another_window = true;
+    m_boolDebugMenu = true;
 
-    for (int i = 0; i < 10; i++) {
-        for (int j = 0; j < 10; j++) {
+    for (int i = 0; i < 11; i++) {
+        for (int j = 0; j < 11; j++) {
             const auto newCube = new Cube(i-5,0,j-5);
             m_cubes.emplace_back(newCube);
         }
@@ -206,6 +206,9 @@ void Game::onStart() {
         m_cubes.emplace_back(newCube);
         penith.emplace_back(newCube);
     }
+
+    const auto newCube = new Cube(0,13,0);
+    m_cubes.emplace_back(newCube);
 
 
     ourShader = new Shader("./Shaders/modelShader.vert", "./Shaders/modelShader.frag");
@@ -224,7 +227,7 @@ void Game::update() {
     //frameCounter += m_deltaTime;
 
     for (int i = 0 ; i < penith.size(); i++) {
-            penith[i]->setPositionY(i+penith_offset);
+            penith[i]->setPosition(penith_offset[0], 1 + i + penith_offset[1], penith_offset[2]);
     }
 
 }
@@ -265,7 +268,7 @@ void Game::render() {
     ImGui_ImplSDL3_NewFrame();
     ImGui::NewFrame();
 
-    if (show_another_window)
+    if (m_boolDebugMenu)
     {
         imguiUI(*m_imguiIO);
     }
@@ -302,7 +305,7 @@ void Game::imguiUI(const ImGuiIO& io) {
         ImGui::Begin("Debug Menu");                          // Create a window called "Hello, world!" and append into it.
 
         ImGui::Text("Cube Count %d ", m_cubes.size());               // Display some text (you can use a format strings too)
-        ImGui::SliderInt("penith", &penith_offset, -25.0f, 25.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+        ImGui::SliderInt3("penith", penith_offset, -25.0f, 25.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
 
         ImGui::Text("Camera Pos %.3f, %.3f, %.3f ", camera->Position.x, camera->Position.y, camera->Position.z);               // Display some text (you can use a format strings too)
         ImGui::SliderFloat("Camera Speed", &camera->MovementSpeed, 1.0f, 25.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
@@ -316,7 +319,7 @@ void Game::imguiUI(const ImGuiIO& io) {
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
         ImGui::Text("Application TIME  (%d ms), Delta: (%d ms)", SDL_GetTicks(), m_deltaTime);
         if (ImGui::Button("Close Me"))
-            show_another_window = false;
+            m_boolDebugMenu = false;
         ImGui::End();
     }
 

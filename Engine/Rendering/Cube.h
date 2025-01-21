@@ -9,6 +9,7 @@
 
 class Cube {
     int posX, posY, posZ;
+
     // Declare a vector for vertices
     std::vector<Vertex> m_vertices;
     vector<unsigned> m_indices;
@@ -71,14 +72,26 @@ public:
 
     ~Cube() = default; // Smart pointer handles cleanup
 
-    void setPosition(int x, int y, int z) {
+    void setPosition(const int x, const int y, const int z) {
         this->posX = x;
         this->posY = y;
         this->posZ = z;
 
-        for (Vertex vertex: m_vertices) {
-            vertex.Position = glm::vec3(x, y, z);
+        //Update mesh code
+        int counter = 0;
+        for (int i = 0; i < 2; i++) {
+            for (int j = 0; j < 2; j++) {
+                for (int k = 0; k < 2; k++) {
+                    m_vertices[counter].Position = glm::vec3( static_cast<float>(posX + i),static_cast<float>(posY + j), static_cast<float>(posZ + k));
+
+                    counter++;
+                }
+            }
         }
+
+        // Create a new mesh (ensure Mesh has a matching constructor)
+        delete this->cubeMesh;
+        this->cubeMesh = new Mesh(m_vertices, m_indices, m_textures);
     }
 
     void setPositionY(int y) {
