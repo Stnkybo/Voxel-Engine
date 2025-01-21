@@ -27,10 +27,13 @@ class Game {
 
     Shader *ourShader{};
     Shader *otherShader{};
-    std::vector<Cube> m_cubes;
+    std::vector<Cube *> m_cubes;
     bool show_another_window{};
     SDL_GLContext m_glContext;
     ImGuiIO* m_imguiIO;
+
+    vector<Cube *> penith;
+    int penith_offset = 0;
 
 public:
     unordered_map<std::string, bool> eventStates;

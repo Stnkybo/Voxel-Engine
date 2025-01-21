@@ -8,12 +8,20 @@
 
 
 class Cube {
+    int posX, posY, posZ;
+    // Declare a vector for vertices
+    std::vector<Vertex> m_vertices;
+    vector<unsigned> m_indices;
+    std::vector<Texture> m_textures;
+
 public:
     Mesh* cubeMesh;
 
     Cube(int x, int y, int z) {
-        // Declare a vector for vertices
-        std::vector<Vertex> vertices;
+        posX = x;
+        posY = y;
+        posZ = z;
+
 
         // Generate vertices for the cube
         int counter = 0;
@@ -28,14 +36,12 @@ public:
                     vertex.Tangent = glm::vec3(0.0f, 0.0f, 0.0f);
                     vertex.Bitangent = glm::vec3(0.0f, 0.0f, 0.0f);
 
-                    vertices.push_back(vertex);
+                    m_vertices.push_back(vertex);
                 }
             }
         }
-                    //cout << "Counter: " << counter << endl;
 
-        // Declare a vector for indices (fix with proper cube indices)
-        std::vector<unsigned int> indices = {
+        m_indices = {
             // front
             0, 1, 2,
             2, 3, 0,
@@ -58,14 +64,53 @@ public:
 
 
 
-        // Declare a vector for textures
-        std::vector<Texture> textures;
-
         // Create a new mesh (ensure Mesh has a matching constructor)
-        this->cubeMesh = new Mesh(vertices, indices, textures);
+        this->cubeMesh = new Mesh(m_vertices, m_indices, m_textures);
     }
 
     ~Cube() = default; // Smart pointer handles cleanup
+
+    void setPosition(int x, int y, int z) {
+        this->posX = x;
+        this->posY = y;
+        this->posZ = z;
+
+        for (Vertex vertex: m_vertices) {
+            vertex.Position = glm::vec3(x, y, z);
+        }
+    }
+
+    void setPositionY(int y) {
+
+
+        this->posY = y;
+
+        //Update mesh code
+        int counter = 0;
+        for (int i = 0; i < 2; i++) {
+            for (int j = 0; j < 2; j++) {
+                for (int k = 0; k < 2; k++) {
+                    m_vertices[counter].Position.y = static_cast<float>(posY + j);
+                    counter++;
+                }
+            }
+        }
+
+        // Create a new mesh (ensure Mesh has a matching constructor)
+        delete this->cubeMesh;
+        this->cubeMesh = new Mesh(m_vertices, m_indices, m_textures);
+    }
+
+    void moveCube(int x, int y, int z) {
+        this->posX += x;
+        this->posY += y;
+        this->posZ += z;
+
+        for (Vertex vertex: m_vertices) {
+            vertex.Position += glm::vec3(x, y, z);
+        }
+
+    }
 };
 
 

@@ -197,13 +197,14 @@ void Game::onStart() {
     for (int i = 0; i < 10; i++) {
         for (int j = 0; j < 10; j++) {
             const auto newCube = new Cube(i-5,0,j-5);
-            m_cubes.emplace_back(*newCube);
+            m_cubes.emplace_back(newCube);
         }
     }
 
     for (int i = 0; i < 10; i++) {
         const auto newCube = new Cube(0,i+1,0);
-        m_cubes.emplace_back(*newCube);
+        m_cubes.emplace_back(newCube);
+        penith.emplace_back(newCube);
     }
 
 
@@ -221,6 +222,10 @@ void Game::update() {
     m_lastTick = currentTick;
     //unprocessedTime += m_deltaTime;
     //frameCounter += m_deltaTime;
+
+    for (int i = 0 ; i < penith.size(); i++) {
+            penith[i]->setPositionY(i+penith_offset);
+    }
 
 }
 
@@ -244,9 +249,10 @@ void Game::render() {
     model = scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
     ourShader->setMat4("model", model);
 
-    for (const Cube& cube : m_cubes) {
-        if (cube.cubeMesh != nullptr) {
-            cube.cubeMesh->Draw(*ourShader);
+    for (const Cube* cube : m_cubes) {
+        if (cube->cubeMesh != nullptr) {
+            // cout << cube->cubeMesh->vertices[0].Position.y << endl;
+            cube->cubeMesh->Draw(*ourShader);
         } else {
             cout << "cubeMesh is nullptr!" << endl;
         }
@@ -262,11 +268,6 @@ void Game::render() {
     if (show_another_window)
     {
         imguiUI(*m_imguiIO);
-        // ImGui::Begin("Another Window", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
-        // ImGui::Text("FPS: %i | %f ms\n", frames, 1000.0 / static_cast<double>(frames));
-        // if (ImGui::Button("Close Me"))
-        //     show_another_window = false;
-        // ImGui::End();
     }
 
 
@@ -301,6 +302,7 @@ void Game::imguiUI(const ImGuiIO& io) {
         ImGui::Begin("Debug Menu");                          // Create a window called "Hello, world!" and append into it.
 
         ImGui::Text("Cube Count %d ", m_cubes.size());               // Display some text (you can use a format strings too)
+        ImGui::SliderInt("penith", &penith_offset, -25.0f, 25.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
 
         ImGui::Text("Camera Pos %.3f, %.3f, %.3f ", camera->Position.x, camera->Position.y, camera->Position.z);               // Display some text (you can use a format strings too)
         ImGui::SliderFloat("Camera Speed", &camera->MovementSpeed, 1.0f, 25.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
