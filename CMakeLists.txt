@@ -1,18 +1,64 @@
 cmake_minimum_required(VERSION 3.30)
-
 project(SDL3PRJ)
 
-find_package(assimp CONFIG REQUIRED)
-find_package(fmt REQUIRED)
-find_package(glad CONFIG REQUIRED)
-find_package(glm CONFIG REQUIRED)
-find_package(imgui CONFIG REQUIRED)
-find_package(SDL3 CONFIG REQUIRED)
+include(FetchContent)
+
+# Assimp
+FetchContent_Declare(
+        assimp
+        GIT_REPOSITORY https://github.com/assimp/assimp.git
+        GIT_TAG v5.4.3
+)
+FetchContent_GetProperties(assimp)
+if(NOT assimp_POPULATED)
+        FetchContent_Populate(assimp)
+        add_subdirectory(${assimp_SOURCE_DIR} ${assimp_BINARY_DIR})
+endif()
+
+# fmt
+FetchContent_Declare(
+        fmt
+        GIT_REPOSITORY https://github.com/fmtlib/fmt.git
+        GIT_TAG 11.0.2
+)
+FetchContent_MakeAvailable(fmt)
+
+# glad
+FetchContent_Declare(
+        glad
+        GIT_REPOSITORY https://github.com/Dav1dde/glad.git
+        GIT_TAG v0.1.36
+)
+FetchContent_MakeAvailable(glad)
+
+# glm
+FetchContent_Declare(
+        glm
+        GIT_REPOSITORY https://github.com/g-truc/glm.git
+        GIT_TAG 1.0.1
+)
+FetchContent_MakeAvailable(glm)
+
+# imgui
+FetchContent_Declare(
+        imgui
+        GIT_REPOSITORY https://github.com/ocornut/imgui.git
+        GIT_TAG v1.91.6
+)
+FetchContent_MakeAvailable(imgui)
+
+# SDL3 (Replaced ExternalProject_Add with FetchContent)
+FetchContent_Declare(
+        SDL3
+        GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
+        GIT_TAG release-3.1.6
+)
+FetchContent_MakeAvailable(SDL3)
 
 set(CMAKE_CXX_STANDARD 23)
 
-
-add_executable(${PROJECT_NAME} main.cpp
+add_executable(${PROJECT_NAME}
+        main.cpp
         Engine/Window.cpp
         Engine/Window.h
         Engine/Triangle.cpp
@@ -31,14 +77,16 @@ add_executable(${PROJECT_NAME} main.cpp
         Engine/Rendering/Mesh.hpp
         Engine/Rendering/Model.hpp
         Temp/imgui_impl_sdl3.cpp
+        Temp/stb_image.h
+        Engine/Rendering/Cube.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}
         PUBLIC
-        assimp::assimp
+        assimp
         fmt::fmt
-        glad::glad
-        glm::glm
-        imgui::imgui
-        SDL3::SDL3
-        )
+        glad
+        glm
+        imgui
+        SDL3
+)

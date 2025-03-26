@@ -14,6 +14,7 @@ class Cube {
     std::vector<Vertex> m_vertices;
     vector<unsigned> m_indices;
     std::vector<Texture> m_textures;
+    static Texture m_texture;
 
 public:
     Mesh* cubeMesh;
@@ -64,6 +65,8 @@ public:
         };
 
 
+        m_textures.emplace_back(m_texture);
+        //cout << m_textures.size()<< " " << m_textures[0].path<< endl;
 
 
         // Create a new mesh (ensure Mesh has a matching constructor)
@@ -125,6 +128,10 @@ public:
         }
 
     }
+    static void setTexture(const Texture &texture) {
+        m_texture = texture;
+    }
+
 };
 
 

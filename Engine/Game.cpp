@@ -17,6 +17,7 @@
 #include "../Config.h"
 #include "Camera/Camera.h"
 #include "Rendering/Cube.h"
+#include "Rendering/Model.hpp"
 
 void imguiUI(ImGuiIO& io);
 
@@ -194,6 +195,13 @@ void Game::onStart() {
 
     m_boolDebugMenu = true;
 
+    // Cheeky duplicate bad mem
+    terrainTexture = new Texture;
+    terrainTexture->id =  TextureFromFile("wall.png", "../Textures");
+    terrainTexture->path = "wall.png";
+    terrainTexture->type = "texture_diffuse";
+    Cube::setTexture(*terrainTexture);
+
     for (int i = 0; i < 11; i++) {
         for (int j = 0; j < 11; j++) {
             const auto newCube = new Cube(i-5,0,j-5);
@@ -216,6 +224,7 @@ void Game::onStart() {
 
 
     camera = new Camera(glm::vec3(0.0f, 5.0f, 10.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+
 
 }
 
