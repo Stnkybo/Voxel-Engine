@@ -27,12 +27,17 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(fmt)
 
 # glad
+set(GLAD_GLAPI_EXPORT OFF CACHE BOOL "" FORCE)
 FetchContent_Declare(
         glad
         GIT_REPOSITORY https://github.com/Dav1dde/glad.git
         GIT_TAG v0.1.36
 )
-FetchContent_MakeAvailable(glad)
+FetchContent_GetProperties(glad)
+if(NOT glad_POPULATED)
+        FetchContent_Populate(glad)
+        add_subdirectory(${glad_SOURCE_DIR} ${glad_BINARY_DIR})
+endif()
 
 # glm
 FetchContent_Declare(
@@ -69,33 +74,34 @@ if(NOT imgui_POPULATED)
         )
 endif()
 
-
 # Set Release build for SDL3 (even if main project is Debug)
-set(SDL3_BUILD_TYPE "Release")  # Force SDL3 to build in Release mode
+# set(SDL3_BUILD_TYPE "Release")  # Force SDL3 to build in Release mode
 # SDL3 (Replaced ExternalProject_Add with FetchContent)
 FetchContent_Declare(
         SDL3
         GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
         GIT_TAG release-3.2.8
 )
-FetchContent_GetProperties(SDL3)
-if(NOT SDL3_POPULATED)
-        FetchContent_Populate(SDL3)
-
-        # Optionally force static build if you prefer
-        # set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
-
-        add_subdirectory(${SDL3_SOURCE_DIR} ${SDL3_BINARY_DIR})
-
-        # Handle different SDL3 target names
-        if(TARGET SDL3::SDL3)
-                # Modern target exists
-        elseif(TARGET SDL3-shared)
-                add_library(SDL3::SDL3 ALIAS SDL3-shared)
-        elseif(TARGET SDL3-static)
-                add_library(SDL3::SDL3 ALIAS SDL3-static)
-        endif()
-endif()
+FetchContent_MakeAvailable(SDL3)
+#
+#if(NOT SDL3_POPULATED)
+#        FetchContent_Populate(SDL3)
+#        # Optionally force static build if you prefer
+#        # set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+#        message(STATUS "SDL3_SOURCE_DIR: ${SDL3_SOURCE_DIR}")
+#        message(STATUS "SDL3_BINARY_DIR: ${SDL3_BINARY_DIR}")
+#        add_subdirectory(${SDL3_SOURCE_DIR} ${SDL3_BINARY_DIR})
+#
+#
+##        # Handle different SDL3 target names
+##        if(TARGET SDL3::SDL3)
+##                # Modern target exists
+##        elseif(TARGET SDL3-shared)
+##                add_library(SDL3::SDL3 ALIAS SDL3-shared)
+##        elseif(TARGET SDL3-static)
+##                add_library(SDL3::SDL3 ALIAS SDL3-static)
+##        endif()
+#endif()
 
 # stb_image
 FetchContent_Declare(
@@ -139,8 +145,10 @@ if(WIN32)
         # get the right .dll and put next to .exe
         if(CMAKE_BUILD_TYPE STREQUAL "Debug")
                 set(SDL3_DLL_NAME "SDL3d.dll")
+                set(GLAD_DLL_NAME "libgladd.dll")  # Debug version
         else()
                 set(SDL3_DLL_NAME "SDL3.dll")
+                set(GLAD_DLL_NAME "libglad.dll")   # Release version
         endif()
 
         add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
@@ -148,6 +156,14 @@ if(WIN32)
                 "${SDL3_BINARY_DIR}/${SDL3_DLL_NAME}"
                 $<TARGET_FILE_DIR:${PROJECT_NAME}>
                 COMMENT "Copying ${SDL3_DLL_NAME} to output directory"
+        )
+
+        # Copy glad DLL
+        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy
+                "${glad_BINARY_DIR}/${GLAD_DLL_NAME}"
+                $<TARGET_FILE_DIR:${PROJECT_NAME}>
+                COMMENT "Copying ${GLAD_DLL_NAME} to output directory"
         )
 endif()
 
