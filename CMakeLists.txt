@@ -141,6 +141,24 @@ add_executable(${PROJECT_NAME}
         Engine/Rendering/Cube.cpp
 )
 
+# Copy Shaders
+add_custom_command(
+        TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_SOURCE_DIR}/Shaders
+        $<TARGET_FILE_DIR:${PROJECT_NAME}>/Shaders
+        COMMENT "Copying Shaders to output directory"
+)
+
+# Copy Textures
+add_custom_command(
+        TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_SOURCE_DIR}/Textures
+        $<TARGET_FILE_DIR:${PROJECT_NAME}>/Textures
+        COMMENT "Copying Textures to output directory"
+)
+
 if(WIN32)
         # get the right .dll and put next to .exe
         if(CMAKE_BUILD_TYPE STREQUAL "Debug")
