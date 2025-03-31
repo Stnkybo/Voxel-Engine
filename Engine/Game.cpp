@@ -197,9 +197,9 @@ void Game::onStart() {
 
     // Cheeky duplicate bad mem
     terrainTexture = new Texture;
-    terrainTexture->id =  TextureFromFile("wall.png", "../Textures");
-    terrainTexture->path = "wall.png";
+    terrainTexture->path = "wall.jpg";
     terrainTexture->type = "texture_diffuse";
+    terrainTexture->id =  TextureFromFile(terrainTexture->path.c_str(), "Textures");
     Cube::setTexture(*terrainTexture);
 
     for (int i = 0; i < 11; i++) {
@@ -327,6 +327,7 @@ void Game::imguiUI(const ImGuiIO& io) {
 
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
         ImGui::Text("Application TIME  (%d ms), Delta: (%d ms)", SDL_GetTicks(), m_deltaTime);
+        ImGui::Text("Terrain Texture:  (%d, %s)", terrainTexture->id, terrainTexture->path.c_str());
         if (ImGui::Button("Close Me"))
             m_boolDebugMenu = false;
         ImGui::End();
