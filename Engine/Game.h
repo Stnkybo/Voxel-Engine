@@ -41,6 +41,9 @@ public:
 
     Uint64  m_deltaTime = 0;
     bool isRunning = true;
+    int m_width;
+    int m_height;
+
 
     Game(const char *title, int width, int height);
 

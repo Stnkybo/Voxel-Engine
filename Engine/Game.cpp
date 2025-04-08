@@ -38,7 +38,9 @@ Game::Game(const char* title, const int width, const int height): m_imguiIO() {
         SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
         bool fuck = false;
-        m_window = SDL_CreateWindow(title, width, height, SDL_WINDOW_OPENGL);
+        m_height = height;
+        m_width = width;
+        m_window = SDL_CreateWindow(title, m_width, m_height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 
         if (m_window == nullptr) {
             std::cerr << "Failed to create window: " << SDL_GetError() << std::endl;
@@ -109,6 +111,13 @@ void Game::handleEvents() {
         ImGui_ImplSDL3_ProcessEvent(&ev);
 
         switch(ev.type) {
+            case SDL_EVENT_WINDOW_RESIZED:
+                m_width = ev.window.data1;
+                m_height = ev.window.data2;
+                glViewport(0, 0, m_width, m_height);  // Update the OpenGL viewport
+                break;
+
+
             case SDL_EVENT_QUIT:
                 isRunning = false;
             break;
@@ -253,7 +262,7 @@ void Game::render() {
 
     // Get camera matrices
     glm::mat4 view = camera->GetViewMatrix();
-    glm::mat4 projection = camera->GetProjectionMatrix(static_cast<float>(WIDTH) / static_cast<float>(HEIGHT));
+    glm::mat4 projection = camera->GetProjectionMatrix(static_cast<float>(m_width) / static_cast<float>(m_height));
     ourShader->setMat4("projection", projection);
     ourShader->setMat4("view", view);
 
