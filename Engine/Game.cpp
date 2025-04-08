@@ -202,10 +202,13 @@ void Game::onStart() {
     terrainTexture->id =  TextureFromFile(terrainTexture->path.c_str(), "Textures");
     Cube::setTexture(*terrainTexture);
 
-    for (int i = 0; i < 11; i++) {
+    for (int i = 0; i < 11; i++) { //Make bajuhjuh
         for (int j = 0; j < 11; j++) {
-            const auto newCube = new Cube(i-5,0,j-5);
-            m_cubes.emplace_back(newCube);
+            if ((i != (11-1)/2) || (j != (11-1)/2)) {
+                const auto newCube = new Cube(i-5,0,j-5);
+                m_cubes.emplace_back(newCube);
+
+            }
         }
     }
 
