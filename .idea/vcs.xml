@@ -2,6 +2,20 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/build/_deps/assimp-src" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/build/_deps/fmt-src" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/build/_deps/glad-src" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/build/_deps/glm-src" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/build/_deps/imgui-src" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/build/_deps/sdl3-src" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/build/_deps/stb-src" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/cmake-build-debug-wsl/_deps/assimp-src" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/cmake-build-debug-wsl/_deps/fmt-src" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/cmake-build-debug-wsl/_deps/glad-src" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/cmake-build-debug-wsl/_deps/glm-src" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/cmake-build-debug-wsl/_deps/imgui-src" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/cmake-build-debug-wsl/_deps/sdl3-src" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/cmake-build-debug-wsl/_deps/stb-src" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/cmake-build-debug/_deps/assimp-src" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/cmake-build-debug/_deps/fmt-src" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/cmake-build-debug/_deps/glad-src" vcs="Git" />

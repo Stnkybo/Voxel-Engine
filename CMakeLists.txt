@@ -196,3 +196,8 @@ target_link_libraries(${PROJECT_NAME}
         stb_image
         OpenGL::GL
 )
+
+# Link dl only on UNIX platforms (Linux, BSD, etc.)
+if(UNIX AND NOT APPLE)
+        target_link_libraries(${PROJECT_NAME} PUBLIC dl)
+endif()
