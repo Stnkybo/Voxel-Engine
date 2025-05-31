@@ -6,7 +6,8 @@ A Simple 3D Application Using SDL3 and OpenGL to Draw voxels to the screen
 ![img_3.png](readmeImages/img_3.png)
 
 
-
-Ensure Python is installed and added to PATH to compile some dependencies
+## Dependencies
+* Ensure Python is installed and added to PATH to compile some dependencies
+* Ensure you have CMake min version 3.22
 
 Other than that, it should install and download all other dependencies when cmake is run
