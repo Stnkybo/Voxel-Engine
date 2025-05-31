@@ -1,12 +1,29 @@
-cmake_minimum_required(VERSION 3.28.6)
+cmake_minimum_required(VERSION 3.22.0)
 project(SDL3PRJ)
 
 include(FetchContent)
 
+
 find_package(OpenGL REQUIRED)
+
+# Check for OpenGL in Linux
+if (UNIX AND NOT APPLE)
+        if (NOT OpenGL_FOUND)
+                message(FATAL_ERROR "OpenGL not found. On Debian/Ubuntu, run:
+  sudo apt install libgl1-mesa-dev libglu1-mesa-dev freeglut3-dev")
+        else()
+                message(STATUS "OpenGL found: ${OpenGL_LIBRARIES}")
+        endif()
+endif()
+
+# OpenGL message for Windows
+if (WIN32)
+        message(STATUS "Running on Windows. Make sure GPU drivers are installed to get OpenGL 4.6+ support.")
+endif()
 
 # Assimp
 set(ASSIMP_WARNINGS_AS_ERRORS OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_ZLIB ON CACHE BOOL "" FORCE)
 FetchContent_Declare(
         assimp
         GIT_REPOSITORY https://github.com/assimp/assimp.git

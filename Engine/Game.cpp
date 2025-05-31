@@ -206,7 +206,7 @@ void Game::onStart() {
 
     // Cheeky duplicate bad mem
     terrainTexture = new Texture;
-    terrainTexture->path = "wall.jpg";
+    terrainTexture->path = "wall.jpg"; //awesomeface.png
     terrainTexture->type = "texture_diffuse";
     terrainTexture->id =  TextureFromFile(terrainTexture->path.c_str(), "Textures");
     Cube::setTexture(*terrainTexture);
