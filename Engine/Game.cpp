@@ -142,7 +142,7 @@ void Game::handleEvents() {
 
                 }
 
-                if (keycode == SDLK_1) {
+                if (keycode == SDLK_F3) {
 
                     //Enable window
                     m_boolDebugMenu = !m_boolDebugMenu;
