@@ -1,11 +1,11 @@
-cmake_minimum_required(VERSION 3.22.0)
+cmake_minimum_required(VERSION 3.28)
 project(SDL3PRJ)
+
+set(CMAKE_CXX_STANDARD 23)
 
 include(FetchContent)
 
-
 find_package(OpenGL REQUIRED)
-
 # Check for OpenGL in Linux
 if (UNIX AND NOT APPLE)
         if (NOT OpenGL_FOUND)
@@ -29,11 +29,8 @@ FetchContent_Declare(
         GIT_REPOSITORY https://github.com/assimp/assimp.git
         GIT_TAG v5.4.3
 )
-FetchContent_GetProperties(assimp)
-if(NOT assimp_POPULATED)
-        FetchContent_Populate(assimp)
-        add_subdirectory(${assimp_SOURCE_DIR} ${assimp_BINARY_DIR})
-endif()
+
+FetchContent_MakeAvailable(assimp)
 
 # fmt
 FetchContent_Declare(
@@ -50,11 +47,9 @@ FetchContent_Declare(
         GIT_REPOSITORY https://github.com/Dav1dde/glad.git
         GIT_TAG v0.1.36
 )
-FetchContent_GetProperties(glad)
-if(NOT glad_POPULATED)
-        FetchContent_Populate(glad)
-        add_subdirectory(${glad_SOURCE_DIR} ${glad_BINARY_DIR})
-endif()
+
+FetchContent_MakeAvailable(glad)
+
 
 # glm
 FetchContent_Declare(
@@ -72,7 +67,7 @@ FetchContent_Declare(
 )
 FetchContent_GetProperties(imgui)
 if(NOT imgui_POPULATED)
-        FetchContent_Populate(imgui)
+        FetchContent_MakeAvailable(imgui)
         add_library(imgui STATIC
                 ${imgui_SOURCE_DIR}/imgui.cpp
                 ${imgui_SOURCE_DIR}/imgui_draw.cpp
@@ -87,8 +82,16 @@ if(NOT imgui_POPULATED)
         )
         target_link_libraries(imgui PRIVATE
                 SDL3::SDL3
-                OpenGL::GL  # Add OpenGL linking
+                glad  # Add OpenGL linking
         )
+endif()
+
+# After find_package(OpenGL REQUIRED)
+if(WIN32)
+        # On Windows, explicitly link to opengl32
+        set(OPENGL_LIBRARIES opengl32)
+else()
+        set(OPENGL_LIBRARIES OpenGL::OpenGL)
 endif()
 
 # Set Release build for SDL3 (even if main project is Debug)
@@ -100,25 +103,6 @@ FetchContent_Declare(
         GIT_TAG release-3.2.8
 )
 FetchContent_MakeAvailable(SDL3)
-#
-#if(NOT SDL3_POPULATED)
-#        FetchContent_Populate(SDL3)
-#        # Optionally force static build if you prefer
-#        # set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
-#        message(STATUS "SDL3_SOURCE_DIR: ${SDL3_SOURCE_DIR}")
-#        message(STATUS "SDL3_BINARY_DIR: ${SDL3_BINARY_DIR}")
-#        add_subdirectory(${SDL3_SOURCE_DIR} ${SDL3_BINARY_DIR})
-#
-#
-##        # Handle different SDL3 target names
-##        if(TARGET SDL3::SDL3)
-##                # Modern target exists
-##        elseif(TARGET SDL3-shared)
-##                add_library(SDL3::SDL3 ALIAS SDL3-shared)
-##        elseif(TARGET SDL3-static)
-##                add_library(SDL3::SDL3 ALIAS SDL3-static)
-##        endif()
-#endif()
 
 # stb_image
 FetchContent_Declare(
@@ -131,8 +115,6 @@ FetchContent_MakeAvailable(stb)
 # Create an interface library for stb_image
 add_library(stb_image INTERFACE)
 target_include_directories(stb_image INTERFACE ${stb_SOURCE_DIR})
-
-set(CMAKE_CXX_STANDARD 23)
 
 add_executable(${PROJECT_NAME}
         main.cpp
@@ -177,18 +159,38 @@ add_custom_command(
 )
 
 if(WIN32)
-        # get the right .dll and put next to .exe
-        if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-                set(SDL3_DLL_NAME "SDL3d.dll")
-                set(GLAD_DLL_NAME "libgladd.dll")  # Debug version
-        else()
-                set(SDL3_DLL_NAME "SDL3.dll")
-                set(GLAD_DLL_NAME "libglad.dll")   # Release version
+        # Hide the console window for Release builds
+        if(CMAKE_BUILD_TYPE STREQUAL "Release")
+                set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -mwindows")
+        endif()
+        if(MINGW)
+                find_package(Threads REQUIRED)
+
+                # Force full static linking
+                set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static -static-libgcc -static-libstdc++")
+                set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static -static-libgcc -static-libstdc++ -Wl,-Bstatic -lstdc++ -lpthread -Wl,-Bdynamic")
+
+                # Prefer static libraries
+                set(CMAKE_FIND_LIBRARY_SUFFIXES ".a;.lib")
+                set(BUILD_SHARED_LIBS OFF)
+
+                # Find MinGW libraries more reliably
+                find_library(STDCXX_LIB stdc++ PATHS "${CMAKE_CXX_COMPILER_PREFIX}/lib")
+                find_library(WINPTHREAD_LIB winpthread PATHS "${CMAKE_CXX_COMPILER_PREFIX}/lib")
+
+                if(STDCXX_LIB AND WINPTHREAD_LIB)
+                        target_link_libraries(${PROJECT_NAME} PRIVATE
+                                "${STDCXX_LIB}"
+                                "${WINPTHREAD_LIB}"
+                        )
+                else()
+                        message(WARNING "Could not find static stdc++ or winpthread libraries - DLLs may be required")
+                endif()
         endif()
 
         add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy
-                "${SDL3_BINARY_DIR}/${SDL3_DLL_NAME}"
+                "lib/${SDL3_DLL_NAME}"
                 $<TARGET_FILE_DIR:${PROJECT_NAME}>
                 COMMENT "Copying ${SDL3_DLL_NAME} to output directory"
         )
@@ -196,14 +198,14 @@ if(WIN32)
         # Copy glad DLL
         add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy
-                "${glad_BINARY_DIR}/${GLAD_DLL_NAME}"
+                "lib/${GLAD_DLL_NAME}"
                 $<TARGET_FILE_DIR:${PROJECT_NAME}>
                 COMMENT "Copying ${GLAD_DLL_NAME} to output directory"
         )
 endif()
 
 target_link_libraries(${PROJECT_NAME}
-        PUBLIC
+        PRIVATE
         assimp
         fmt::fmt
         glad
@@ -212,6 +214,7 @@ target_link_libraries(${PROJECT_NAME}
         SDL3::SDL3
         stb_image
         OpenGL::GL
+        Threads::Threads
 )
 
 # Link dl only on UNIX platforms (Linux, BSD, etc.)
