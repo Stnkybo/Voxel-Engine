@@ -159,6 +159,25 @@ add_custom_command(
 )
 
 if(WIN32)
+        # Define icon and resource file paths
+        set(APP_ICON "${CMAKE_CURRENT_SOURCE_DIR}/appicon.ico")  # Your .ico file
+        set(RES_FILE "${CMAKE_CURRENT_BINARY_DIR}/app_icon.rc")  # Generated .rc file
+
+        # Create the resource file dynamically
+        file(WRITE ${RES_FILE}
+                "IDI_ICON1 ICON DISCARDABLE \"${APP_ICON}\"\n"
+        )
+
+        # Force rebuild when icon changes
+        set_source_files_properties(
+                ${RES_FILE}
+                PROPERTIES
+                OBJECT_DEPENDS "${APP_ICON}"
+        )
+
+        # Add to executable
+        target_sources(${PROJECT_NAME} PRIVATE ${RES_FILE})
+
         # Hide the console window for Release builds
         if(CMAKE_BUILD_TYPE STREQUAL "Release")
                 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -mwindows")
