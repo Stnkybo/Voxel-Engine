@@ -106,27 +106,27 @@ add_library(stb_image INTERFACE)
 target_include_directories(stb_image INTERFACE ${stb_SOURCE_DIR})
 
 add_executable(${PROJECT_NAME}
-        main.cpp
-        Engine/Window.cpp
-        Engine/Window.h
-        Engine/Triangle.cpp
-        Engine/Triangle.h
-        Engine/Rendering/Cube.h
-        Entities/Player.cpp
-        Entities/Player.h
-        Entities/Entity.cpp
-        Entities/Entity.h
-        Engine/Game.cpp
-        Engine/Game.h
-        Engine/Camera/Camera.cpp
-        Engine/Camera/Camera.h
-        Config.h
-        Engine/Shader.h
-        Engine/Rendering/Mesh.hpp
-        Engine/Rendering/Model.hpp
+        src/main.cpp
+        src/Engine/Window.cpp
+        src/Engine/Window.h
+        src/Engine/Triangle.cpp
+        src/Engine/Triangle.h
+        src/Engine/Rendering/Cube.h
+        src/Entities/Player.cpp
+        src/Entities/Player.h
+        src/Entities/Entity.cpp
+        src/Entities/Entity.h
+        src/Engine/Game.cpp
+        src/Engine/Game.h
+        src/Engine/Camera/Camera.cpp
+        src/Engine/Camera/Camera.h
+        src/Config.h
+        src/Engine/Shader.h
+        src/Engine/Rendering/Mesh.hpp
+        src/Engine/Rendering/Model.hpp
         Temp/imgui_impl_sdl3.cpp
         Temp/stb_image.h
-        Engine/Rendering/Cube.cpp
+        src/Engine/Rendering/Cube.cpp
 )
 
 # Copy Shaders
@@ -168,10 +168,10 @@ if(WIN32)
         )
         # Add to executable
         target_sources(${PROJECT_NAME} PRIVATE ${RES_FILE})
-        # Hide the console window for Release builds
-        set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -mwindows")
 
         if(MINGW)
+                # Hide the console window for Release builds
+                set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -mwindows")
                 # Find MinGW libraries # Might be ass code
                 find_library(STDCXX_LIB stdc++ PATHS "${CMAKE_CXX_COMPILER_PREFIX}/lib")
                 find_library(WINPTHREAD_LIB winpthread PATHS "${CMAKE_CXX_COMPILER_PREFIX}/lib")
@@ -204,14 +204,17 @@ if(WIN32)
                         set(SDL3_DLL_NAME "SDL3.dll")
                         set(GLAD_DLL_NAME "glad.dll")   # Release version
                 endif()
+
                 # Add Sanitization to Debug Builds
                 target_compile_options(${PROJECT_NAME} PRIVATE
                         $<$<CONFIG:Debug>:-g>
                         $<$<CONFIG:Debug>:-O0>
                         $<$<CONFIG:Debug>:-fsanitize=address>
                 )
+                target_sources(${PROJECT_NAME} PRIVATE src/main_win32.cpp)
 
                 target_link_options(${PROJECT_NAME} PRIVATE
+                        $<$<CONFIG:Release>:/SUBSYSTEM:WINDOWS>
                         $<$<CONFIG:Debug>:-fsanitize=address>
                 )
         endif ()
