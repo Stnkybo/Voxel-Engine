@@ -9,6 +9,7 @@
 #include <SDL3/SDL.h>
 #include <memory>
 #include <optional>
+#include <string>
 
 
 class Window {

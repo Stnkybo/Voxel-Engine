@@ -32,14 +32,6 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(assimp)
 
-# fmt
-FetchContent_Declare(
-        fmt
-        GIT_REPOSITORY https://github.com/fmtlib/fmt.git
-        GIT_TAG 11.0.2
-)
-FetchContent_MakeAvailable(fmt)
-
 # glad
 set(GLAD_GLAPI_EXPORT OFF CACHE BOOL "" FORCE)
 FetchContent_Declare(
@@ -94,9 +86,6 @@ else()
         set(OPENGL_LIBRARIES OpenGL::OpenGL)
 endif()
 
-# Set Release build for SDL3 (even if main project is Debug)
-# set(SDL3_BUILD_TYPE "Release")  # Force SDL3 to build in Release mode
-# SDL3 (Replaced ExternalProject_Add with FetchContent)
 FetchContent_Declare(
         SDL3
         GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
@@ -148,7 +137,6 @@ add_custom_command(
         $<TARGET_FILE_DIR:${PROJECT_NAME}>/Shaders
         COMMENT "Copying Shaders to output directory"
 )
-
 # Copy Textures
 add_custom_command(
         TARGET ${PROJECT_NAME} POST_BUILD
@@ -158,42 +146,33 @@ add_custom_command(
         COMMENT "Copying Textures to output directory"
 )
 
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+        find_package(Threads REQUIRED)
+        set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -static -static-libgcc -static-libstdc++")
+        set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -static -static-libgcc -static-libstdc++ -Wl,-Bstatic -lpthread -Wl,-Bdynamic")
+endif()
+
 if(WIN32)
         # Define icon and resource file paths
         set(APP_ICON "${CMAKE_CURRENT_SOURCE_DIR}/appicon.ico")  # Your .ico file
         set(RES_FILE "${CMAKE_CURRENT_BINARY_DIR}/app_icon.rc")  # Generated .rc file
-
         # Create the resource file dynamically
         file(WRITE ${RES_FILE}
                 "IDI_ICON1 ICON DISCARDABLE \"${APP_ICON}\"\n"
         )
-
         # Force rebuild when icon changes
         set_source_files_properties(
                 ${RES_FILE}
                 PROPERTIES
                 OBJECT_DEPENDS "${APP_ICON}"
         )
-
         # Add to executable
         target_sources(${PROJECT_NAME} PRIVATE ${RES_FILE})
-
         # Hide the console window for Release builds
-        if(CMAKE_BUILD_TYPE STREQUAL "Release")
-                set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -mwindows")
-        endif()
+        set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -mwindows")
+
         if(MINGW)
-                find_package(Threads REQUIRED)
-
-                # Force full static linking
-                set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static -static-libgcc -static-libstdc++")
-                set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static -static-libgcc -static-libstdc++ -Wl,-Bstatic -lstdc++ -lpthread -Wl,-Bdynamic")
-
-                # Prefer static libraries
-                set(CMAKE_FIND_LIBRARY_SUFFIXES ".a;.lib")
-                set(BUILD_SHARED_LIBS OFF)
-
-                # Find MinGW libraries more reliably
+                # Find MinGW libraries # Might be ass code
                 find_library(STDCXX_LIB stdc++ PATHS "${CMAKE_CXX_COMPILER_PREFIX}/lib")
                 find_library(WINPTHREAD_LIB winpthread PATHS "${CMAKE_CXX_COMPILER_PREFIX}/lib")
 
@@ -205,35 +184,65 @@ if(WIN32)
                 else()
                         message(WARNING "Could not find static stdc++ or winpthread libraries - DLLs may be required")
                 endif()
-        endif()
 
+                # get the right .dll and put next to .exe
+                if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+                        set(SDL3_DLL_NAME "SDL3d.dll")
+                        set(GLAD_DLL_NAME "libgladd.dll")  # Debug version
+                else()
+                        set(SDL3_DLL_NAME "SDL3.dll")
+                        set(GLAD_DLL_NAME "libglad.dll")   # Release version
+                endif()
+
+        endif()
+        if(MSVC)
+                # get the right .dll and put next to .exe
+                if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+                        set(SDL3_DLL_NAME "SDL3d.dll")
+                        set(GLAD_DLL_NAME "gladd.dll")  # Debug version
+                else()
+                        set(SDL3_DLL_NAME "SDL3.dll")
+                        set(GLAD_DLL_NAME "glad.dll")   # Release version
+                endif()
+                # Add Sanitization to Debug Builds
+                target_compile_options(${PROJECT_NAME} PRIVATE
+                        $<$<CONFIG:Debug>:-g>
+                        $<$<CONFIG:Debug>:-O0>
+                        $<$<CONFIG:Debug>:-fsanitize=address>
+                )
+
+                target_link_options(${PROJECT_NAME} PRIVATE
+                        $<$<CONFIG:Debug>:-fsanitize=address>
+                )
+        endif ()
+
+        # Copy dll for SDL3
         add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy
-                "lib/${SDL3_DLL_NAME}"
+                "${SDL3_BINARY_DIR}/${SDL3_DLL_NAME}"
                 $<TARGET_FILE_DIR:${PROJECT_NAME}>
                 COMMENT "Copying ${SDL3_DLL_NAME} to output directory"
         )
-
         # Copy glad DLL
         add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy
-                "lib/${GLAD_DLL_NAME}"
+                "${GLAD_BINARY_DIR}/${GLAD_DLL_NAME}"
                 $<TARGET_FILE_DIR:${PROJECT_NAME}>
                 COMMENT "Copying ${GLAD_DLL_NAME} to output directory"
         )
 endif()
 
+target_include_directories(${PROJECT_NAME} PRIVATE ${glm_SOURCE_DIR})
+
 target_link_libraries(${PROJECT_NAME}
         PRIVATE
         assimp
-        fmt::fmt
         glad
-        glm
         imgui
         SDL3::SDL3
         stb_image
         OpenGL::GL
-        Threads::Threads
+        $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:Threads::Threads>  # Only link if not MSVC
 )
 
 # Link dl only on UNIX platforms (Linux, BSD, etc.)
