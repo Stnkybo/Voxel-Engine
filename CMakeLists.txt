@@ -124,8 +124,6 @@ add_executable(${PROJECT_NAME}
         src/Engine/Shader.h
         src/Engine/Rendering/Mesh.hpp
         src/Engine/Rendering/Model.hpp
-        Temp/imgui_impl_sdl3.cpp
-        Temp/stb_image.h
         src/Engine/Rendering/Cube.cpp
 )
 
@@ -133,16 +131,16 @@ add_executable(${PROJECT_NAME}
 add_custom_command(
         TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${CMAKE_SOURCE_DIR}/Shaders
-        $<TARGET_FILE_DIR:${PROJECT_NAME}>/Shaders
+        ${CMAKE_SOURCE_DIR}/Resources/Shaders
+        $<TARGET_FILE_DIR:${PROJECT_NAME}>/Resources/Shaders
         COMMENT "Copying Shaders to output directory"
 )
 # Copy Textures
 add_custom_command(
         TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${CMAKE_SOURCE_DIR}/Textures
-        $<TARGET_FILE_DIR:${PROJECT_NAME}>/Textures
+        ${CMAKE_SOURCE_DIR}/Resources/Textures
+        $<TARGET_FILE_DIR:${PROJECT_NAME}>/Resources/Textures
         COMMENT "Copying Textures to output directory"
 )
 
