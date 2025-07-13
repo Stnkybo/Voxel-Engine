@@ -208,7 +208,7 @@ void Game::onStart() {
     terrainTexture = new Texture;
     terrainTexture->path = "wall.jpg"; //awesomeface.png
     terrainTexture->type = "texture_diffuse";
-    terrainTexture->id =  TextureFromFile(terrainTexture->path.c_str(), "Textures");
+    terrainTexture->id =  TextureFromFile(terrainTexture->path.c_str(), "Resources/Textures");
     Cube::setTexture(*terrainTexture);
 
     for (int i = 0; i < 11; i++) { //Make bajuhjuh
@@ -231,8 +231,8 @@ void Game::onStart() {
     m_cubes.emplace_back(newCube);
 
 
-    ourShader = new Shader("./Shaders/modelShader.vert", "./Shaders/modelShader.frag");
-    otherShader = new Shader("./Shaders/shader.vert", "./Shaders/shader.frag");
+    ourShader = new Shader("./Resources/Shaders/modelShader.vert", "./Resources/Shaders/modelShader.frag");
+    otherShader = new Shader("./Resources/Shaders/shader.vert", "./Resources/Shaders/shader.frag");
 
 
     camera = new Camera(glm::vec3(0.0f, 5.0f, 10.0f), glm::vec3(0.0f, 1.0f, 0.0f));
