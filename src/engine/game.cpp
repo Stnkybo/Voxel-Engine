@@ -2,7 +2,7 @@
 // Created by Lamad on 11/12/2024.
 //
 
-#include "Game.h"
+#include "game.h"
 #include <SDL3/SDL.h>
 #include <glad/glad.h>
 #include <imgui.h>
@@ -13,11 +13,11 @@
 #include <iostream>
 #include <ostream>
 
-#include "Shader.h"
-#include "../Config.h"
-#include "Camera/Camera.h"
-#include "Rendering/Cube.h"
-#include "Rendering/Model.hpp"
+#include "rendering/shader.h"
+#include "../config.h"
+#include "camera/camera.h"
+#include "rendering/cube.h"
+#include "rendering/model.hpp"
 
 void imguiUI(ImGuiIO& io);
 

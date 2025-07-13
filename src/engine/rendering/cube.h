@@ -4,7 +4,7 @@
 
 #ifndef CUBE_H
 #define CUBE_H
-#include "Mesh.hpp"
+#include "mesh.hpp"
 
 
 class Cube {

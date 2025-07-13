@@ -107,40 +107,40 @@ target_include_directories(stb_image INTERFACE ${stb_SOURCE_DIR})
 
 add_executable(${PROJECT_NAME}
         src/main.cpp
-        src/Engine/Window.cpp
-        src/Engine/Window.h
-        src/Engine/Triangle.cpp
-        src/Engine/Triangle.h
-        src/Engine/Rendering/Cube.h
-        src/Entities/Player.cpp
-        src/Entities/Player.h
-        src/Entities/Entity.cpp
-        src/Entities/Entity.h
-        src/Engine/Game.cpp
-        src/Engine/Game.h
-        src/Engine/Camera/Camera.cpp
-        src/Engine/Camera/Camera.h
-        src/Config.h
-        src/Engine/Shader.h
-        src/Engine/Rendering/Mesh.hpp
-        src/Engine/Rendering/Model.hpp
-        src/Engine/Rendering/Cube.cpp
+        src/engine/window.cpp
+        src/engine/window.h
+        src/engine/triangle.cpp
+        src/engine/triangle.h
+        src/engine/rendering/cube.h
+        src/entities/player.cpp
+        src/entities/player.h
+        src/entities/entity.cpp
+        src/entities/entity.h
+        src/engine/game.cpp
+        src/engine/game.h
+        src/engine/camera/camera.cpp
+        src/engine/camera/camera.h
+        src/config.h
+        src/engine/rendering/shader.h
+        src/engine/rendering/mesh.hpp
+        src/engine/rendering/model.hpp
+        src/engine/rendering/cube.cpp
 )
 
 # Copy Shaders
 add_custom_command(
         TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${CMAKE_SOURCE_DIR}/Resources/Shaders
-        $<TARGET_FILE_DIR:${PROJECT_NAME}>/Resources/Shaders
+        ${CMAKE_SOURCE_DIR}/resources/shaders
+        $<TARGET_FILE_DIR:${PROJECT_NAME}>/resources/shaders
         COMMENT "Copying Shaders to output directory"
 )
 # Copy Textures
 add_custom_command(
         TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${CMAKE_SOURCE_DIR}/Resources/Textures
-        $<TARGET_FILE_DIR:${PROJECT_NAME}>/Resources/Textures
+        ${CMAKE_SOURCE_DIR}/resources/textures
+        $<TARGET_FILE_DIR:${PROJECT_NAME}>/resources/textures
         COMMENT "Copying Textures to output directory"
 )
 

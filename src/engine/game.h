@@ -9,9 +9,9 @@
 #include <SDL3/SDL.h>
 
 
-#include "Shader.h"
-#include "Camera/Camera.h"
-#include "Rendering/Cube.h"
+#include "rendering/shader.h"
+#include "camera/camera.h"
+#include "rendering/cube.h"
 
 
 class Game {
