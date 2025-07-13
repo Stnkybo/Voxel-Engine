@@ -2,7 +2,7 @@
 // Created by Lamad on 9/12/2024.
 //
 
-#include "Window.h"
+#include "window.h"
 
 #include <iostream>
 
