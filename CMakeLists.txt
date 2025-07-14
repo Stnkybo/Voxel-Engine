@@ -149,6 +149,15 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
         set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -static -static-libgcc -static-libstdc++")
         set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -static -static-libgcc -static-libstdc++ -Wl,-Bstatic -lpthread -Wl,-Bdynamic")
 endif()
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+        target_compile_options(${PROJECT_NAME} PRIVATE
+                $<$<CONFIG:Debug>:-g -O0 -fsanitize=address>
+        )
+        target_link_options(${PROJECT_NAME} PRIVATE
+                $<$<CONFIG:Debug>:-fsanitize=address>
+        )
+endif()
+
 
 if(WIN32)
         # Define icon and resource file paths
@@ -205,15 +214,13 @@ if(WIN32)
 
                 # Add Sanitization to Debug Builds
                 target_compile_options(${PROJECT_NAME} PRIVATE
-                        $<$<CONFIG:Debug>:-g>
-                        $<$<CONFIG:Debug>:-O0>
-                        $<$<CONFIG:Debug>:-fsanitize=address>
+                        $<$<CONFIG:Debug>:/Od /Zi>
                 )
                 target_sources(${PROJECT_NAME} PRIVATE src/main_win32.cpp)
 
                 target_link_options(${PROJECT_NAME} PRIVATE
                         $<$<CONFIG:Release>:/SUBSYSTEM:WINDOWS>
-                        $<$<CONFIG:Debug>:-fsanitize=address>
+                        $<$<CONFIG:Debug>:/DEBUG>
                 )
         endif ()
 
