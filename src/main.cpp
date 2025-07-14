@@ -1,5 +1,5 @@
-#include "Config.h"
-#include "Engine/Game.h"
+#include "config.h"
+#include "Engine/game.h"
 
 int main() {
     const auto game = new Game("Cube Example", WIDTH, HEIGHT);

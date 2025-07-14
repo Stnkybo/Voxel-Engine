@@ -11,8 +11,8 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-#include "Mesh.hpp"
-#include "../Shader.h"
+#include "mesh.hpp"
+#include "../shader.h"
 
 
 #include <string>

@@ -2,7 +2,7 @@
 // Created by Lamad on 11/12/2024.
 //
 
-#include "Game.h"
+#include "game.h"
 #include <SDL3/SDL.h>
 #include <glad/glad.h>
 #include <imgui.h>
@@ -13,11 +13,11 @@
 #include <iostream>
 #include <ostream>
 
-#include "Shader.h"
-#include "../Config.h"
-#include "Camera/Camera.h"
-#include "Rendering/Cube.h"
-#include "Rendering/Model.hpp"
+#include "shader.h"
+#include "../config.h"
+#include "camera/camera.h"
+#include "rendering/cube.h"
+#include "rendering/model.hpp"
 
 void imguiUI(ImGuiIO& io);
 
@@ -208,7 +208,7 @@ void Game::onStart() {
     terrainTexture = new Texture;
     terrainTexture->path = "wall.jpg"; //awesomeface.png
     terrainTexture->type = "texture_diffuse";
-    terrainTexture->id =  TextureFromFile(terrainTexture->path.c_str(), "Resources/Textures");
+    terrainTexture->id =  TextureFromFile(terrainTexture->path.c_str(), "resources/textures");
     Cube::setTexture(*terrainTexture);
 
     for (int i = 0; i < 11; i++) { //Make bajuhjuh
@@ -231,8 +231,8 @@ void Game::onStart() {
     m_cubes.emplace_back(newCube);
 
 
-    ourShader = new Shader("./Resources/Shaders/modelShader.vert", "./Resources/Shaders/modelShader.frag");
-    otherShader = new Shader("./Resources/Shaders/shader.vert", "./Resources/Shaders/shader.frag");
+    ourShader = new Shader("./resources/shaders/modelShader.vert", "./resources/shaders/modelShader.frag");
+    otherShader = new Shader("./resources/shaders/shader.vert", "./resources/shaders/shader.frag");
 
 
     camera = new Camera(glm::vec3(0.0f, 5.0f, 10.0f), glm::vec3(0.0f, 1.0f, 0.0f));

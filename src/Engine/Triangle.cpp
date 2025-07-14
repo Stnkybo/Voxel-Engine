@@ -2,7 +2,7 @@
 // Created by Lamad on 10/12/2024.
 //
 
-#include "Triangle.h"
+#include "triangle.h"
 
 #include <SDL3/SDL_render.h>
 
