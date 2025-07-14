@@ -18,6 +18,7 @@
 #include "camera/camera.h"
 #include "rendering/cube.h"
 #include "rendering/model.hpp"
+#include "terrain/world.h"
 
 void imguiUI(ImGuiIO& io);
 
@@ -237,6 +238,20 @@ void Game::onStart() {
 
     camera = new Camera(glm::vec3(0.0f, 5.0f, 10.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
+    auto world = new World();
+    ChunkCoord chunk_coords = {1,-1};
+    world->generateChunk(chunk_coords);
+    Chunk* chunk = world->getChunk(chunk_coords);
+
+    for (int x = 0; x < CHUNK_SIZE_X; x++) {
+        for (int y = 0; y < CHUNK_SIZE_Y; y++) {
+            for (int z = 0; z < CHUNK_SIZE_Z; z++) {
+                if (chunk->at(x,y,z).type != 0) {
+                    m_cubes.emplace_back(new Cube(x + chunk_coords.x * CHUNK_SIZE_X, y, z + chunk_coords.z * CHUNK_SIZE_Z));
+                }
+            }
+        }
+    }
 
 }
 

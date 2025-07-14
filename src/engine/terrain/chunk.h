@@ -35,6 +35,9 @@ class Chunk {
   std::vector<Voxel> voxels;
   Chunk() {
       voxels.resize(CHUNK_SIZE_X * CHUNK_SIZE_Y * CHUNK_SIZE_Z);
+    for (Voxel voxel:voxels) {
+      voxel.type = 1;
+    }
 
     }
   ~Chunk();

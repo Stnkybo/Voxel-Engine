@@ -8,7 +8,7 @@
 
 
 class Cube {
-    int64_t posX, posY, posZ;
+    int posX, posY, posZ;
 
     // Declare a vector for vertices
      std::vector<Vertex> m_vertices;
@@ -43,7 +43,7 @@ class Cube {
 public:
     Mesh* cubeMesh;
 
-    Cube(int64_t x, int64_t y, int64_t z) {
+    Cube(int x, int y, int z) {
         posX = x;
         posY = y;
         posZ = z;
