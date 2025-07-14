@@ -169,7 +169,7 @@ if(WIN32)
         set(RES_FILE "${CMAKE_CURRENT_BINARY_DIR}/app_icon.rc")  # Generated .rc file
         # Create the resource file dynamically
         file(WRITE ${RES_FILE}
-                "IDI_ICON1○ ICON DISCARDABLE \"${APP_ICON}\"\n"
+                "IDI_ICON1 ICON DISCARDABLE \"${APP_ICON}\"\n"
         )
         # Force rebuild when icon changes
         set_source_files_properties(
