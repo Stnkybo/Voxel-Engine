@@ -9,7 +9,7 @@
 #include <SDL3/SDL.h>
 
 
-#include "shader.h"
+#include "rendering/shader.h"
 #include "camera/camera.h"
 #include "rendering/cube.h"
 

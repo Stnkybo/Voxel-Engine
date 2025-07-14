@@ -12,7 +12,7 @@ A Simple 3D Application Using SDL3 and OpenGL to Draw voxels to the screen
 * Ensure you have CMake min version 3.22
 ### Windows
 * Ensure that Ninja is installed 
-* Compile with CMake:
+* Compile with CMake: (OUTDATED USE MSVC)
   * cmake -G Ninja -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ ..
 ### Linux
 * Ensure OpenGL is installed for your system (if your using linux, you can figure it out.)

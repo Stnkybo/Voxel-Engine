@@ -13,7 +13,7 @@
 #include <iostream>
 #include <ostream>
 
-#include "shader.h"
+#include "rendering/shader.h"
 #include "../config.h"
 #include "camera/camera.h"
 #include "rendering/cube.h"

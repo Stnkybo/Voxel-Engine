@@ -121,7 +121,7 @@ add_executable(${PROJECT_NAME}
         src/engine/camera/camera.cpp
         src/engine/camera/camera.h
         src/config.h
-        src/engine/shader.h
+        src/engine/rendering/shader.h
         src/engine/rendering/mesh.hpp
         src/engine/rendering/model.hpp
         src/engine/rendering/cube.cpp

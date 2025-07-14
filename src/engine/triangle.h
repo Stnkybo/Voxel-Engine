@@ -9,7 +9,7 @@
 
 class Triangle {
     public:
-    SDL_Vertex vert[vertLen];
+    SDL_Vertex vert[vertLen]{};
     Triangle();
 
 };
