@@ -10,7 +10,7 @@ bool worldCollision::isSolid(int x, int y, int z, World* world) {
         Voxel* block = world->getBlock(x,y,z);
         if ( block != nullptr) {
 
-            return block->type != static_cast<uint8_t>(BlockType::AIR);
+            return static_cast<uint8_t>(getBlockType(*block)) != static_cast<uint8_t>(BlockType::AIR);
         }
         return false;
 }

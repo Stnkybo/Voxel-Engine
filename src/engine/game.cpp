@@ -242,21 +242,27 @@ void Game::onStart() {
     //camera = new Camera(glm::vec3(0.0f, 5.0f, 10.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
     world = &World::getInstance();
-    ChunkCoord chunk_coords = {1,-1};
-    world->generateChunk(chunk_coords);
-    Chunk* chunk = world->getChunk(chunk_coords);
+    // Generate some chunks
+    for (int i = -1; i <= 1; i++) {
+        for (int j = 1; j <= 3; j++) {
 
-    for (int x = 0; x < CHUNK_SIZE_X; x++) {
-        for (int y = 0; y < CHUNK_SIZE_Y; y++) {
-            for (int z = 0; z < CHUNK_SIZE_Z; z++) {
-                if (chunk->at(x,y,z).type != 0) {
-                    m_cubes.emplace_back(new Cube(x + chunk_coords.x * CHUNK_SIZE_X, y, z + chunk_coords.z * CHUNK_SIZE_Z));
+            ChunkCoord chunk_coords = {i,j};
+            world->generateChunk(chunk_coords);
+            Chunk* chunk = world->getChunk(chunk_coords);
+
+            for (int x = 0; x < CHUNK_SIZE_X; x++) {
+                for (int y = 0; y < CHUNK_SIZE_Y; y++) {
+                    for (int z = 0; z < CHUNK_SIZE_Z; z++) {
+                        if (getBlockType(chunk->at(x,y,z)) != BlockType::AIR) {
+                            m_cubes.emplace_back(new Cube(x + chunk_coords.x * CHUNK_SIZE_X, y, z + chunk_coords.z * CHUNK_SIZE_Z));
+                        }
+                    }
                 }
             }
+
+        }
         }
     }
-
-}
 
 void Game::update() {
     const Uint32 currentTick = SDL_GetTicks();

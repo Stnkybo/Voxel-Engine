@@ -51,19 +51,19 @@ class Chunk {
   public:
   std::array<Voxel, CHUNK_SIZE_X * CHUNK_SIZE_Y * CHUNK_SIZE_Z> voxels;
   Chunk() {
-    for (Voxel voxel:voxels) {
-      setBlockType(voxel, BlockType::AIR);
+    for (int i = 0; i < CHUNK_SIZE_X * CHUNK_SIZE_Y * CHUNK_SIZE_Z; ++i) {
+      makeVoxel(BlockType::AIR);
     }
 
     }
   ~Chunk();
 
   inline Voxel& at(int x, int y, int z) {
-    return voxels[x + CHUNK_SIZE_X * (z + CHUNK_SIZE_Z * y)];
+    return voxels[x + CHUNK_SIZE_X * (y + CHUNK_SIZE_Y * z)];
   }
 
   inline const Voxel& at(int x, int y, int z) const {
-    return voxels[x + CHUNK_SIZE_X * (z + CHUNK_SIZE_Z * y)];
+    return voxels[x + CHUNK_SIZE_X * (y + CHUNK_SIZE_Y * z)];
   }
 
 
