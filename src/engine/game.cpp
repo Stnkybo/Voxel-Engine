@@ -212,7 +212,7 @@ void Game::onStart() {
     terrainTexture->id =  TextureFromFile(terrainTexture->path.c_str(), "resources/textures");
     Cube::setTexture(*terrainTexture);
 
-    for (int i = 0; i < 11; i++) { //Make bajuhjuh
+    for (int i = 0; i < 11; i++) { //Make floor
         for (int j = 0; j < 11; j++) {
             if ((i != (11-1)/2) || (j != (11-1)/2)) {
                 const auto newCube = new Cube(i-5,0,j-5);
@@ -238,7 +238,7 @@ void Game::onStart() {
 
     camera = new Camera(glm::vec3(0.0f, 5.0f, 10.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
-    auto world = new World();
+    auto world = &World::getInstance();
     ChunkCoord chunk_coords = {1,-1};
     world->generateChunk(chunk_coords);
     Chunk* chunk = world->getChunk(chunk_coords);
@@ -257,7 +257,7 @@ void Game::onStart() {
 
 void Game::update() {
     const Uint32 currentTick = SDL_GetTicks();
-    m_deltaTime = currentTick - m_lastTick;;
+    m_deltaTime = currentTick - m_lastTick;
     m_lastTick = currentTick;
     //unprocessedTime += m_deltaTime;
     //frameCounter += m_deltaTime;
@@ -265,6 +265,9 @@ void Game::update() {
     for (int i = 0 ; i < penith.size(); i++) {
             penith[i]->setPosition(penith_offset[0], 1 + i + penith_offset[1], penith_offset[2]);
     }
+
+    //PHYSICS
+
 
 }
 

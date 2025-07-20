@@ -20,6 +20,13 @@ struct ChunkCoord {
   }
 };
 
+//for converting voxel coordinates to Chunk Coords
+inline ChunkCoord VoxelToChunkCoords(int x, int z) {
+
+  ChunkCoord chunk_coord{x/CHUNK_SIZE_X, z/CHUNK_SIZE_Z};
+  return chunk_coord;
+}
+
 // define hash for storing chunks
 namespace std {
   template<> struct hash<ChunkCoord> {

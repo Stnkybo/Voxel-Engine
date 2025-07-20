@@ -11,14 +11,19 @@
 
 
 class World {
-
-  std::unordered_map<ChunkCoord, Chunk*> chunkMap;
-
-  public:
+public:
+    static World& getInstance() {
+        static World instance;
+        return instance;
+    }
+    Voxel* getBlock(int x, int y, int z);
     void generateChunk(ChunkCoord coord);
     Chunk* getChunk(ChunkCoord coord);
     void removeChunk(ChunkCoord coord);
 
+private:
+    World() = default;
+    std::unordered_map<ChunkCoord, Chunk*> chunkMap;
 };
 
 

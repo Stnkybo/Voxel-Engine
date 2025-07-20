@@ -5,7 +5,7 @@
 #ifndef ENTITY_H
 #define ENTITY_H
 
-
+#include "../engine/physics/AABB.h"
 
 class Entity {
 public:
@@ -14,13 +14,14 @@ public:
           positionY(position_y),
           positionZ(position_z) {
     }
-    ~Entity() {}
+    ~Entity() = default;
 
 private:
     float positionX;
     float positionY;
     float positionZ;
     //Collider m_collider;
+    AABB boundingBox;
 
 };
 

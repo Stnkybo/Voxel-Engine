@@ -129,6 +129,10 @@ add_executable(${PROJECT_NAME}
         src/engine/terrain/voxel.h
         src/engine/terrain/world.cpp
         src/engine/terrain/world.h
+        src/engine/physics/worldCollision.cpp
+        src/engine/physics/worldCollision.h
+        src/engine/physics/AABB.cpp
+        src/engine/physics/AABB.h
 )
 
 # Copy Shaders
