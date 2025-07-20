@@ -24,7 +24,7 @@ void World::generateChunk(ChunkCoord coord) {
         for (int y = 0; y < CHUNK_SIZE_Y; ++y) {
             for (int z = 0; z < CHUNK_SIZE_Z; ++z) {
                 if (y < 8) {
-                    setBlockType(newChunk->at(x, y, z), BlockType::GRASS); // solid block
+                    setBlockType(newChunk->at(x, y, z), BlockType::BRICK); // solid block
 
                 } else {
                     setBlockType(newChunk->at(x, y, z), BlockType::AIR);

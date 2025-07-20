@@ -9,7 +9,8 @@ enum class BlockType : uint8_t {
   AIR = 0,
   GRASS = 1,
   DIRT = 2,
-  STONE = 3
+  STONE = 3,
+  BRICK = 4
 };
 
 struct Voxel {
