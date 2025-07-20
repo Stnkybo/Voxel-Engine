@@ -14,7 +14,6 @@
 #include <ostream>
 
 #include "rendering/shader.h"
-#include "../config.h"
 #include "camera/camera.h"
 #include "rendering/cube.h"
 #include "rendering/model.hpp"
@@ -150,8 +149,8 @@ void Game::handleEvents() {
 
                 }if (keycode == SDLK_R) {
 
-                    //Test
-                    //camera->Position = glm::vec3(0.0f, 5.0f, 10.0f);
+                    //reset player position
+                    player->setPosition(glm::vec3(0.0f, 5.0f, 10.0f));
 
                 }
             }
@@ -172,19 +171,19 @@ void Game::handleEvents() {
         const auto* keyState = reinterpret_cast<const Uint8 *>(SDL_GetKeyboardState(nullptr));
 
         if (keyState[SDL_SCANCODE_W])
-            player->camera->ProcessKeyboard(FORWARD, m_deltaTime);
+            player->ProcessMovement(FORWARD, m_deltaTime);
         if (keyState[SDL_SCANCODE_S])
-            player->camera->ProcessKeyboard(BACKWARD, m_deltaTime);
+            player->ProcessMovement(BACKWARD, m_deltaTime);
         if (keyState[SDL_SCANCODE_A])
-            player->camera->ProcessKeyboard(LEFT, m_deltaTime);
+            player->ProcessMovement(LEFT, m_deltaTime);
         if (keyState[SDL_SCANCODE_D])
-            player->camera->ProcessKeyboard(RIGHT, m_deltaTime);
+            player->ProcessMovement(RIGHT, m_deltaTime);
         if (keyState[SDL_SCANCODE_LSHIFT]) {
 
-            player->camera->MovementSpeed = 20.0f;
+            player->setMovementSpeed(20.0f);
         }
         else {
-            player->camera->MovementSpeed = 5.0f;
+            player->setMovementSpeed(5.0f);
         }
 
 }
@@ -347,8 +346,8 @@ void Game::imguiUI(const ImGuiIO& io) {
         ImGui::Text("Cube Count %d ", m_cubes.size());               // Display some text (you can use a format strings too)
         ImGui::SliderInt3("penith", penith_offset, -25.0f, 25.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
 
-        ImGui::Text("Camera Pos %.3f, %.3f, %.3f ", player->camera->Position.x, player->camera->Position.y, player->camera->Position.z);               // Display some text (you can use a format strings too)
-        //ImGui::SliderFloat("Camera Speed", &camera->MovementSpeed, 1.0f, 25.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+        ImGui::Text("Player Pos %.3f, %.3f, %.3f ", player->getPosition().x, player->getPosition().y, player->getPosition().z);
+        ImGui::Text("Player Speed %.2f", player->getMovementSpeed());            // Edit 1 float using a slider from 0.0f to 1.0f
         ImGui::ColorEdit3("clear color", reinterpret_cast<float *>(&clear_color)); // Edit 3 floats representing a color
 
         // if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)

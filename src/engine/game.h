@@ -28,7 +28,7 @@ class Game {
     Shader *ourShader{};
     Shader *otherShader{};
     std::vector<Cube *> m_cubes;
-    Texture *terrainTexture;
+    Texture *terrainTexture{};
     bool m_boolDebugMenu{};
     SDL_GLContext m_glContext;
     ImGuiIO* m_imguiIO;

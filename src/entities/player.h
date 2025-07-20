@@ -12,9 +12,18 @@ class Player : public Entity {
   public:
   Player(glm::vec3 positionIn);
   ~Player() = default;
+  void setPosition(glm::vec3 positionIn);
+
+  void ProcessMovement(Camera_Movement direction, Uint64 deltaTime);
+  void setMovementSpeed(float speed);
+  float getMovementSpeed() const;
+
+  Camera* camera;
+
+private:
   int m_health = 100;
   int m_maxHealth = 100;
-  Camera* camera;
+  float movementSpeed = 5.0f;
 };
 
 

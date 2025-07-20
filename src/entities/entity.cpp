@@ -9,3 +9,11 @@ Entity::Entity(glm::vec3 positionIn, glm::vec3 sizeIn) {
     size = sizeIn;
     boundingBox = AABB::fromCenterSize(position, size);
 }
+
+void Entity::setPosition(glm::vec3 positionIn) {
+    position = positionIn;
+}
+
+glm::vec3 Entity::getPosition() {
+    return position;
+}
