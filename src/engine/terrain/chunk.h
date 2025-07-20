@@ -4,6 +4,8 @@
 
 #ifndef CHUNK_H
 #define CHUNK_H
+#include <array>
+
 #include "../rendering/cube.h"
 #include "voxel.h"
 
@@ -21,7 +23,7 @@ constexpr int CHUNK_SIZE_X = 16;
 constexpr int CHUNK_SIZE_Y = 256;
 constexpr int CHUNK_SIZE_Z = 16;
 
-// for indentifying chunks
+// for identifying chunks
 struct ChunkCoord {
   int x, z;
   bool operator==(const ChunkCoord& other) const {
@@ -47,11 +49,10 @@ namespace std {
 
 class Chunk {
   public:
-  std::vector<Voxel> voxels;
+  std::array<Voxel, CHUNK_SIZE_X * CHUNK_SIZE_Y * CHUNK_SIZE_Z> voxels;
   Chunk() {
-      voxels.resize(CHUNK_SIZE_X * CHUNK_SIZE_Y * CHUNK_SIZE_Z);
     for (Voxel voxel:voxels) {
-      voxel.type = 1;
+      setBlockType(voxel, BlockType::AIR);
     }
 
     }
