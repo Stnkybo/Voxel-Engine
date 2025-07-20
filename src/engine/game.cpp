@@ -15,6 +15,7 @@
 
 #include "rendering/shader.h"
 #include "camera/camera.h"
+#include "physics/worldCollision.h"
 #include "rendering/cube.h"
 #include "rendering/model.hpp"
 #include "terrain/world.h"
@@ -238,7 +239,7 @@ void Game::onStart() {
     player = new Player(glm::vec3(0.0f, 5.0f, 10.0f));
     //camera = new Camera(glm::vec3(0.0f, 5.0f, 10.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
-    auto world = &World::getInstance();
+    world = &World::getInstance();
     ChunkCoord chunk_coords = {1,-1};
     world->generateChunk(chunk_coords);
     Chunk* chunk = world->getChunk(chunk_coords);
@@ -267,7 +268,7 @@ void Game::update() {
     }
 
     //PHYSICS
-
+    worldCollision::resolveCollisions(player->getBoundingBox(), world);
 
 }
 

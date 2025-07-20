@@ -12,6 +12,7 @@
 #include "rendering/shader.h"
 #include "../entities/player.h"
 #include "rendering/cube.h"
+#include "terrain/world.h"
 
 
 class Game {
@@ -35,6 +36,7 @@ class Game {
 
     vector<Cube *> penith;
     int penith_offset[3] = {0, 0, 0};
+    World *world;
 
 public:
     unordered_map<std::string, bool> eventStates;

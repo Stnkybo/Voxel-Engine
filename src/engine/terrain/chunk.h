@@ -7,6 +7,15 @@
 #include "../rendering/cube.h"
 #include "voxel.h"
 
+inline int floor_div(int a, int b) {
+  int result = a / b;
+  // Adjust for negative results where a % b != 0 and signs differ
+  if ((a % b != 0) && ((a < 0) != (b < 0))) {
+    result--;
+  }
+  return result;
+}
+
 // define the dimensions of a chunk
 constexpr int CHUNK_SIZE_X = 16;
 constexpr int CHUNK_SIZE_Y = 256;
@@ -22,8 +31,7 @@ struct ChunkCoord {
 
 //for converting voxel coordinates to Chunk Coords
 inline ChunkCoord VoxelToChunkCoords(int x, int z) {
-
-  ChunkCoord chunk_coord{x/CHUNK_SIZE_X, z/CHUNK_SIZE_Z};
+  ChunkCoord chunk_coord{floor_div(x, CHUNK_SIZE_X), floor_div(z, CHUNK_SIZE_Z)};
   return chunk_coord;
 }
 

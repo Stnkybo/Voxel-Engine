@@ -8,7 +8,7 @@
 
 Voxel* World::getBlock(int x, int y, int z) {
     //calc chunk map coords from vec3
-    ChunkCoord chunk_coord = VoxelToChunkCoords(x, y);
+    ChunkCoord chunk_coord = VoxelToChunkCoords(x, z);
     //get chunk if it exists
     Chunk* chunk = getChunk(chunk_coord);
     if (chunk != nullptr) {

@@ -11,10 +11,10 @@
 
 
 class worldCollision {
-    World* world = &World::getInstance();
-    bool isSolid(int x, int y, int z);
+    public:
+    static bool isSolid(int x, int y, int z, World* world);
 
-    void resolveCollisions(AABB& player);
+    static void resolveCollisions(AABB player, World *world);
 
 
 };

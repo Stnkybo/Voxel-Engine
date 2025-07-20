@@ -4,7 +4,7 @@
 
 #include "worldCollision.h"
 
-bool worldCollision::isSolid(int x, int y, int z) {
+bool worldCollision::isSolid(int x, int y, int z, World* world) {
         Voxel* block = world->getBlock(x,y,z);
         if ( block != nullptr) {
 
@@ -13,11 +13,11 @@ bool worldCollision::isSolid(int x, int y, int z) {
         return false;
 }
 
- void worldCollision::resolveCollisions(AABB& player) {
+void worldCollision::resolveCollisions(AABB player, World* world) {
     for (int x = floor(player.min.x); x <= floor(player.max.x); ++x) {
         for (int y = floor(player.min.y); y <= floor(player.max.y); ++y) {
-            for (int z = floor(player.min.y); z <= floor(player.max.z); ++z) {
-                if (isSolid(x, y, z)) {
+            for (int z = floor(player.min.z); z <= floor(player.max.z); ++z) {
+                if (isSolid(x, y, z, world)) {
                     AABB block = AABB::fromCenterSize({x, y, z}, {1,1,1});
                     if (player.intersects(block)) {
                         std::cout << "RAHHHH" << std::endl;
