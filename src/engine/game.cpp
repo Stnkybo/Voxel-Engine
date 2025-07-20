@@ -243,6 +243,19 @@ void Game::onStart() {
 
     world = &World::getInstance();
     // Generate some chunks
+    ChunkCoord chunk_coords = {0,0};
+    world->generateChunk(chunk_coords);
+    Chunk* chunk = world->getChunk(chunk_coords);
+    for (int x = 0; x < CHUNK_SIZE_X; x++) {
+        for (int y = 0; y < CHUNK_SIZE_Y; y++) {
+            for (int z = 0; z < CHUNK_SIZE_Z; z++) {
+                if (getBlockType(chunk->at(x,y,z)) != BlockType::AIR) {
+                    m_cubes.emplace_back(new Cube(x + chunk_coords.x * CHUNK_SIZE_X, y, z + chunk_coords.z * CHUNK_SIZE_Z));
+                }
+            }
+        }
+    }
+
     for (int i = -1; i <= 1; i++) {
         for (int j = 1; j <= 3; j++) {
 
@@ -262,6 +275,12 @@ void Game::onStart() {
 
         }
         }
+
+    std::cout << "block -1,8,16 type: " << static_cast<int>(world->getBlock(-1,8,16)->type) << std::endl;
+    std::cout << "block -1,9,16 type: " << static_cast<int>(world->getBlock(-1,9,16)->type) << std::endl;
+
+    std::cout << "block 1,8,16 type: " << static_cast<int>(world->getBlock(1,8,16)->type) << std::endl;
+    std::cout << "block 1,9,16 type: " << static_cast<int>(world->getBlock(1,9,16)->type) << std::endl;
     }
 
 void Game::update() {

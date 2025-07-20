@@ -4,7 +4,7 @@
 
 #include "player.h"
 
-Player::Player(glm::vec3 positionIn): Entity(positionIn, {1,2,1}) {
+Player::Player(glm::vec3 positionIn): Entity(positionIn, {0.5f,2,0.5f}) {
     camera = new Camera(position, glm::vec3(0.0f, 1.0f, 0.0f));
 }
 

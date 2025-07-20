@@ -21,7 +21,7 @@ void worldCollision::resolveCollisions(Player& player, World* world) {
         for (int y = floor(playerBox.min.y); y <= ceil(playerBox.max.y); ++y) {
             for (int z = floor(playerBox.min.z); z <= ceil(playerBox.max.z); ++z) {
                 if (isSolid(x, y, z, world)) {
-                    AABB blockBox = AABB::fromCenterSize({x, y, z}, {1,1,1});
+                    AABB blockBox = AABB::fromCenterSize(glm::vec3(x, y, z) + glm::vec3(0.5f,0.5f,0.5f), {1,1,1});
                     if (playerBox.intersects(blockBox)) {
                         // Handle response here
                         glm::vec3 mtvVec = AABB::getMTV(playerBox, blockBox);
