@@ -133,6 +133,7 @@ add_executable(${PROJECT_NAME}
         src/engine/physics/worldCollision.h
         src/engine/physics/AABB.cpp
         src/engine/physics/AABB.h
+        src/engine/math/mod.h
 )
 
 # Copy Shaders

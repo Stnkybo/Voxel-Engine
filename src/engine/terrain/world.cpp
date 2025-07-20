@@ -4,6 +4,7 @@
 
 #include "world.h"
 #include "chunk.h"
+#include "../math/mod.h"
 
 
 Voxel* World::getBlock(int x, int y, int z) {
@@ -12,10 +13,9 @@ Voxel* World::getBlock(int x, int y, int z) {
     //get chunk if it exists
     Chunk* chunk = getChunk(chunk_coord);
     if (chunk != nullptr) {
-        int local_x, local_y, local_z;
-        local_x = x % CHUNK_SIZE_X;
-        local_y = y % CHUNK_SIZE_Y;
-        local_z = z % CHUNK_SIZE_Z;
+        int local_x = mod(x,CHUNK_SIZE_X);
+        int local_y = mod(y,CHUNK_SIZE_Y);
+        int local_z = mod(z,CHUNK_SIZE_Z);
         return &chunk->at(local_x,local_y,local_z);
     }
     // if no chunk data exist
