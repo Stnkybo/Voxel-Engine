@@ -21,6 +21,10 @@ inline BlockType getBlockType(const Voxel& v) {
   return static_cast<BlockType>(v.type);
 }
 
+inline void setBlockType(Voxel& v, BlockType type) {
+  v.type = static_cast<uint8_t>(type);
+}
+
 inline Voxel makeVoxel(BlockType type) {
   return Voxel{static_cast<uint8_t>(type)};
 }
