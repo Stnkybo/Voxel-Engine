@@ -350,6 +350,7 @@ void Game::imguiUI(const ImGuiIO& io) {
         ImGui::SliderInt3("penith", penith_offset, -25.0f, 25.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
 
         ImGui::Text("Player Pos %.3f, %.3f, %.3f ", player->getPosition().x, player->getPosition().y, player->getPosition().z);
+        ImGui::Text("Player Feet %.3f, %.3f, %.3f ", player->getBoundingBox().min.x, player->getBoundingBox().min.y, player->getBoundingBox().min.z);
         ImGui::Text("Player Speed %.2f", player->getMovementSpeed());            // Edit 1 float using a slider from 0.0f to 1.0f
         ImGui::ColorEdit3("clear color", reinterpret_cast<float *>(&clear_color)); // Edit 3 floats representing a color
 
