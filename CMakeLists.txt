@@ -109,8 +109,8 @@ add_executable(${PROJECT_NAME}
         src/main.cpp
         src/engine/window.cpp
         src/engine/window.h
-        src/engine/triangle.cpp
-        src/engine/triangle.h
+        src/engine/demo/triangle.cpp
+        src/engine/demo/triangle.h
         src/engine/rendering/cube.h
         src/entities/player.cpp
         src/entities/player.h
