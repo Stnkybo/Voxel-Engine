@@ -13,6 +13,7 @@
 #include <iostream>
 #include <ostream>
 
+#include "../config.h"
 #include "rendering/shader.h"
 #include "camera/camera.h"
 #include "physics/worldCollision.h"
@@ -237,6 +238,7 @@ void Game::onStart() {
 
 
     player = new Player(glm::vec3(0.0f, 5.0f, 10.0f));
+    player->camera->Zoom = FOV;
     //camera = new Camera(glm::vec3(0.0f, 5.0f, 10.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
     world = &World::getInstance();

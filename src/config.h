@@ -7,5 +7,6 @@
 
 inline int WIDTH = 800;
 inline int HEIGHT = 600;
+inline float FOV = 80.0f;
 
 #endif //CONFIG_H
