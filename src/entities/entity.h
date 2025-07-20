@@ -9,19 +9,16 @@
 
 class Entity {
 public:
-    Entity(float position_x, float position_y, float position_z)
-        : positionX(position_x),
-          positionY(position_y),
-          positionZ(position_z) {
-    }
+    Entity(glm::vec3 positionIn, glm::vec3 sizeIn);
     ~Entity() = default;
+    glm::vec3 velocity;
+    glm::vec3 position;
+    glm::vec3 size;
+    AABB boundingBox;
 
 private:
-    float positionX;
-    float positionY;
-    float positionZ;
+
     //Collider m_collider;
-    AABB boundingBox;
 
 };
 

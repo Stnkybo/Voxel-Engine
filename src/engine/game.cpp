@@ -151,7 +151,7 @@ void Game::handleEvents() {
                 }if (keycode == SDLK_R) {
 
                     //Test
-                    camera->Position = glm::vec3(0.0f, 5.0f, 10.0f);
+                    //camera->Position = glm::vec3(0.0f, 5.0f, 10.0f);
 
                 }
             }
@@ -172,19 +172,19 @@ void Game::handleEvents() {
         const auto* keyState = reinterpret_cast<const Uint8 *>(SDL_GetKeyboardState(nullptr));
 
         if (keyState[SDL_SCANCODE_W])
-            camera->ProcessKeyboard(FORWARD, m_deltaTime);
+            player->camera->ProcessKeyboard(FORWARD, m_deltaTime);
         if (keyState[SDL_SCANCODE_S])
-            camera->ProcessKeyboard(BACKWARD, m_deltaTime);
+            player->camera->ProcessKeyboard(BACKWARD, m_deltaTime);
         if (keyState[SDL_SCANCODE_A])
-            camera->ProcessKeyboard(LEFT, m_deltaTime);
+            player->camera->ProcessKeyboard(LEFT, m_deltaTime);
         if (keyState[SDL_SCANCODE_D])
-            camera->ProcessKeyboard(RIGHT, m_deltaTime);
+            player->camera->ProcessKeyboard(RIGHT, m_deltaTime);
         if (keyState[SDL_SCANCODE_LSHIFT]) {
 
-            camera->MovementSpeed = 20.0f;
+            player->camera->MovementSpeed = 20.0f;
         }
         else {
-            camera->MovementSpeed = 5.0f;
+            player->camera->MovementSpeed = 5.0f;
         }
 
 }
@@ -195,7 +195,7 @@ void Game::processMouseMotion(const SDL_Event& event) const {
         const float yOffset = event.motion.yrel; // Relative y motion
 
         // Process mouse movement in the camera
-        camera->ProcessMouseMovement(xOffset, yOffset);
+        player->camera->ProcessMouseMovement(xOffset, yOffset);
     }
 }
 
@@ -236,7 +236,8 @@ void Game::onStart() {
     otherShader = new Shader("./resources/shaders/shader.vert", "./resources/shaders/shader.frag");
 
 
-    camera = new Camera(glm::vec3(0.0f, 5.0f, 10.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    player = new Player(glm::vec3(0.0f, 5.0f, 10.0f));
+    //camera = new Camera(glm::vec3(0.0f, 5.0f, 10.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
     auto world = &World::getInstance();
     ChunkCoord chunk_coords = {1,-1};
@@ -279,8 +280,8 @@ void Game::render() {
     ourShader->use();
 
     // Get camera matrices
-    glm::mat4 view = camera->GetViewMatrix();
-    glm::mat4 projection = camera->GetProjectionMatrix(static_cast<float>(m_width) / static_cast<float>(m_height));
+    glm::mat4 view = player->camera->GetViewMatrix();
+    glm::mat4 projection = player->camera->GetProjectionMatrix(static_cast<float>(m_width) / static_cast<float>(m_height));
     ourShader->setMat4("projection", projection);
     ourShader->setMat4("view", view);
 
@@ -346,8 +347,8 @@ void Game::imguiUI(const ImGuiIO& io) {
         ImGui::Text("Cube Count %d ", m_cubes.size());               // Display some text (you can use a format strings too)
         ImGui::SliderInt3("penith", penith_offset, -25.0f, 25.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
 
-        ImGui::Text("Camera Pos %.3f, %.3f, %.3f ", camera->Position.x, camera->Position.y, camera->Position.z);               // Display some text (you can use a format strings too)
-        ImGui::SliderFloat("Camera Speed", &camera->MovementSpeed, 1.0f, 25.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+        ImGui::Text("Camera Pos %.3f, %.3f, %.3f ", player->camera->Position.x, player->camera->Position.y, player->camera->Position.z);               // Display some text (you can use a format strings too)
+        //ImGui::SliderFloat("Camera Speed", &camera->MovementSpeed, 1.0f, 25.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
         ImGui::ColorEdit3("clear color", reinterpret_cast<float *>(&clear_color)); // Edit 3 floats representing a color
 
         // if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)

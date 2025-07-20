@@ -11,7 +11,8 @@ class AABB {
 public:
     glm::vec3 min;
     glm::vec3 max;
-    // Create from center + size
+
+    // Create an AABB from center + size
     static AABB fromCenterSize(const glm::vec3& center, const glm::vec3& size) {
         glm::vec3 halfSize = size * 0.5f;
         return AABB(center - halfSize, center + halfSize);

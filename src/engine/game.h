@@ -10,14 +10,14 @@
 
 
 #include "rendering/shader.h"
-#include "camera/camera.h"
+#include "../entities/player.h"
 #include "rendering/cube.h"
 
 
 class Game {
     SDL_Window *m_window;
     SDL_Renderer *m_renderer{};
-    Camera *camera{};
+    Player* player{};
 
     const double FRAME_TIME = 1.0f / 60.0f;
     Uint64  m_lastTick = 0.0f;
