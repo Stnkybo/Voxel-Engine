@@ -270,7 +270,7 @@ void Game::update() {
     }
 
     //PHYSICS
-    worldCollision::resolveCollisions(player->getBoundingBox(), world);
+    worldCollision::resolveCollisions(*player, world);
 
 }
 

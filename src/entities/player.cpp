@@ -34,7 +34,7 @@ float Player::getMovementSpeed() const {
     return movementSpeed;
 }
 
-AABB Player::getBoundingBox() {
+AABB &Player::getBoundingBox() {
     return boundingBox;
 }
 

@@ -6,15 +6,14 @@
 #define WORLDCOLLISION_H
 #include <cmath>
 
-#include "AABB.h"
+#include "../../entities/player.h"
 #include "../terrain/world.h"
-
 
 class worldCollision {
     public:
     static bool isSolid(int x, int y, int z, World* world);
 
-    static void resolveCollisions(AABB player, World *world);
+    static void resolveCollisions(Player & player, World *world);
 
 
 };

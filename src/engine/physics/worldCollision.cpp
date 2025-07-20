@@ -4,6 +4,8 @@
 
 #include "worldCollision.h"
 
+#include "../../Entities/player.h"
+
 bool worldCollision::isSolid(int x, int y, int z, World* world) {
         Voxel* block = world->getBlock(x,y,z);
         if ( block != nullptr) {
@@ -13,15 +15,18 @@ bool worldCollision::isSolid(int x, int y, int z, World* world) {
         return false;
 }
 
-void worldCollision::resolveCollisions(AABB player, World* world) {
-    for (int x = floor(player.min.x); x <= floor(player.max.x); ++x) {
-        for (int y = floor(player.min.y); y <= floor(player.max.y); ++y) {
-            for (int z = floor(player.min.z); z <= floor(player.max.z); ++z) {
+void worldCollision::resolveCollisions(Player& player, World* world) {
+    AABB& playerBox = player.getBoundingBox();
+    for (int x = floor(playerBox.min.x); x <= ceil(playerBox.max.x); ++x) {
+        for (int y = floor(playerBox.min.y); y <= ceil(playerBox.max.y); ++y) {
+            for (int z = floor(playerBox.min.z); z <= ceil(playerBox.max.z); ++z) {
                 if (isSolid(x, y, z, world)) {
-                    AABB block = AABB::fromCenterSize({x, y, z}, {1,1,1});
-                    if (player.intersects(block)) {
-                        std::cout << "RAHHHH" << std::endl;
+                    AABB blockBox = AABB::fromCenterSize({x, y, z}, {1,1,1});
+                    if (playerBox.intersects(blockBox)) {
                         // Handle response here
+                        glm::vec3 mtvVec = AABB::getMTV(playerBox, blockBox);
+                        player.setPosition(player.getPosition() + mtvVec);
+                        //std::cout << "RAHHHH" << std::endl;
                     }
                 }
             }

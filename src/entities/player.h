@@ -18,7 +18,7 @@ class Player : public Entity {
   void setMovementSpeed(float speed);
   float getMovementSpeed() const;
 
-  AABB getBoundingBox();
+  AABB &getBoundingBox();
 
   Camera* camera;
 
