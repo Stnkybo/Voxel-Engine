@@ -216,21 +216,21 @@ void Game::onStart() {
     for (int i = 0; i < 11; i++) { //Make floor
         for (int j = 0; j < 11; j++) {
             if ((i != (11-1)/2) || (j != (11-1)/2)) {
-                const auto newCube = new Cube(i-5,0,j-5);
-                m_cubes.emplace_back(newCube);
+                auto newCube = std::make_unique<Cube>(i-5, 0, j-5);
+                m_cubes.emplace_back(std::move(newCube));
 
             }
         }
     }
 
     for (int i = 0; i < 10; i++) {
-        const auto newCube = new Cube(0,i+1,0);
-        m_cubes.emplace_back(newCube);
-        penith.emplace_back(newCube);
+        auto newCube = std::make_unique<Cube>(0,i+1,0);
+        penith.emplace_back(newCube.get()); // doesnt own reference to cube
+        m_cubes.emplace_back(std::move(newCube)); // owns the reference to cube
     }
 
-    const auto newCube = new Cube(0,13,0);
-    m_cubes.emplace_back(newCube);
+    auto newCube = std::make_unique<Cube>(0,13,0);
+    m_cubes.emplace_back(std::move(newCube));
 
 
     ourShader = new Shader("./resources/shaders/modelShader.vert", "./resources/shaders/modelShader.frag");
@@ -250,7 +250,7 @@ void Game::onStart() {
         for (int y = 0; y < CHUNK_SIZE_Y; y++) {
             for (int z = 0; z < CHUNK_SIZE_Z; z++) {
                 if (getBlockType(chunk->at(x,y,z)) != BlockType::AIR) {
-                    m_cubes.emplace_back(new Cube(x + chunk_coords.x * CHUNK_SIZE_X, y, z + chunk_coords.z * CHUNK_SIZE_Z));
+                    m_cubes.emplace_back(std::make_unique<Cube>(x + chunk_coords.x * CHUNK_SIZE_X, y, z + chunk_coords.z * CHUNK_SIZE_Z));
                 }
             }
         }
@@ -259,7 +259,7 @@ void Game::onStart() {
     for (int i = -1; i <= 1; i++) {
         for (int j = 1; j <= 3; j++) {
 
-            ChunkCoord chunk_coords = {i,j};
+            chunk_coords = {i,j};
             world->generateChunk(chunk_coords);
             Chunk* chunk = world->getChunk(chunk_coords);
 
@@ -319,7 +319,7 @@ void Game::render() {
     model = scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
     ourShader->setMat4("model", model);
 
-    for (const Cube* cube : m_cubes) {
+    for (const auto& cube : m_cubes) {
         if (cube->cubeMesh != nullptr) {
             // cout << cube->cubeMesh->vertices[0].Position.y << endl;
             cube->cubeMesh->Draw(*ourShader);

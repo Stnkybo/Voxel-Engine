@@ -28,7 +28,7 @@ class Game {
 
     Shader *ourShader{};
     Shader *otherShader{};
-    std::vector<Cube *> m_cubes;
+    std::vector<std::unique_ptr<Cube>> m_cubes;
     Texture *terrainTexture{};
     bool m_boolDebugMenu{};
     SDL_GLContext m_glContext;
@@ -36,7 +36,7 @@ class Game {
 
     vector<Cube *> penith;
     int penith_offset[3] = {0, 0, 0};
-    World *world;
+    World *world{};
 
 public:
     unordered_map<std::string, bool> eventStates;
