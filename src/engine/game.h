@@ -7,6 +7,7 @@
 #include <imgui.h>
 #include <unordered_map>
 #include <SDL3/SDL.h>
+#include <memory>
 
 
 #include "rendering/shader.h"
