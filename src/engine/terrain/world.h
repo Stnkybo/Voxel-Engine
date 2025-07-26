@@ -7,7 +7,7 @@
 #include <unordered_map>
 
 #include "chunk.h"
-
+#include "../rendering/terrain/GreedyMesher.h"
 
 
 class World {
@@ -21,9 +21,14 @@ public:
     Chunk* getChunk(ChunkCoord coord);
     void removeChunk(ChunkCoord coord);
 
+    void updateDirtyChunks();
+    void renderVisibleChunks(Shader& shader);
+    GreedyMesher mesher;
+
 private:
     World() = default;
     std::unordered_map<ChunkCoord, Chunk*> chunkMap;
+    std::vector<ChunkCoord> dirtyChunks;
 };
 
 

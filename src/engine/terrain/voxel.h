@@ -13,6 +13,15 @@ enum class BlockType : uint8_t {
   BRICK = 4
 };
 
+enum class FaceDirection {
+  XP, // +X face (right)
+  XN, // -X face (left)
+  YP, // +Y face (top)
+  YN, // -Y face (bottom)
+  ZP, // +Z face (front)
+  ZN  // -Z face (back)
+};
+
 struct Voxel {
   uint8_t type;  // block type ID
   // maybe other data: light, metadata, etc.

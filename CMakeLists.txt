@@ -138,6 +138,8 @@ add_executable(${PROJECT_NAME}
         src/engine/rendering/terrain/ChunkMesh.h
         src/engine/rendering/terrain/GreedyMesher.cpp
         src/engine/rendering/terrain/GreedyMesher.h
+        src/engine/rendering/terrain/BlockTextureAtlas.cpp
+        src/engine/rendering/terrain/BlockTextureAtlas.h
 )
 
 # Copy Shaders

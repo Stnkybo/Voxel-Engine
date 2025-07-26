@@ -8,6 +8,7 @@
 
 #include "../rendering/cube.h"
 #include "voxel.h"
+#include "../rendering/terrain/ChunkMesh.h"
 
 inline int floor_div(int a, int b) {
   int result = a / b;
@@ -50,6 +51,7 @@ namespace std {
 class Chunk {
   public:
   std::array<Voxel, CHUNK_SIZE_X * CHUNK_SIZE_Y * CHUNK_SIZE_Z> voxels;
+  ChunkMeshing::ChunkMesh mesh;
   Chunk() {
     for (int i = 0; i < CHUNK_SIZE_X * CHUNK_SIZE_Y * CHUNK_SIZE_Z; ++i) {
       makeVoxel(BlockType::AIR);

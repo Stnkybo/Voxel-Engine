@@ -5,30 +5,34 @@
 #ifndef GREEDYMESHER_H
 #define GREEDYMESHER_H
 
+#include "BlockTextureAtlas.h"
 #include "ChunkMesh.h"
 #include "../../terrain/chunk.h"
 
 
 class GreedyMesher {
+    public:
+    GreedyMesher() = default;
+    ~GreedyMesher() = default;
+        void GreedyMeshChunk(Chunk& chunk, ChunkMeshing::ChunkMesh& chunkMesh);
+        BlockTextureAtlas blockTextureAtlas;
+    private:
+        void ProcessDirection(Chunk& chunk, ChunkMeshing::ChunkMesh& chunkMesh, int dir);
 
+        int GetDepthForDirection(int z, int dir);
 
-    void GreedyMeshChunk(Chunk& chunk, ChunkMeshing::ChunkMesh& chunkMesh);
+        bool IsFaceVisible(Chunk& chunk, int x, int y, int z, int dir);
 
-    void ProcessDirection(Chunk& chunk, ChunkMeshing::ChunkMesh& chunkMesh, int dir);
+        void AddQuad(ChunkMeshing::ChunkMesh& chunkMesh, int x, int y, int width, int height, int dir, uint8_t blockType);
 
-    int GetDepthForDirection(int z, int dir);
+        glm::vec3 GetNormal(int dir);
 
-    bool IsFaceVisible(Chunk& chunk, int x, int y, int z, int dir);
+        void CalculateQuadCorners(int x, int y, int width, int height, int dir, glm::vec3 corners[4]);
 
-    void AddQuad(ChunkMeshing::ChunkMesh& chunkMesh, int x, int y, int width, int height, int dir, uint8_t blockType);
+        glm::vec2 CalculateUVs(uint8_t blockType, int faceDir, int cornerIdx, int quadWidth, int quadHeight);
 
-    glm::vec3 GetNormal(int dir);
+        glm::ivec2 GetTexturePosition(uint8_t blockType, int faceDir);
 
-    void CalculateQuadCorners(int x, int y, int width, int height, int dir, glm::vec3 corners[4]);
-
-    glm::vec2 CalculateUVs(uint8_t blockType, int faceDir, int cornerIdx, int quadWidth, int quadHeight);
-
-    glm::ivec2 GetTexturePosition(uint8_t blockType, int faceDir);
 };
 
 

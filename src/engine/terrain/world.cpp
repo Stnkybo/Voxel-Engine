@@ -23,6 +23,7 @@ Voxel* World::getBlock(int x, int y, int z) {
 }
 
 void World::generateChunk(ChunkCoord coord) {
+    if (chunkMap.contains(coord)) return;  // Early exit if chunk exists
     auto* newChunk = new Chunk();
     for (int x = 0; x < CHUNK_SIZE_X; ++x) {
         for (int y = 0; y < CHUNK_SIZE_Y; ++y) {
@@ -37,6 +38,7 @@ void World::generateChunk(ChunkCoord coord) {
         }
     }
     chunkMap[coord] = newChunk;
+    dirtyChunks.push_back(coord); // Mark for meshing
 }
 
 Chunk * World::getChunk(ChunkCoord coord) {
@@ -44,5 +46,37 @@ Chunk * World::getChunk(ChunkCoord coord) {
 }
 
 void World::removeChunk(ChunkCoord coord) {
+    chunkMap[coord]->mesh.DeleteGPUResources();
     chunkMap.erase(coord);
+}
+
+void World::updateDirtyChunks() {
+    for (ChunkCoord coord : dirtyChunks) {
+        if (auto it = chunkMap.find(coord); it != chunkMap.end()) {
+            Chunk* chunk = it->second;
+            chunk->mesh.Clear();
+            mesher.GreedyMeshChunk(*chunk, chunk->mesh);
+            chunk->mesh.UploadToGPU();
+        }
+    }
+    dirtyChunks.clear();
+}
+
+void World::renderVisibleChunks(Shader& shader) {
+    shader.use();
+    mesher.blockTextureAtlas.Bind();
+    // Bind once for all chunks
+
+    for (auto& [coord, chunk] : chunkMap) {
+        if (chunk == nullptr ) continue;
+
+        // Frustum culling check here if implemented
+        glm::mat4 model = glm::translate(glm::mat4(1.0f),
+            glm::vec3(coord.x * CHUNK_SIZE_X,
+                     0 * CHUNK_SIZE_Y,
+                     coord.z * CHUNK_SIZE_Z));
+
+        shader.setMat4("model", model);
+        chunk->mesh.Draw();
+    }
 }

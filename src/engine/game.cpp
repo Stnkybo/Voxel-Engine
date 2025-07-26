@@ -131,6 +131,8 @@ void Game::handleEvents() {
                     isRunning = false;
                 }
                 if (keycode == SDLK_SPACE) {
+                    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // wireframe gl
+
                     Shader *tempShader = ourShader;
                     ourShader = otherShader;
                     otherShader = tempShader;
@@ -210,13 +212,6 @@ void Game::onStart() {
 
     m_boolDebugMenu = true;
 
-    // Cheeky duplicate bad mem
-    terrainTexture = new Texture;
-    terrainTexture->path = "wall.jpg"; //awesomeface.png
-    terrainTexture->type = "texture_diffuse";
-    terrainTexture->id =  TextureFromFile(terrainTexture->path.c_str(), "resources/textures");
-    Cube::setTexture(*terrainTexture);
-
     for (int i = 0; i < 11; i++) { //Make floor
         for (int j = 0; j < 11; j++) {
             if ((i != (11-1)/2) || (j != (11-1)/2)) {
@@ -243,49 +238,22 @@ void Game::onStart() {
 
     player = new Player(glm::vec3(0.0f, 5.0f, 10.0f));
     player->camera->Zoom = FOV;
-    //camera = new Camera(glm::vec3(0.0f, 5.0f, 10.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
     world = &World::getInstance();
+
+    world->mesher.blockTextureAtlas.LoadFromFile("resources/textures/wall.jpg");
+
     // Generate some chunks
     ChunkCoord chunk_coords = {0,0};
     world->generateChunk(chunk_coords);
-    Chunk* chunk = world->getChunk(chunk_coords);
-    for (int x = 0; x < CHUNK_SIZE_X; x++) {
-        for (int y = 0; y < CHUNK_SIZE_Y; y++) {
-            for (int z = 0; z < CHUNK_SIZE_Z; z++) {
-                if (getBlockType(chunk->at(x,y,z)) != BlockType::AIR) {
-                    m_cubes.emplace_back(std::make_unique<Cube>(x + chunk_coords.x * CHUNK_SIZE_X, y, z + chunk_coords.z * CHUNK_SIZE_Z));
-                }
-            }
-        }
-    }
-
     for (int i = -1; i <= 1; i++) {
         for (int j = 1; j <= 3; j++) {
 
             chunk_coords = {i,j};
             world->generateChunk(chunk_coords);
-            Chunk* chunk = world->getChunk(chunk_coords);
-
-            for (int x = 0; x < CHUNK_SIZE_X; x++) {
-                for (int y = 0; y < CHUNK_SIZE_Y; y++) {
-                    for (int z = 0; z < CHUNK_SIZE_Z; z++) {
-                        if (getBlockType(chunk->at(x,y,z)) != BlockType::AIR) {
-                            m_cubes.emplace_back(new Cube(x + chunk_coords.x * CHUNK_SIZE_X, y, z + chunk_coords.z * CHUNK_SIZE_Z));
-                        }
-                    }
-                }
-            }
-
         }
-        }
-
-    std::cout << "block -1,8,16 type: " << static_cast<int>(world->getBlock(-1,8,16)->type) << std::endl;
-    std::cout << "block -1,9,16 type: " << static_cast<int>(world->getBlock(-1,9,16)->type) << std::endl;
-
-    std::cout << "block 1,8,16 type: " << static_cast<int>(world->getBlock(1,8,16)->type) << std::endl;
-    std::cout << "block 1,9,16 type: " << static_cast<int>(world->getBlock(1,9,16)->type) << std::endl;
     }
+}
 
 void Game::update() {
     const Uint32 currentTick = SDL_GetTicks();
@@ -293,6 +261,9 @@ void Game::update() {
     m_lastTick = currentTick;
     //unprocessedTime += m_deltaTime;
     //frameCounter += m_deltaTime;
+
+    // Update world (chunk loading/unloading)
+    world->updateDirtyChunks();
 
     for (int i = 0 ; i < penith.size(); i++) {
             penith[i]->setPosition(penith_offset[0], 1 + i + penith_offset[1], penith_offset[2]);
@@ -316,21 +287,30 @@ void Game::render() {
     ourShader->setMat4("projection", projection);
     ourShader->setMat4("view", view);
 
-    // Draw cubes
-    // render the loaded model
-    auto model = glm::mat4(1.0f);
-    model = translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
-    model = scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
-    ourShader->setMat4("model", model);
+    // 2. Rendering
+    world->renderVisibleChunks(*ourShader);
 
-    for (const auto& cube : m_cubes) {
-        if (cube->cubeMesh != nullptr) {
-            // cout << cube->cubeMesh->vertices[0].Position.y << endl;
-            cube->cubeMesh->Draw(*ourShader);
-        } else {
-            cout << "cubeMesh is nullptr!" << endl;
-        }
-    }
+    // 3. Mark chunks dirty when modified
+    // if (playerModifiedBlock) {
+    //     ChunkCoord coord = getChunkCoord(modifiedBlockPos);
+    //     world.dirtyChunks.push_back(coord);
+    // }
+
+    // // Draw cubes
+    // // render the loaded model
+    // auto model = glm::mat4(1.0f);
+    // model = translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
+    // model = scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
+    // ourShader->setMat4("model", model);
+    //
+    // for (const auto& cube : m_cubes) {
+    //     if (cube->cubeMesh != nullptr) {
+    //         // cout << cube->cubeMesh->vertices[0].Position.y << endl;
+    //         cube->cubeMesh->Draw(*ourShader);
+    //     } else {
+    //         cout << "cubeMesh is nullptr!" << endl;
+    //     }
+    // }
 
 
     // Text
@@ -390,7 +370,7 @@ void Game::imguiUI(const ImGuiIO& io) {
 
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
         ImGui::Text("Application TIME  (%d ms), Delta: (%d ms)", SDL_GetTicks(), m_deltaTime);
-        ImGui::Text("Terrain Texture:  (%d, %s)", terrainTexture->id, terrainTexture->path.c_str());
+        //ImGui::Text("Terrain Texture:  (%d, %s)", terrainTexture->id, terrainTexture->path.c_str());
         if (ImGui::Button("Close Me"))
             m_boolDebugMenu = false;
         ImGui::End();

@@ -4,6 +4,9 @@ void GreedyMesher::GreedyMeshChunk(Chunk& chunk, ChunkMeshing::ChunkMesh& chunkM
     for (int dir = 0; dir < 6; dir++) {
         ProcessDirection(chunk, chunkMesh, dir);
     }
+    std::cout << "Vertices: " << chunk.mesh.vertices.size()
+          << ", Indices: " << chunk.mesh.indices.size() << std::endl;
+
 }
 
 void GreedyMesher::ProcessDirection(Chunk& chunk, ChunkMeshing::ChunkMesh& chunkMesh, int dir) {
@@ -15,14 +18,11 @@ void GreedyMesher::ProcessDirection(Chunk& chunk, ChunkMeshing::ChunkMesh& chunk
     MaskCell mask[CHUNK_SIZE_X][CHUNK_SIZE_Y] = {{{false, 0}}};
 
     // Step 1: Build visibility mask with block types
-    for (int x = 0; x < CHUNK_SIZE_X; x++) {
-        for (int y = 0; y < CHUNK_SIZE_Y; y++) {
-            for (int z = 0; z < CHUNK_SIZE_Z; z++) {
+    for (int x = 0+1; x < CHUNK_SIZE_X-1; x++) {
+        for (int y = 0+1; y < CHUNK_SIZE_Y-1; y++) {
+            for (int z = 0+1; z < CHUNK_SIZE_Z-1; z++) {
                 if (IsFaceVisible(chunk, x, y, z, dir)) {
-                    mask[x][y] = {
-                        true,
-                        chunk.at(x, y, GetDepthForDirection(z, dir)).type
-                    };
+                    mask[x][y] = {true, chunk.at(x, y, GetDepthForDirection(z, dir)).type};
                     break;
                 }
             }
@@ -150,24 +150,22 @@ void GreedyMesher::CalculateQuadCorners(int x, int y, int width, int height, int
     }
 }
 
-glm::vec2 GreedyMesher::CalculateUVs(uint8_t blockType, int faceDir, int cornerIdx, 
-                                    int quadWidth, int quadHeight) {
-    const int ATLAS_TILE_SIZE = 16; // pixels per texture
-    const int ATLAS_WIDTH = 256;    // total atlas width in pixels
-    
-    glm::ivec2 texTile = GetTexturePosition(blockType, faceDir);
-    
-    // UV corners with quad size scaling
+glm::vec2 GreedyMesher::CalculateUVs(uint8_t type, int face,
+                                    int cornerIdx, int quadWidth, int quadHeight) {
+    // Get base UV offset from atlas
+    glm::vec2 baseUV = blockTextureAtlas.GetUVOffset(type, face);
+
+    // Scale UVs by quad dimensions
     glm::vec2 uvCorners[4] = {
         {0.0f,         0.0f},
         {quadWidth,    0.0f},
         {quadWidth,    quadHeight},
         {0.0f,         quadHeight}
     };
-    
-    // Convert to normalized atlas coordinates
-    float u = (texTile.x * ATLAS_TILE_SIZE + uvCorners[cornerIdx].x) / ATLAS_WIDTH;
-    float v = (texTile.y * ATLAS_TILE_SIZE + uvCorners[cornerIdx].y) / ATLAS_WIDTH;
+
+    // Convert to normalized coordinates
+    float u = baseUV.x + (uvCorners[cornerIdx].x / blockTextureAtlas.GetAtlasWidth());
+    float v = baseUV.y + (uvCorners[cornerIdx].y / blockTextureAtlas.GetAtlasHeight());
     
     return {u, v};
 }
