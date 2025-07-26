@@ -23,8 +23,7 @@ Window::~Window() {
 std::expected<void, const char *> Window::init() {
     if (SDL_InitSubSystem(SDL_INIT_VIDEO))
         return std::unexpected(SDL_GetError());
-    else
-        return {};
+    return {};
 }
 
 void Window::quit() {

@@ -14,6 +14,7 @@
 #include <ostream>
 
 #include "../config.h"
+
 #include "rendering/shader.h"
 #include "camera/camera.h"
 #include "physics/worldCollision.h"
@@ -202,6 +203,9 @@ void Game::processMouseMotion(const SDL_Event& event) const {
 
 void Game::onStart() {
     cout << "onStart" << endl;
+    // To lock the cursor to the window:
+    SDL_SetWindowMouseGrab(m_window, true);
+    // To get relative motion without hiding cursor
     SDL_SetWindowRelativeMouseMode(m_window, true);
 
     m_boolDebugMenu = true;

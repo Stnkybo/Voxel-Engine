@@ -89,7 +89,7 @@ endif()
 FetchContent_Declare(
         SDL3
         GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
-        GIT_TAG release-3.2.8
+        GIT_TAG release-3.2.18
 )
 FetchContent_MakeAvailable(SDL3)
 
@@ -134,6 +134,10 @@ add_executable(${PROJECT_NAME}
         src/engine/physics/AABB.cpp
         src/engine/physics/AABB.h
         src/engine/math/mod.h
+        src/engine/rendering/terrain/ChunkMesh.cpp
+        src/engine/rendering/terrain/ChunkMesh.h
+        src/engine/rendering/terrain/GreedyMesher.cpp
+        src/engine/rendering/terrain/GreedyMesher.h
 )
 
 # Copy Shaders

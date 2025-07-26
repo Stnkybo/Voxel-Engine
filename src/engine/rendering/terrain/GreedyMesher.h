@@ -1,0 +1,36 @@
+//
+// Created by Lamad on 26/07/2025.
+//
+
+#ifndef GREEDYMESHER_H
+#define GREEDYMESHER_H
+
+#include "ChunkMesh.h"
+#include "../../terrain/chunk.h"
+
+
+class GreedyMesher {
+
+
+    void GreedyMeshChunk(Chunk& chunk, ChunkMeshing::ChunkMesh& chunkMesh);
+
+    void ProcessDirection(Chunk& chunk, ChunkMeshing::ChunkMesh& chunkMesh, int dir);
+
+    int GetDepthForDirection(int z, int dir);
+
+    bool IsFaceVisible(Chunk& chunk, int x, int y, int z, int dir);
+
+    void AddQuad(ChunkMeshing::ChunkMesh& chunkMesh, int x, int y, int width, int height, int dir, uint8_t blockType);
+
+    glm::vec3 GetNormal(int dir);
+
+    void CalculateQuadCorners(int x, int y, int width, int height, int dir, glm::vec3 corners[4]);
+
+    glm::vec2 CalculateUVs(uint8_t blockType, int faceDir, int cornerIdx, int quadWidth, int quadHeight);
+
+    glm::ivec2 GetTexturePosition(uint8_t blockType, int faceDir);
+};
+
+
+
+#endif //GREEDYMESHER_H
