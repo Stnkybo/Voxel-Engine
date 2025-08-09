@@ -6,6 +6,7 @@
 
 Player::Player(glm::vec3 positionIn): Entity(positionIn, {0.5f,2,0.5f}) {
     camera = new Camera(position + glm::vec3(0.0f, 0.8f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    boundingBox = AABB::fromCenterSize(position, size);
 }
 
 void Player::setPosition(glm::vec3 positionIn) {
@@ -32,6 +33,14 @@ void Player::setMovementSpeed(float speed) {
 
 float Player::getMovementSpeed() const {
     return movementSpeed;
+}
+
+glm::vec3 Player::getFeet() const {
+    return boundingBox.min + glm::vec3(0.25f,0,0.25f);
+}
+
+glm::vec3 Player::getHead() const {
+    return boundingBox.max - glm::vec3(0.25f,0,0.25f);
 }
 
 AABB &Player::getBoundingBox() {

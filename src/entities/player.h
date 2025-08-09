@@ -17,6 +17,8 @@ class Player : public Entity {
   void ProcessMovement(Camera_Movement direction, Uint64 deltaTime);
   void setMovementSpeed(float speed);
   float getMovementSpeed() const;
+  glm::vec3 getFeet() const;
+  glm::vec3 getHead() const;
 
   AABB &getBoundingBox();
 

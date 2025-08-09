@@ -214,37 +214,16 @@ void Game::processMouseMotion(const SDL_Event& event) const {
 
 void Game::onStart() {
     cout << "onStart" << endl;
-    // To lock the cursor to the window:
-    SDL_SetWindowMouseGrab(m_window, true);
     // To get relative motion without hiding cursor
     SDL_SetWindowRelativeMouseMode(m_window, true);
 
     m_boolDebugMenu = true;
 
-    for (int i = 0; i < 11; i++) { //Make floor
-        for (int j = 0; j < 11; j++) {
-            if ((i != (11-1)/2) || (j != (11-1)/2)) {
-                auto newCube = std::make_unique<Cube>(i-5, 0, j-5);
-                m_cubes.emplace_back(std::move(newCube));
-
-            }
-        }
-    }
-
-    for (int i = 0; i < 10; i++) {
-        auto newCube = std::make_unique<Cube>(0,i+1,0);
-        penith.emplace_back(newCube.get()); // doesnt own reference to cube
-        m_cubes.emplace_back(std::move(newCube)); // owns the reference to cube
-    }
-
-    auto newCube = std::make_unique<Cube>(0,13,0);
-    m_cubes.emplace_back(std::move(newCube));
-
-
     ourShader = new Shader("./resources/shaders/modelShader.vert", "./resources/shaders/modelShader.frag");
     otherShader = new Shader("./resources/shaders/shader.vert", "./resources/shaders/shader.frag");
 
 
+    // Setup Player
     player = new Player(glm::vec3(8.0f, 9.0f, 8.0f));
     player->camera->Zoom = FOV;
 
@@ -305,22 +284,6 @@ void Game::render() {
     //     world.dirtyChunks.push_back(coord);
     // }
 
-    // // Draw cubes
-    // // render the loaded model
-    // auto model = glm::mat4(1.0f);
-    // model = translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
-    // model = scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
-    // ourShader->setMat4("model", model);
-    //
-    // for (const auto& cube : m_cubes) {
-    //     if (cube->cubeMesh != nullptr) {
-    //         // cout << cube->cubeMesh->vertices[0].Position.y << endl;
-    //         cube->cubeMesh->Draw(*ourShader);
-    //     } else {
-    //         cout << "cubeMesh is nullptr!" << endl;
-    //     }
-    // }
-
 
     // Text
     // Start the Dear ImGui frame
@@ -358,29 +321,19 @@ void Game::clean() const {
 
 void Game::imguiUI(const ImGuiIO& io) {
     {
-        ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-
-        //static int counter = 0;
-
         ImGui::Begin("Debug Menu");                          // Create a window called "Hello, world!" and append into it.
 
         ImGui::Text("Cube Count %d ", m_cubes.size());               // Display some text (you can use a format strings too)
         ImGui::SliderInt3("penith", penith_offset, -25.0f, 25.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
 
+        ImGui::Text("Player Head %.3f, %.3f, %.3f ", player->getHead().x, player->getHead().y, player->getHead().z);
         ImGui::Text("Player Pos %.3f, %.3f, %.3f ", player->getPosition().x, player->getPosition().y, player->getPosition().z);
         ImGui::Text("Player Cam %.3f, %.3f, %.3f ", player->camera->Position.x, player->camera->Position.y, player->camera->Position.z);
-        ImGui::Text("Player Feet %.3f, %.3f, %.3f ", player->getBoundingBox().min.x, player->getBoundingBox().min.y, player->getBoundingBox().min.z);
+        ImGui::Text("Player Feet %.3f, %.3f, %.3f ", player->getFeet().x, player->getFeet().y, player->getFeet().z);
         ImGui::Text("Player Speed %.2f", player->getMovementSpeed());            // Edit 1 float using a slider from 0.0f to 1.0f
-        ImGui::ColorEdit3("clear color", reinterpret_cast<float *>(&clear_color)); // Edit 3 floats representing a color
-
-        // if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-        //     counter++;
-        // ImGui::SameLine();
-        // ImGui::Text("counter = %d", counter);
 
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
         ImGui::Text("Application TIME  (%d ms), Delta: (%d ms)", SDL_GetTicks(), m_deltaTime);
-        //ImGui::Text("Terrain Texture:  (%d, %s)", terrainTexture->id, terrainTexture->path.c_str());
         if (ImGui::Button("Close Me"))
             m_boolDebugMenu = false;
         ImGui::End();
