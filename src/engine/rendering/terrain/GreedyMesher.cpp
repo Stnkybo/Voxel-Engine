@@ -4,8 +4,8 @@ void GreedyMesher::GreedyMeshChunk(Chunk& chunk, ChunkMeshing::ChunkMesh& chunkM
     for (int dir = 0; dir < 6; dir++) {
         ProcessDirection(chunk, chunkMesh, dir);
     }
-    std::cout << "Vertices: " << chunk.mesh.vertices.size()
-          << ", Indices: " << chunk.mesh.indices.size() << std::endl;
+    // std::cout << "Vertices: " << chunk.mesh.vertices.size()
+    //       << ", Indices: " << chunk.mesh.indices.size() << std::endl;
 
 }
 

@@ -2,7 +2,7 @@
 #include "engine/game.h"
 
 int main() {
-    const auto game = new Game("Cube Example", WIDTH, HEIGHT);
+    const auto game = new Game("Chunk Demo", WIDTH, HEIGHT);
 
     game->onStart();
     while (game->isRunning) {
