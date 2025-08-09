@@ -29,6 +29,9 @@ class Game {
 
     Shader *ourShader{};
     Shader *otherShader{};
+
+    bool drawWireframe = false;
+
     std::vector<std::unique_ptr<Cube>> m_cubes;
     Texture *terrainTexture{};
     bool m_boolDebugMenu{};

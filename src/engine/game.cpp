@@ -131,11 +131,20 @@ void Game::handleEvents() {
                     isRunning = false;
                 }
                 if (keycode == SDLK_SPACE) {
-                    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // wireframe gl
+                    drawWireframe = !drawWireframe;
+                    switch (drawWireframe) {
+                        case true:
+                            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // wireframe gl
+                            break;
+                        case false:
+                            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); // disable wireframe gl
+                            break;
+                    }
 
-                    Shader *tempShader = ourShader;
-                    ourShader = otherShader;
-                    otherShader = tempShader;
+                    // swap to debug shader
+                    // Shader *tempShader = ourShader;
+                    // ourShader = otherShader;
+                    // otherShader = tempShader;
 
                 }
                 if (keycode == SDLK_TAB) {
