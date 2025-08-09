@@ -164,7 +164,7 @@ void Game::handleEvents() {
                 }if (keycode == SDLK_R) {
 
                     //reset player position
-                    player->setPosition(glm::vec3(0.0f, 5.0f, 10.0f));
+                    player->setPosition(glm::vec3(8.0f, 9.0f, 8.0f));
 
                 }
             }
@@ -245,7 +245,7 @@ void Game::onStart() {
     otherShader = new Shader("./resources/shaders/shader.vert", "./resources/shaders/shader.frag");
 
 
-    player = new Player(glm::vec3(0.0f, 5.0f, 10.0f));
+    player = new Player(glm::vec3(8.0f, 9.0f, 8.0f));
     player->camera->Zoom = FOV;
 
     world = &World::getInstance();
@@ -368,6 +368,7 @@ void Game::imguiUI(const ImGuiIO& io) {
         ImGui::SliderInt3("penith", penith_offset, -25.0f, 25.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
 
         ImGui::Text("Player Pos %.3f, %.3f, %.3f ", player->getPosition().x, player->getPosition().y, player->getPosition().z);
+        ImGui::Text("Player Cam %.3f, %.3f, %.3f ", player->camera->Position.x, player->camera->Position.y, player->camera->Position.z);
         ImGui::Text("Player Feet %.3f, %.3f, %.3f ", player->getBoundingBox().min.x, player->getBoundingBox().min.y, player->getBoundingBox().min.z);
         ImGui::Text("Player Speed %.2f", player->getMovementSpeed());            // Edit 1 float using a slider from 0.0f to 1.0f
         ImGui::ColorEdit3("clear color", reinterpret_cast<float *>(&clear_color)); // Edit 3 floats representing a color
