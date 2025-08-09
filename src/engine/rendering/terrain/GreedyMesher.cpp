@@ -9,71 +9,98 @@ void GreedyMesher::GreedyMeshChunk(Chunk& chunk, ChunkMeshing::ChunkMesh& chunkM
 
 }
 
+// Replace your ProcessDirection with this:
 void GreedyMesher::ProcessDirection(Chunk& chunk, ChunkMeshing::ChunkMesh& chunkMesh, int dir) {
-    struct MaskCell {
-        bool visible;
-        uint8_t blockType;
-    };
-    
-    MaskCell mask[CHUNK_SIZE_X][CHUNK_SIZE_Y] = {{{false, 0}}};
+    struct MaskCell { bool visible; uint8_t blockType; };
 
-    // Step 1: Build visibility mask with block types
-    for (int x = 0+1; x < CHUNK_SIZE_X-1; x++) {
-        for (int y = 0+1; y < CHUNK_SIZE_Y-1; y++) {
-            for (int z = 0+1; z < CHUNK_SIZE_Z-1; z++) {
-                if (IsFaceVisible(chunk, x, y, z, dir)) {
-                    mask[x][y] = {true, chunk.at(x, y, GetDepthForDirection(z, dir)).type};
-                    break;
+    // Determine which axis is U, V (the 2D plane) and W (depth)
+    int axisU, axisV, axisW;
+    bool positiveDir = (dir % 2 == 0); // even = +X,+Y,+Z
+
+    switch (dir / 2) {
+        case 0: axisU = 2; axisV = 1; axisW = 0; break; // ±X: U=Z, V=Y, W=X
+        case 1: axisU = 0; axisV = 2; axisW = 1; break; // ±Y: U=X, V=Z, W=Y
+        default: axisU = 0; axisV = 1; axisW = 2; break; // ±Z: U=X, V=Y, W=Z
+    }
+
+    int sizeU = (axisU == 0 ? CHUNK_SIZE_X : (axisU == 1 ? CHUNK_SIZE_Y : CHUNK_SIZE_Z));
+    int sizeV = (axisV == 0 ? CHUNK_SIZE_X : (axisV == 1 ? CHUNK_SIZE_Y : CHUNK_SIZE_Z));
+    int sizeW = (axisW == 0 ? CHUNK_SIZE_X : (axisW == 1 ? CHUNK_SIZE_Y : CHUNK_SIZE_Z));
+
+    // For each slice along the depth axis
+    for (int w = 0; w < sizeW; ++w) {
+        // mask sized to current slice
+        std::vector<MaskCell> mask(sizeU * sizeV);
+        // Build mask for this slice
+        // Build mask for this slice
+        for (int v = 0; v < sizeV; ++v) {
+            for (int u = 0; u < sizeU; ++u) {
+                int c[3] = {0,0,0};
+                c[axisU] = u;
+                c[axisV] = v;
+                c[axisW] = w;
+
+                const Voxel& voxel = chunk.at(c[0], c[1], c[2]);
+                // IMPORTANT: only consider non-AIR voxels
+                if (voxel.type != static_cast<uint8_t>(BlockType::AIR) &&
+                    IsFaceVisible(chunk, c[0], c[1], c[2], dir))
+                {
+                    mask[u + v * sizeU] = { true, voxel.type };
+                } else {
+                    mask[u + v * sizeU] = { false, 0 };
                 }
             }
         }
-    }
 
-    // Step 2: Greedily merge faces with same block type
-    for (int y = 0; y < CHUNK_SIZE_Y; y++) {
-        for (int x = 0; x < CHUNK_SIZE_X; ) {
-            if (!mask[x][y].visible) {
-                x++;
-                continue;
-            }
 
-            uint8_t currentType = mask[x][y].blockType;
-            int width = 1, height = 1;
+        // Greedy merge rectangles on this mask
+        for (int v = 0; v < sizeV; ++v) {
+            for (int u = 0; u < sizeU; ) {
+                MaskCell &cell = mask[u + v * sizeU];
+                if (!cell.visible) { ++u; continue; }
 
-            // Expand width
-            while (x + width < CHUNK_SIZE_X && 
-                   mask[x + width][y].visible && 
-                   mask[x + width][y].blockType == currentType) {
-                width++;
-            }
+                uint8_t currentType = cell.blockType;
+                int width = 1;
+                while (u + width < sizeU && mask[(u + width) + v * sizeU].visible &&
+                       mask[(u + width) + v * sizeU].blockType == currentType) {
+                    ++width;
+                }
 
-            // Expand height
-            bool canExpandHeight = true;
-            while (canExpandHeight && y + height < CHUNK_SIZE_Y) {
-                for (int w = 0; w < width; w++) {
-                    if (!mask[x + w][y + height].visible || 
-                        mask[x + w][y + height].blockType != currentType) {
-                        canExpandHeight = false;
-                        break;
+                int height = 1;
+                bool canExpandHeight = true;
+                while (canExpandHeight && v + height < sizeV) {
+                    for (int k = 0; k < width; ++k) {
+                        MaskCell &c2 = mask[(u + k) + (v + height) * sizeU];
+                        if (!c2.visible || c2.blockType != currentType) {
+                            canExpandHeight = false;
+                            break;
+                        }
                     }
+                    if (canExpandHeight) ++height;
                 }
-                if (canExpandHeight) height++;
+
+                // Mark processed
+                for (int hh = 0; hh < height; ++hh)
+                    for (int ww = 0; ww < width; ++ww)
+                        mask[(u + ww) + (v + hh) * sizeU].visible = false;
+
+                // Convert (u,v,w) slice coords to world chunk coords (x,y,z)
+                int startCoords[3] = {0,0,0};
+                startCoords[axisU] = u;
+                startCoords[axisV] = v;
+                startCoords[axisW] = w;
+
+                // IMPORTANT: pass the full 3D start coordinates and the width/height
+                AddQuad(chunkMesh, startCoords[0], startCoords[1], startCoords[2],
+                        width, height, dir, currentType);
+
+                u += width;
             }
-
-            // Add quad
-            AddQuad(chunkMesh, x, y, width, height, dir, currentType);
-
-            // Mark as processed
-            for (int h = 0; h < height; h++) {
-                for (int w = 0; w < width; w++) {
-                    mask[x + w][y + h].visible = false;
-                }
-            }
-
-            x += width;
         }
     }
 }
+
+
 
 int GreedyMesher::GetDepthForDirection(int z, int dir) {
     // Returns z coordinate for the face in given direction
@@ -92,25 +119,72 @@ bool GreedyMesher::IsFaceVisible(Chunk& chunk, int x, int y, int z, int dir) {
     return (neighbor.type == static_cast<uint8_t>(BlockType::AIR));
 }
 
-void GreedyMesher::AddQuad(ChunkMeshing::ChunkMesh& chunkMesh, int x, int y, int width, int height, 
-                          int dir, uint8_t blockType) {
-    glm::vec3 corners[4];
-    CalculateQuadCorners(x, y, width, height, dir, corners);
+// Replace your AddQuad with this signature (takes full start x,y,z)
+void GreedyMesher::AddQuad(ChunkMeshing::ChunkMesh& chunkMesh,
+                           int startX, int startY, int startZ,
+                           int width, int height,
+                           int dir, uint8_t blockType)
+{
+    if (blockType == static_cast<uint8_t>(BlockType::AIR)) return;
 
-    uint32_t baseIndex = chunkMesh.vertices.size();
-    for (int i = 0; i < 4; i++) {
+    // Determine axis mapping again (same logic as ProcessDirection)
+    int axisU, axisV, axisW;
+    bool positiveDir = (dir % 2 == 0);
+    switch (dir / 2) {
+        case 0: axisU = 2; axisV = 1; axisW = 0; break; // ±X
+        case 1: axisU = 0; axisV = 2; axisW = 1; break; // ±Y
+        default: axisU = 0; axisV = 1; axisW = 2; break; // ±Z
+    }
+
+    // Base voxel corner (the "lower-left" in UV/u/v sense) in world voxel coords
+    glm::vec3 base(
+        static_cast<float>(startX),
+        static_cast<float>(startY),
+        static_cast<float>(startZ)
+    );
+
+    // For positive faces (+X/+Y/+Z) the face sits at the high side of the voxel (w + 1.0)
+    // For negative faces (-X/-Y/-Z) the face sits at the low side (w + 0.0)
+    if (positiveDir) {
+        base[axisW] += 1.0f;
+    } // else base[axisW] remains startW
+
+    // Unit directions along the mask's U and V axes (in world coords)
+    glm::vec3 uDir(0.0f), vDir(0.0f);
+    uDir[axisU] = 1.0f;
+    vDir[axisV] = 1.0f;
+
+    glm::vec3 uStep = uDir * static_cast<float>(width);
+    glm::vec3 vStep = vDir * static_cast<float>(height);
+
+    // corners in consistent order (base, +U, +U+V, +V)
+    glm::vec3 corners[4];
+    corners[0] = base;
+    corners[1] = base + uStep;
+    corners[2] = base + uStep + vStep;
+    corners[3] = base + vStep;
+
+    // Flip corners (winding) for negative directions so the normal points outward:
+    if (!positiveDir) std::swap(corners[1], corners[3]);
+
+    // Push vertices and indices
+    auto baseIndex = static_cast<uint32_t>(chunkMesh.vertices.size());
+    for (int i = 0; i < 4; ++i) {
         ChunkMeshing::Vertex v;
         v.Position = corners[i];
         v.Normal = GetNormal(dir);
-        v.TexCoord = CalculateUVs(blockType, dir, i, width, height);
+        v.TexCoord = CalculateUVs(blockType, dir, i, width, height); // keep your UV helper for now
         chunkMesh.vertices.push_back(v);
     }
 
+    // Two triangles (winding is already corrected above)
     chunkMesh.indices.insert(chunkMesh.indices.end(), {
         baseIndex, baseIndex + 1, baseIndex + 2,
         baseIndex, baseIndex + 2, baseIndex + 3
     });
 }
+
+
 
 glm::vec3 GreedyMesher::GetNormal(int dir) {
     // Direction to normal lookup table
