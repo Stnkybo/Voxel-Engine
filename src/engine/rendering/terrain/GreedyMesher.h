@@ -19,22 +19,24 @@ class GreedyMesher {
     private:
         void ProcessDirection(Chunk& chunk, ChunkMeshing::ChunkMesh& chunkMesh, int dir);
 
-        int GetDepthForDirection(int z, int dir);
+    static int GetDepthForDirection(int z, int dir);
 
-        bool IsFaceVisible(Chunk& chunk, int x, int y, int z, int dir);
+        static bool IsFaceVisible(Chunk& chunk, int x, int y, int z, int dir);
 
-    void AddQuad(ChunkMeshing::ChunkMesh& chunkMesh,
-                       int startX, int startY, int startZ,
-                       int width, int height,
-                       int dir, uint8_t blockType);
+    static void AddQuad(ChunkMeshing::ChunkMesh& mesh,
+                    const glm::vec3& origin,
+                    const glm::vec3& normal,
+                    int du, int dv,
+                    uint8_t blockTexIndex,
+                    int axisU, int axisV);
 
-        glm::vec3 GetNormal(int dir);
+        static glm::vec3 GetNormal(int dir);
 
-        void CalculateQuadCorners(int x, int y, int width, int height, int dir, glm::vec3 corners[4]);
+    static void CalculateQuadCorners(int x, int y, int width, int height, int dir, glm::vec3 corners[4]);
 
         glm::vec2 CalculateUVs(uint8_t blockType, int faceDir, int cornerIdx, int quadWidth, int quadHeight);
 
-        glm::ivec2 GetTexturePosition(uint8_t blockType, int faceDir);
+        static glm::ivec2 GetTexturePosition(uint8_t blockType, int faceDir);
 
 };
 

@@ -9,11 +9,10 @@ void GreedyMesher::GreedyMeshChunk(Chunk& chunk, ChunkMeshing::ChunkMesh& chunkM
 
 }
 
-// Replace your ProcessDirection with this:
 void GreedyMesher::ProcessDirection(Chunk& chunk, ChunkMeshing::ChunkMesh& chunkMesh, int dir) {
     struct MaskCell { bool visible; uint8_t blockType; };
 
-    // Determine which axis is U, V (the 2D plane) and W (depth)
+    // Figure out which axes are U, V (face plane) and W (depth)
     int axisU, axisV, axisW;
     bool positiveDir = (dir % 2 == 0); // even = +X,+Y,+Z
 
@@ -27,21 +26,18 @@ void GreedyMesher::ProcessDirection(Chunk& chunk, ChunkMeshing::ChunkMesh& chunk
     int sizeV = (axisV == 0 ? CHUNK_SIZE_X : (axisV == 1 ? CHUNK_SIZE_Y : CHUNK_SIZE_Z));
     int sizeW = (axisW == 0 ? CHUNK_SIZE_X : (axisW == 1 ? CHUNK_SIZE_Y : CHUNK_SIZE_Z));
 
-    // For each slice along the depth axis
     for (int w = 0; w < sizeW; ++w) {
-        // mask sized to current slice
         std::vector<MaskCell> mask(sizeU * sizeV);
-        // Build mask for this slice
-        // Build mask for this slice
+
+        // Build visibility mask
         for (int v = 0; v < sizeV; ++v) {
             for (int u = 0; u < sizeU; ++u) {
-                int c[3] = {0,0,0};
+                int c[3] = {0, 0, 0};
                 c[axisU] = u;
                 c[axisV] = v;
                 c[axisW] = w;
 
                 const Voxel& voxel = chunk.at(c[0], c[1], c[2]);
-                // IMPORTANT: only consider non-AIR voxels
                 if (voxel.type != static_cast<uint8_t>(BlockType::AIR) &&
                     IsFaceVisible(chunk, c[0], c[1], c[2], dir))
                 {
@@ -52,20 +48,24 @@ void GreedyMesher::ProcessDirection(Chunk& chunk, ChunkMeshing::ChunkMesh& chunk
             }
         }
 
-
-        // Greedy merge rectangles on this mask
+        // Greedy rectangle merging
         for (int v = 0; v < sizeV; ++v) {
-            for (int u = 0; u < sizeU; ) {
+            for (int u = 0; u < sizeU;) {
                 MaskCell &cell = mask[u + v * sizeU];
                 if (!cell.visible) { ++u; continue; }
 
                 uint8_t currentType = cell.blockType;
+
+                // Width expansion
                 int width = 1;
-                while (u + width < sizeU && mask[(u + width) + v * sizeU].visible &&
-                       mask[(u + width) + v * sizeU].blockType == currentType) {
+                while (u + width < sizeU &&
+                       mask[(u + width) + v * sizeU].visible &&
+                       mask[(u + width) + v * sizeU].blockType == currentType)
+                {
                     ++width;
                 }
 
+                // Height expansion
                 int height = 1;
                 bool canExpandHeight = true;
                 while (canExpandHeight && v + height < sizeV) {
@@ -79,28 +79,33 @@ void GreedyMesher::ProcessDirection(Chunk& chunk, ChunkMeshing::ChunkMesh& chunk
                     if (canExpandHeight) ++height;
                 }
 
-                // Mark processed
+                // Mark cells as processed
                 for (int hh = 0; hh < height; ++hh)
                     for (int ww = 0; ww < width; ++ww)
                         mask[(u + ww) + (v + hh) * sizeU].visible = false;
 
-                // Convert (u,v,w) slice coords to world chunk coords (x,y,z)
+                // Convert slice coords (u,v,w) to chunk coords (x,y,z)
                 int startCoords[3] = {0,0,0};
                 startCoords[axisU] = u;
                 startCoords[axisV] = v;
-                startCoords[axisW] = w;
 
-                // IMPORTANT: pass the full 3D start coordinates and the width/height
-                AddQuad(chunkMesh, startCoords[0], startCoords[1], startCoords[2],
-                        width, height, dir, currentType);
+                if (positiveDir) {
+                    startCoords[axisW] = w + 1; // far side
+                } else {
+                    startCoords[axisW] = w;     // near side
+                }
+
+                glm::vec3 origin(startCoords[0], startCoords[1], startCoords[2]);
+                glm::vec3 normal = GetNormal(dir);
+
+                // Add the quad
+                AddQuad(chunkMesh, origin, normal, width, height, 0, axisU, axisV);
 
                 u += width;
             }
         }
     }
 }
-
-
 
 int GreedyMesher::GetDepthForDirection(int z, int dir) {
     // Returns z coordinate for the face in given direction
@@ -119,71 +124,76 @@ bool GreedyMesher::IsFaceVisible(Chunk& chunk, int x, int y, int z, int dir) {
     return (neighbor.type == static_cast<uint8_t>(BlockType::AIR));
 }
 
-// Replace your AddQuad with this signature (takes full start x,y,z)
-void GreedyMesher::AddQuad(ChunkMeshing::ChunkMesh& chunkMesh,
-                           int startX, int startY, int startZ,
-                           int width, int height,
-                           int dir, uint8_t blockType)
+void GreedyMesher::AddQuad(ChunkMeshing::ChunkMesh& mesh,
+                           const glm::vec3& origin,
+                           const glm::vec3& normal,
+                           int du, int dv,
+                           uint8_t blockTexIndex,
+                           int axisU, int axisV)
 {
-    if (blockType == static_cast<uint8_t>(BlockType::AIR)) return;
+    // Atlas params
+    constexpr int ATLAS_COLS = 16;
+    constexpr int ATLAS_ROWS = 16;
+    const float atlasCellW = 1.0f / ATLAS_COLS;
+    const float atlasCellH = 1.0f / ATLAS_ROWS;
 
-    // Determine axis mapping again (same logic as ProcessDirection)
-    int axisU, axisV, axisW;
-    bool positiveDir = (dir % 2 == 0);
-    switch (dir / 2) {
-        case 0: axisU = 2; axisV = 1; axisW = 0; break; // ±X
-        case 1: axisU = 0; axisV = 2; axisW = 1; break; // ±Y
-        default: axisU = 0; axisV = 1; axisW = 2; break; // ±Z
+    int texX = blockTexIndex % ATLAS_COLS;
+    int texY = blockTexIndex / ATLAS_COLS;
+    float baseU = texX * atlasCellW;
+    float baseV = texY * atlasCellH;
+
+    float u0 = baseU;
+    float v0 = baseV;
+    float u1 = baseU + static_cast<float>(du) * atlasCellW;
+    float v1 = baseV + static_cast<float>(dv) * atlasCellH;
+
+    // build axis aligned du/dv unit vectors
+    glm::vec3 duVec(0.0f), dvVec(0.0f);
+    duVec[axisU] = 1.0f;
+    dvVec[axisV] = 1.0f;
+
+    // Compute p0 such that p0 is the "lower-left" corner in (u,v) local space.
+    // If duVec or dvVec is negative we must shift p0 by width/height so the rectangle
+    // extents go into the positive du/dv local directions from p0.
+    glm::vec3 shift(0.0f);
+    if (duVec[axisU] < 0.0f) shift += duVec * static_cast<float>(du);
+    if (dvVec[axisV] < 0.0f) shift += dvVec * static_cast<float>(dv);
+
+    glm::vec3 p0 = origin + shift;
+    glm::vec3 p1 = p0 + duVec * static_cast<float>(du);
+    glm::vec3 p2 = p1 + dvVec * static_cast<float>(dv);
+    glm::vec3 p3 = p0 + dvVec * static_cast<float>(dv);
+
+    // Ensure winding gives the outward normal (if not, swap p1 <-> p3 and their UVs)
+    // We compute face normal from (p1 - p0) x (p3 - p0)
+    glm::vec3 faceDir = glm::cross(p1 - p0, p3 - p0);
+    if (glm::dot(faceDir, normal) < 0.0f) {
+        std::swap(p1, p3);
+        // also swap uv mapping for those indices below
+        std::swap(u1, u0); // we will reassign UVs accordingly below by indices swap
     }
 
-    // Base voxel corner (the "lower-left" in UV/u/v sense) in world voxel coords
-    glm::vec3 base(
-        static_cast<float>(startX),
-        static_cast<float>(startY),
-        static_cast<float>(startZ)
-    );
+    // assign UVs for the four corners in the same order as p0,p1,p2,p3
+    glm::vec2 uv0 = { u0, v0 };
+    glm::vec2 uv1 = { u1, v0 };
+    glm::vec2 uv2 = { u1, v1 };
+    glm::vec2 uv3 = { u0, v1 };
 
-    // For positive faces (+X/+Y/+Z) the face sits at the high side of the voxel (w + 1.0)
-    // For negative faces (-X/-Y/-Z) the face sits at the low side (w + 0.0)
-    if (positiveDir) {
-        base[axisW] += 1.0f;
-    } // else base[axisW] remains startW
+    // If we swapped p1/p3 above we already swapped u0/u1 — but to be safe:
+    // (the swap of u0/u1 above is a simple way to keep uv->vertex mapping consistent)
 
-    // Unit directions along the mask's U and V axes (in world coords)
-    glm::vec3 uDir(0.0f), vDir(0.0f);
-    uDir[axisU] = 1.0f;
-    vDir[axisV] = 1.0f;
+    // push vertices
+    mesh.vertices.push_back({ p0, normal, uv0 });
+    mesh.vertices.push_back({ p1, normal, uv1 });
+    mesh.vertices.push_back({ p2, normal, uv2 });
+    mesh.vertices.push_back({ p3, normal, uv3 });
 
-    glm::vec3 uStep = uDir * static_cast<float>(width);
-    glm::vec3 vStep = vDir * static_cast<float>(height);
-
-    // corners in consistent order (base, +U, +U+V, +V)
-    glm::vec3 corners[4];
-    corners[0] = base;
-    corners[1] = base + uStep;
-    corners[2] = base + uStep + vStep;
-    corners[3] = base + vStep;
-
-    // Flip corners (winding) for negative directions so the normal points outward:
-    if (!positiveDir) std::swap(corners[1], corners[3]);
-
-    // Push vertices and indices
-    auto baseIndex = static_cast<uint32_t>(chunkMesh.vertices.size());
-    for (int i = 0; i < 4; ++i) {
-        ChunkMeshing::Vertex v;
-        v.Position = corners[i];
-        v.Normal = GetNormal(dir);
-        v.TexCoord = CalculateUVs(blockType, dir, i, width, height); // keep your UV helper for now
-        chunkMesh.vertices.push_back(v);
-    }
-
-    // Two triangles (winding is already corrected above)
-    chunkMesh.indices.insert(chunkMesh.indices.end(), {
-        baseIndex, baseIndex + 1, baseIndex + 2,
-        baseIndex, baseIndex + 2, baseIndex + 3
+    uint32_t startIndex = static_cast<uint32_t>(mesh.vertices.size()) - 4;
+    mesh.indices.insert(mesh.indices.end(), {
+        startIndex, startIndex + 1, startIndex + 2,
+        startIndex, startIndex + 2, startIndex + 3
     });
 }
-
 
 
 glm::vec3 GreedyMesher::GetNormal(int dir) {
