@@ -220,7 +220,7 @@ void Game::onStart() {
     m_boolDebugMenu = true;
 
     ourShader = new Shader("./resources/shaders/modelShader.vert", "./resources/shaders/modelShader.frag");
-    otherShader = new Shader("./resources/shaders/shader.vert", "./resources/shaders/shader.frag");
+    terrainShader = new Shader("./resources/shaders/terrainShader.vert", "./resources/shaders/terrainShader.frag");
 
 
     // Setup Player
@@ -229,10 +229,12 @@ void Game::onStart() {
 
     world = &World::getInstance();
 
-    world->mesher.blockTextureAtlas.LoadFromFile("resources/textures/wall.jpg");
+    world->mesher.blockTextureAtlas.LoadFromFile("resources/textures/missing_texture.png");
 
     // Generate some chunks
     ChunkCoord chunk_coords = {0,0};
+    world->generateChunk(chunk_coords);
+    chunk_coords = {-3, -3};
     world->generateChunk(chunk_coords);
     for (int i = -1; i <= 1; i++) {
         for (int j = 1; j <= 3; j++) {
@@ -241,6 +243,21 @@ void Game::onStart() {
             world->generateChunk(chunk_coords);
         }
     }
+
+    auto modifyChunk = world->getChunk({-3,-3});
+    for (int x=0; x < CHUNK_SIZE_X; x++) {
+        for (int y=0; y < CHUNK_SIZE_Y; y++) {
+            for (int z=0; z < CHUNK_SIZE_Z; z++) {
+                if (x < 5 && z < 2) {
+                    setBlockType(modifyChunk->at(x,y,z), BlockType::AIR);
+                }
+                if (x < 11 && z < 13) {
+                    setBlockType(modifyChunk->at(x,y,z), BlockType::AIR);
+                }
+            }
+        }
+    }
+
 }
 
 void Game::update() {
@@ -267,16 +284,16 @@ void Game::render() {
     glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    ourShader->use();
+    terrainShader->use();
 
     // Get camera matrices
     glm::mat4 view = player->camera->GetViewMatrix();
     glm::mat4 projection = player->camera->GetProjectionMatrix(static_cast<float>(m_width) / static_cast<float>(m_height));
-    ourShader->setMat4("projection", projection);
-    ourShader->setMat4("view", view);
+    terrainShader->setMat4("projection", projection);
+    terrainShader->setMat4("view", view);
 
     // 2. Rendering
-    world->renderVisibleChunks(*ourShader);
+    world->renderVisibleChunks(*terrainShader);
 
     // 3. Mark chunks dirty when modified
     // if (playerModifiedBlock) {

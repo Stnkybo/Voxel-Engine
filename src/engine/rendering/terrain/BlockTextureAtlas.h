@@ -23,9 +23,10 @@ public:
     void Bind(GLenum textureUnit = GL_TEXTURE0) const;
     glm::vec2 GetUVOffset(uint8_t type, int face) const;
 
-    float GetAtlasWidth();
+    float GetAtlasWidth() const;
 
-    float GetAtlasHeight();
+    float GetAtlasHeight() const;
+    int GetTileSize() const;
 
 private:
     GLuint textureID;

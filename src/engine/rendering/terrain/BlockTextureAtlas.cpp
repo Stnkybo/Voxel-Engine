@@ -4,6 +4,7 @@
 
 #include "BlockTextureAtlas.h"
 
+#include "GreedyMesher.h"
 #include "stb_image.h"
 BlockTextureAtlas::BlockTextureAtlas() : textureID(0), atlasWidth(1024), atlasHeight(1024), tileSize(16) {}
 
@@ -16,9 +17,12 @@ BlockTextureAtlas::~BlockTextureAtlas() {
 
 
 bool BlockTextureAtlas::LoadFromFile(const std::string& path) {
-    // 1. Load texture file (using stb_image or similar)
+    // 1. Load texture file
     int channels;
     unsigned char* data = stbi_load(path.c_str(), &atlasWidth, &atlasHeight, &channels, 4);
+
+    // TEMPORARY
+    tileSize = atlasWidth * atlasHeight;
 
     // 2. Create OpenGL texture
     glGenTextures(1, &textureID);
@@ -31,13 +35,14 @@ bool BlockTextureAtlas::LoadFromFile(const std::string& path) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-    // 4. Define texture coordinates (example)
+    // 4. Define texture coordinates
     textureCoordinates[BlockType::GRASS] = {0, 0}; // Second row, first tile
     textureCoordinates[BlockType::DIRT] = {0, 0};     // First row, second tile
     textureCoordinates[BlockType::STONE] = {0, 0};     // First row, second tile
     textureCoordinates[BlockType::BRICK] = {0, 0};    // Top-left tile
 
     stbi_image_free(data);
+
     return true;
 }
 
@@ -52,15 +57,21 @@ glm::vec2 BlockTextureAtlas::GetUVOffset(uint8_t type, int face) const {
 
     glm::ivec2 tilePos = it->second;
     return {
-        (tilePos.x * tileSize) / (float)atlasWidth,
-        (tilePos.y * tileSize) / (float)atlasHeight
+        // (tilePos.x * tileSize) / (float)atlasWidth,
+        // (tilePos.y * tileSize) / (float)atlasHeigh
+        (tilePos.x * tileSize),
+        (tilePos.y * tileSize)
     };
 }
 
-float BlockTextureAtlas::GetAtlasWidth() {
+float BlockTextureAtlas::GetAtlasWidth() const {
     return atlasWidth;
 }
 
-float BlockTextureAtlas::GetAtlasHeight() {
+float BlockTextureAtlas::GetAtlasHeight() const {
     return atlasHeight;
+}
+
+int BlockTextureAtlas::GetTileSize() const {
+    return tileSize;
 }

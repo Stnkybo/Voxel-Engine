@@ -28,7 +28,7 @@ class Game {
     int frames = 0;
 
     Shader *ourShader{};
-    Shader *otherShader{};
+    Shader *terrainShader{};
 
     bool drawWireframe = false;
 
