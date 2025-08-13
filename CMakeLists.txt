@@ -30,10 +30,10 @@ add_executable(${PROJECT_NAME}
         src/engine/terrain/voxel.h
         src/engine/terrain/world.cpp
         src/engine/terrain/world.h
-        src/engine/physics/worldCollision.cpp
-        src/engine/physics/worldCollision.h
-        src/engine/physics/AABB.cpp
-        src/engine/physics/AABB.h
+        src/engine/physics/collisions/worldCollision.cpp
+        src/engine/physics/collisions/worldCollision.h
+        src/engine/physics/collisions/AABB.cpp
+        src/engine/physics/collisions/AABB.h
         src/engine/math/mod.h
         src/engine/rendering/terrain/ChunkMesh.cpp
         src/engine/rendering/terrain/ChunkMesh.h

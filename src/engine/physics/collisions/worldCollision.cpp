@@ -2,9 +2,9 @@
 // Created by Lamad on 18/07/2025.
 //
 
-#include "worldCollision.h"
+#include "./worldCollision.h"
 
-#include "../../Entities/player.h"
+#include "../../../Entities/player.h"
 
 bool worldCollision::isSolid(int x, int y, int z, World* world) {
         Voxel* block = world->getBlock(x,y,z);

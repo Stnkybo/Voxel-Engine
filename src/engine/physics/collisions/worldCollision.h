@@ -6,8 +6,8 @@
 #define WORLDCOLLISION_H
 #include <cmath>
 
-#include "../../entities/player.h"
-#include "../terrain/world.h"
+#include "../../../entities/player.h"
+#include "../../terrain/world.h"
 
 class worldCollision {
     public:
