@@ -17,7 +17,7 @@
 
 #include "rendering/shader.h"
 #include "camera/camera.h"
-#include "physics/worldCollision.h"
+#include "physics/collisions/worldCollision.h"
 #include "rendering/cube.h"
 #include "rendering/model.hpp"
 #include "terrain/world.h"
@@ -229,7 +229,7 @@ void Game::onStart() {
 
     world = &World::getInstance();
 
-    world->mesher.blockTextureAtlas.LoadFromFile("resources/textures/missing_texture.png");
+    world->mesher.blockTextureAtlas.LoadFromFile("resources/textures/debug_texture.png");
 
     // Generate some chunks
     ChunkCoord chunk_coords = {0,0};
