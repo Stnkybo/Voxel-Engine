@@ -166,6 +166,13 @@ void Game::handleEvents() {
                     //reset player position
                     player->setPosition(glm::vec3(8.0f, 9.0f, 8.0f));
 
+                }if (keycode == SDLK_P) {
+
+                    //toggle Player gravity
+                    player->physics->affectedByGravity = !player->physics->affectedByGravity;
+                    player->physics->velocity = glm::vec3(0.0f);
+                    std::cout << "Player Gravity: " << player->physics->affectedByGravity << std::endl;
+
                 }
             }
 
@@ -224,7 +231,7 @@ void Game::onStart() {
 
 
     // Setup Player
-    player = new Player(glm::vec3(8.0f, 9.0f, 8.0f));
+    player = std::make_shared<Player>(glm::vec3(8.0f, 9.0f, 8.0f));
     player->camera->Zoom = FOV;
 
     world = &World::getInstance();
@@ -258,23 +265,21 @@ void Game::onStart() {
         }
     }
 
+    // Make Physics
+    physicsSystem.RegisterEntity(std::shared_ptr<Entity>(player));
+
 }
 
 void Game::update() {
-    const Uint32 currentTick = SDL_GetTicks();
-    m_deltaTime = currentTick - m_lastTick;
+    const Uint64 currentTick = SDL_GetTicks();
+    m_deltaTime = (currentTick - m_lastTick) / 1000.0f;
     m_lastTick = currentTick;
-    //unprocessedTime += m_deltaTime;
-    //frameCounter += m_deltaTime;
 
     // Update world (chunk loading/unloading)
     world->updateDirtyChunks();
 
-    for (int i = 0 ; i < penith.size(); i++) {
-            penith[i]->setPosition(penith_offset[0], 1 + i + penith_offset[1], penith_offset[2]);
-    }
-
     //PHYSICS
+    physicsSystem.Update(m_deltaTime);
     worldCollision::resolveCollisions(*player, world);
 
 }
@@ -341,7 +346,6 @@ void Game::imguiUI(const ImGuiIO& io) {
         ImGui::Begin("Debug Menu");                          // Create a window called "Hello, world!" and append into it.
 
         ImGui::Text("Cube Count %d ", m_cubes.size());               // Display some text (you can use a format strings too)
-        ImGui::SliderInt3("penith", penith_offset, -25.0f, 25.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
 
         ImGui::Text("Player Head %.3f, %.3f, %.3f ", player->getHead().x, player->getHead().y, player->getHead().z);
         ImGui::Text("Player Pos %.3f, %.3f, %.3f ", player->getPosition().x, player->getPosition().y, player->getPosition().z);
@@ -350,7 +354,7 @@ void Game::imguiUI(const ImGuiIO& io) {
         ImGui::Text("Player Speed %.2f", player->getMovementSpeed());            // Edit 1 float using a slider from 0.0f to 1.0f
 
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-        ImGui::Text("Application TIME  (%d ms), Delta: (%d ms)", SDL_GetTicks(), m_deltaTime);
+        ImGui::Text("Application TIME  (%d ms), Delta: (%.4f s)", SDL_GetTicks(), m_deltaTime);
         if (ImGui::Button("Close Me"))
             m_boolDebugMenu = false;
         ImGui::End();

@@ -3,6 +3,9 @@
 //
 
 #include "PhysicsSystem.h"
+
+#include <iostream>
+
 #include "../../entities/entity.h"
 
 #include <memory>
@@ -29,7 +32,7 @@ void PhysicsSystem::Update(float deltaTime) {
         if (phys->affectedByGravity)
             phys->velocity += gravity * deltaTime;
 
-        entity->position += phys->velocity * deltaTime;
+        entity->setPosition(entity->getPosition()+phys->velocity * deltaTime);
 
         HandleCollisions(entity);
     }

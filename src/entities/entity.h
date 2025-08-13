@@ -14,13 +14,12 @@ class Entity {
 public:
     Entity(glm::vec3 positionIn, glm::vec3 sizeIn);
     ~Entity() = default;
-    void setPosition(glm::vec3 positionIn);
+    virtual void setPosition(glm::vec3 positionIn);
     glm::vec3 getPosition();
     std::shared_ptr<PhysicsComponent> physics;
     glm::vec3 position;
 
 protected:
-    glm::vec3 velocity;
     glm::vec3 size;
     AABB boundingBox;
 };

@@ -14,7 +14,7 @@ class Player : public Entity {
   ~Player() = default;
   void setPosition(glm::vec3 positionIn);
 
-  void ProcessMovement(Camera_Movement direction, Uint64 deltaTime);
+  void ProcessMovement(Camera_Movement direction, float deltaTime);
   void setMovementSpeed(float speed);
   float getMovementSpeed() const;
   glm::vec3 getFeet() const;

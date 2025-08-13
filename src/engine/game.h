@@ -19,7 +19,7 @@
 class Game {
     SDL_Window *m_window;
     SDL_Renderer *m_renderer{};
-    Player* player{};
+    std::shared_ptr<Player> player{};
 
     const double FRAME_TIME = 1.0f / 60.0f;
     Uint64  m_lastTick = 0.0f;
@@ -45,7 +45,8 @@ class Game {
 public:
     unordered_map<std::string, bool> eventStates;
 
-    Uint64  m_deltaTime = 0;
+    PhysicsSystem physicsSystem;
+    float  m_deltaTime = 0;
     bool isRunning = true;
     int m_width;
     int m_height;

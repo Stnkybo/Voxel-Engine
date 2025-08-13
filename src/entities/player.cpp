@@ -7,6 +7,7 @@
 Player::Player(glm::vec3 positionIn): Entity(positionIn, {0.5f,2,0.5f}) {
     camera = new Camera(position + glm::vec3(0.0f, 0.8f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     boundingBox = AABB::fromCenterSize(position, size);
+    physics = std::make_shared<PhysicsComponent>(70.0f);
 }
 
 void Player::setPosition(glm::vec3 positionIn) {
@@ -17,8 +18,8 @@ void Player::setPosition(glm::vec3 positionIn) {
 }
 
 // processes input received from any keyboard-like input system. Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)
-void Player::ProcessMovement(Camera_Movement direction, Uint64 deltaTime) {
-    float velocity = movementSpeed * (static_cast<float>(deltaTime) / 1000.0f);
+void Player::ProcessMovement(Camera_Movement direction, float deltaTime) {
+    float velocity = movementSpeed * deltaTime;
     switch (direction) {
         case FORWARD:  setPosition(position + camera->Front * velocity); break;
         case BACKWARD: setPosition(position - camera->Front * velocity); break;

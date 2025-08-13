@@ -24,9 +24,9 @@ void worldCollision::resolveCollisions(Player& player, World* world) {
                     AABB blockBox = AABB::fromCenterSize(glm::vec3(x, y, z) + glm::vec3(0.5f,0.5f,0.5f), {1,1,1});
                     if (playerBox.intersects(blockBox)) {
                         // Handle response here
+                        player.physics->velocity = glm::vec3(0.0f);
                         glm::vec3 mtvVec = AABB::getMTV(playerBox, blockBox);
                         player.setPosition(player.getPosition() + mtvVec);
-                        //std::cout << "RAHHHH" << std::endl;
                     }
                 }
             }
