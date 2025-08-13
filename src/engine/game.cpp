@@ -18,7 +18,6 @@
 #include "rendering/shader.h"
 #include "camera/camera.h"
 #include "physics/collisions/worldCollision.h"
-#include "rendering/cube.h"
 #include "rendering/model.hpp"
 #include "terrain/world.h"
 
@@ -115,8 +114,8 @@ void Game::handleEvents() {
 
         switch(ev.type) {
             case SDL_EVENT_WINDOW_RESIZED:
-                m_width = ev.window.data1;
-                m_height = ev.window.data2;
+                // Set Window Dimensions
+                SDL_GetWindowSizeInPixels(m_window, &m_width, &m_height);
                 glViewport(0, 0, m_width, m_height);  // Update the OpenGL viewport
                 break;
 
@@ -157,11 +156,20 @@ void Game::handleEvents() {
                 }
 
                 if (keycode == SDLK_F3) {
-
                     //Enable window
                     m_boolDebugMenu = !m_boolDebugMenu;
+                }
 
-                }if (keycode == SDLK_R) {
+                if (keycode == SDLK_F11) {
+                    //Toggle FullScreen
+                    static bool fullscreen = false;
+                    fullscreen = !fullscreen;
+                    if (!SDL_SetWindowFullscreen(m_window, fullscreen)) {
+                        SDL_Log("Failed to toggle fullscreen: %s", SDL_GetError());
+                    }
+                }
+
+                if (keycode == SDLK_R) {
 
                     //reset player position
                     player->setPosition(glm::vec3(8.0f, 9.0f, 8.0f));
@@ -319,8 +327,6 @@ void Game::render() {
     }
 
 
-    SDL_RenderPresent(m_renderer);
-
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
@@ -343,15 +349,18 @@ void Game::clean() const {
 
 void Game::imguiUI(const ImGuiIO& io) {
     {
-        ImGui::Begin("Debug Menu");                          // Create a window called "Hello, world!" and append into it.
+        int fbWidth, fbHeight;
 
-        ImGui::Text("Cube Count %d ", m_cubes.size());               // Display some text (you can use a format strings too)
+        ImGui::Begin("Debug Menu");
+
+        ImGui::Text("Window Size: %d x %d", m_width, m_height);
+        ImGui::Text("Cube Count %d ", m_cubes.size());
 
         ImGui::Text("Player Head %.3f, %.3f, %.3f ", player->getHead().x, player->getHead().y, player->getHead().z);
         ImGui::Text("Player Pos %.3f, %.3f, %.3f ", player->getPosition().x, player->getPosition().y, player->getPosition().z);
         ImGui::Text("Player Cam %.3f, %.3f, %.3f ", player->camera->Position.x, player->camera->Position.y, player->camera->Position.z);
         ImGui::Text("Player Feet %.3f, %.3f, %.3f ", player->getFeet().x, player->getFeet().y, player->getFeet().z);
-        ImGui::Text("Player Speed %.2f", player->getMovementSpeed());            // Edit 1 float using a slider from 0.0f to 1.0f
+        ImGui::Text("Player Speed %.2f", player->getMovementSpeed());
 
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
         ImGui::Text("Application TIME  (%d ms), Delta: (%.4f s)", SDL_GetTicks(), m_deltaTime);
