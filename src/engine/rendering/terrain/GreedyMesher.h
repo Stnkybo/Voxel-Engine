@@ -42,19 +42,21 @@ class GreedyMesher {
         static bool IsFaceVisible(Chunk& chunk, int x, int y, int z, int dir);
 
     static void AddQuad(ChunkMeshing::ChunkMesh& mesh,
-                       const glm::vec3& origin,
-                       const glm::vec3& normal,
-                       const glm::vec3& duVec,
-                       const glm::vec3& dvVec,
-                       int width, int height,
-                       int blockType,
-                       int faceDir);
+                           const glm::vec3& origin,
+                           const glm::vec3& normal,
+                           const glm::vec3& duVec,
+                           const glm::vec3& dvVec,
+                           int width, int height);
 
         static glm::vec3 GetNormal(int dir);
 
         static void CalculateQuadCorners(int x, int y, int width, int height, int dir, glm::vec3 corners[4]);
 
         static glm::vec2 CalculateUVs(uint8_t blockType, int faceDir, int cornerIdx, int quadWidth, int quadHeight);
+
+        static glm::vec3 GetDUVec(int faceDir);
+
+        static glm::vec3 GetDVVec(int faceDir);
 
 };
 

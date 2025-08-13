@@ -64,8 +64,6 @@ void World::updateDirtyChunks() {
 
 void World::renderVisibleChunks(Shader& shader) {
     shader.use();
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     mesher.blockTextureAtlas.Bind();
     // Bind once for all chunks
 
@@ -79,6 +77,8 @@ void World::renderVisibleChunks(Shader& shader) {
                      coord.z * CHUNK_SIZE_Z));
 
         shader.setMat4("model", model);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
         chunk->mesh.Draw();
     }
 }

@@ -75,33 +75,28 @@ void GreedyMesher::buildMask(Chunk &chunk, std::vector<MaskCell> &mask,
 }
 
 void GreedyMesher::mergeMaskIntoQuads(std::vector<MaskCell>& mask,
-                                       ChunkMeshing::ChunkMesh& chunkMesh,
-                                       int axisU, int axisV, int axisW,
-                                       int sizeU, int sizeV, int w,
-                                       bool isPositiveDir, int dir)
+                                      ChunkMeshing::ChunkMesh& chunkMesh,
+                                      int axisU, int axisV, int axisW,
+                                      int sizeU, int sizeV, int w,
+                                      bool isPositiveDir, int dir)
 {
     for (int v = 0; v < sizeV; ++v) {
         for (int u = 0; u < sizeU;) {
             MaskCell& cell = mask[u + v * sizeU];
             if (!cell.visible) { ++u; continue; }
 
-            const uint8_t blockType = cell.blockType;
-
-            // Expand width
             int width = 1;
             while (u + width < sizeU &&
                    mask[(u + width) + v * sizeU].visible &&
-                   mask[(u + width) + v * sizeU].blockType == blockType) {
+                   mask[(u + width) + v * sizeU].blockType == cell.blockType)
                 ++width;
-            }
 
-            // Expand height
             int height = 1;
             bool canExpand = true;
             while (canExpand && v + height < sizeV) {
                 for (int k = 0; k < width; ++k) {
                     MaskCell& testCell = mask[(u + k) + (v + height) * sizeU];
-                    if (!testCell.visible || testCell.blockType != blockType) {
+                    if (!testCell.visible || testCell.blockType != cell.blockType) {
                         canExpand = false;
                         break;
                     }
@@ -114,73 +109,61 @@ void GreedyMesher::mergeMaskIntoQuads(std::vector<MaskCell>& mask,
                 for (int du = 0; du < width; ++du)
                     mask[(u + du) + (v + dv) * sizeU].visible = false;
 
-            // Convert slice coords to chunk coords
-            int start[3] = {0,0,0};
+            // Compute origin in world space
+            int start[3] = {0, 0, 0};
             start[axisU] = u;
             start[axisV] = v;
             start[axisW] = isPositiveDir ? w + 1 : w;
-
             glm::vec3 origin(start[0], start[1], start[2]);
 
-            // Axis-aligned vectors for quad
+            // du/dv aligned to face
             glm::vec3 duVec(0.0f), dvVec(0.0f);
-            duVec[axisU] = 1.0f;
-            dvVec[axisV] = 1.0f;
+            switch (dir) {
+                case 0: case 1: duVec.z = 1.0f; dvVec.y = 1.0f; break; // ±X
+                case 2: case 3: duVec.x = 1.0f; dvVec.z = 1.0f; break; // ±Y
+                case 4: case 5: duVec.x = 1.0f; dvVec.y = 1.0f; break; // ±Z
+            }
 
             glm::vec3 normal = GetNormal(dir);
 
-            // Call AddQuad with proper faceDir
-            AddQuad(chunkMesh, origin, normal, duVec, dvVec, width, height, blockType, dir);
+            // Add quad with width/height in voxel units
+            AddQuad(chunkMesh, origin, normal, duVec, dvVec, width, height);
 
             u += width;
         }
     }
 }
 
+
 void GreedyMesher::AddQuad(ChunkMeshing::ChunkMesh& mesh,
                            const glm::vec3& origin,
                            const glm::vec3& normal,
                            const glm::vec3& duVec,
                            const glm::vec3& dvVec,
-                           int width, int height,
-                           int blockType,
-                           int faceDir)
+                           int width, int height)
 {
-    // Calculate quad corners
+    // Compute world-space corners
     glm::vec3 corners[4];
     corners[0] = origin;
     corners[1] = origin + duVec * float(width);
     corners[2] = origin + duVec * float(width) + dvVec * float(height);
     corners[3] = origin + dvVec * float(height);
 
-    // Flip winding for negative faces
-    if (faceDir % 2 != 0) std::swap(corners[1], corners[3]);
-
-    // Compute UVs to tile texture per block
+    // UVs: 1 voxel = 1 unit of texture space
     glm::vec2 uvs[4];
     uvs[0] = glm::vec2(0.0f, 0.0f);
     uvs[1] = glm::vec2(float(width), 0.0f);
     uvs[2] = glm::vec2(float(width), float(height));
     uvs[3] = glm::vec2(0.0f, float(height));
 
-    // Add vertices
-    for (int i = 0; i < 4; ++i) {
+    for (int i = 0; i < 4; ++i)
         mesh.vertices.push_back({corners[i], normal, uvs[i]});
 
-        // Debug print
-        std::cout << "Vertex " << i
-                  << " | BlockType: " << blockType
-                  << " | FaceDir: " << faceDir
-                  << " | Corner: (" << corners[i].x << "," << corners[i].y << "," << corners[i].z << ")"
-                  << " | UV: (" << uvs[i].x << "," << uvs[i].y << ")"
-                  << std::endl;
-    }
-
-    // Add indices for two triangles
     unsigned int start = mesh.vertices.size() - 4;
     mesh.indices.insert(mesh.indices.end(),
                         {start, start+1, start+2, start, start+2, start+3});
 }
+
 
 
 int GreedyMesher::GetDepthForDirection(int z, int dir) {
@@ -260,4 +243,21 @@ glm::vec2 GreedyMesher::CalculateUVs(
     }
 
     return { baseUV.x + uOffset, baseUV.y + vOffset };
+}
+glm::vec3 GreedyMesher::GetDUVec(int faceDir) {
+    switch(faceDir) {
+        case 0: case 1: return glm::vec3(0, 0, 1); // ±X -> Z
+        case 2: case 3: return glm::vec3(1, 0, 0); // ±Y -> X
+        case 4: case 5: return glm::vec3(1, 0, 0); // ±Z -> X
+        default: return glm::vec3(1, 0, 0);
+    }
+}
+
+glm::vec3 GreedyMesher::GetDVVec(int faceDir) {
+    switch(faceDir) {
+        case 0: case 1: return glm::vec3(0, 1, 0); // ±X -> Y
+        case 2: case 3: return glm::vec3(0, 0, 1); // ±Y -> Z
+        case 4: case 5: return glm::vec3(0, 1, 0); // ±Z -> Y
+        default: return glm::vec3(0, 1, 0);
+    }
 }
