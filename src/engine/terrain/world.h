@@ -22,7 +22,7 @@ public:
     void removeChunk(ChunkCoord coord);
 
     void updateDirtyChunks();
-    void renderVisibleChunks(Shader& shader);
+    void renderVisibleChunks(const Shader& shader);
     GreedyMesher mesher;
 
 private:

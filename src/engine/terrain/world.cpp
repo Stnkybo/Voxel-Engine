@@ -62,7 +62,7 @@ void World::updateDirtyChunks() {
     dirtyChunks.clear();
 }
 
-void World::renderVisibleChunks(Shader& shader) {
+void World::renderVisibleChunks(const Shader& shader) {
     shader.use();
     mesher.blockTextureAtlas.Bind();
     // Bind once for all chunks
