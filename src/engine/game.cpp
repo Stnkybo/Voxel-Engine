@@ -244,7 +244,7 @@ void Game::onStart() {
 
     world = &World::getInstance();
 
-    world->mesher.blockTextureAtlas.LoadFromFile("resources/textures/debug_texture.png");
+    world->mesher.blockTextureAtlas.LoadFromFile("resources/textures/texture_atlas.png");
 
     // Generate some chunks
     ChunkCoord chunk_coords = {0,0};
@@ -267,7 +267,7 @@ void Game::onStart() {
                     setBlockType(modifyChunk->at(x,y,z), BlockType::AIR);
                 }
                 if (x < 11 && z < 13) {
-                    setBlockType(modifyChunk->at(x,y,z), BlockType::AIR);
+                    setBlockType(modifyChunk->at(x,y,z), BlockType::DIRT);
                 }
             }
         }
