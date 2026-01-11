@@ -249,6 +249,7 @@ void Game::onStart() {
     // Generate some chunks
     ChunkCoord chunk_coords = {0,0};
     world->generateChunk(chunk_coords);
+
     chunk_coords = {-3, -3};
     world->generateChunk(chunk_coords);
     for (int i = -1; i <= 1; i++) {
@@ -272,6 +273,24 @@ void Game::onStart() {
             }
         }
     }
+    setBlockType(modifyChunk->at(15, 10, 15), BlockType::STONE);
+    
+    // generate and modify for testing
+    world->generateChunk({ 3,3 });
+    modifyChunk = world->getChunk({3,3});
+    for (int x = 0; x < CHUNK_SIZE_X; x++) {
+        for (int y = 0; y < CHUNK_SIZE_Y; y++) {
+            for (int z = 0; z < CHUNK_SIZE_Z; z++) {
+                if (x < 5 && z < 2) {
+                    setBlockType(modifyChunk->at(x, y, z), BlockType::AIR);
+                }
+                if (x < 11 && z < 13) {
+                    setBlockType(modifyChunk->at(x, y, z), BlockType::STONE);
+                }
+            }
+        }
+    }
+
 
     // Make Physics
     physicsSystem.RegisterEntity(std::shared_ptr<Entity>(player));

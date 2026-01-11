@@ -71,6 +71,8 @@ void World::renderVisibleChunks(const Shader& shader) {
         if (chunk == nullptr ) continue;
 
         // Frustum culling check here if implemented
+
+        // squish
         glm::mat4 model = glm::translate(glm::mat4(1.0f),
             glm::vec3(coord.x * CHUNK_SIZE_X,
                      0 * CHUNK_SIZE_Y,

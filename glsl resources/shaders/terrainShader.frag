@@ -21,16 +21,8 @@ void main()
     vec3 diffuse = diff * lightColor;
     vec3 ambient = ambientColor;
 
-    // Temp hardcoded
-	vec2 tileSize = vec2(1.0/2, 1.0/1);		// Each tile is 1/2 of the atlas
+    // TexCoord is expected to be normalized (0..1) already
+    vec4 texColor = texture(uTexture, TexCoord);
 
-    vec2 coord = tileSize * fract(TexCoord);
-
-    // Sample texture (UVs can be >1 for tiling)
-    vec4 texColor = texture(uTexture, coord);
-
-
-    // FragColor = vec4(TexCoord.x, TexCoord.y, 0.0, 1.0);
     FragColor = vec4(texColor.rgb * (diffuse + ambient), texColor.a);
-    // Fragment shader debug - should show color variations
 }

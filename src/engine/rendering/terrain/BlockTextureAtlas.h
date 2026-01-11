@@ -31,7 +31,7 @@ public:
 private:
     GLuint textureID;
     int atlasWidth, atlasHeight;
-    int tileSize; // e.g., 16x16 pixels per block texture
+    int tileSize; 
     std::unordered_map<BlockType, glm::ivec2> textureCoordinates;
 
 };
