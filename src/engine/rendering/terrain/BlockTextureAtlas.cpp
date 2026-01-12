@@ -52,7 +52,7 @@ void BlockTextureAtlas::Bind(GLenum textureUnit) const {
 }
 
 // Returns width and height of Tile UV offset
-glm::vec2 BlockTextureAtlas::GetUVOffset(uint8_t type, int face) const {
+glm::vec2 BlockTextureAtlas::GetUVTileOffset(uint8_t type, int face) const {
 
     glm::ivec2 tilePos = textureCoordinates.at(static_cast<BlockType>(type));
     return {

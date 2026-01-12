@@ -22,7 +22,7 @@ void main()
     vec3 ambient = ambientColor;
 
     // Temp hardcoded
-	vec2 tileSize = vec2(1.0/2, 1.0/1);		// Each tile is 1/2 of the atlas
+	vec2 tileSize = vec2(1.0/1, 1.0/1);		// Each tile is 1/2 of the atlas
 
     vec2 coord = tileSize * fract(TexCoord);
 

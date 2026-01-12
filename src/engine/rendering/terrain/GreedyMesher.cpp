@@ -199,7 +199,7 @@ glm::vec3 GreedyMesher::GetNormal(int dir) {
 void GreedyMesher::CalculateQuadCorners(int x, int y, int width, int height, int dir, glm::vec3 corners[4]) {
 	// Determine depth axis and sign
 	const int depthAxis = dir / 2;  // 0=X, 1=Y, 2=Z
-	const float depth = (dir % 2) ? 0.0f : 1.0f;  // -X/-Y/-Z=0.0, +X/+Y/+Z=1.0
+	const float depth = (dir % 2) ? 0.0f : 1.0f;  // -X/-Y/-Z=0.0, +X/+Y/+Z=1.0f
 
 	// Base position (aligned to voxel grid)
 	glm::vec3 base(x, y, 0);
@@ -225,30 +225,36 @@ glm::vec2 GreedyMesher::CalculateUVs(
 	uint8_t blockType, int faceDir, int cornerIdx, int quadWidth, int quadHeight)
 {
 	// Get the atlas offset for this block type
-	glm::vec2 AtlasOffset = blockTextureAtlas.GetUVOffset(blockType, faceDir);
+	glm::vec2 AtlasOffset = blockTextureAtlas.GetUVTileOffset(blockType, faceDir);
 
+	// Use public getters instead of private members
+	float atlasWidth = blockTextureAtlas.GetAtlasWidth();
+	float atlasHeight = blockTextureAtlas.GetAtlasHeight();
+	int tileSize = blockTextureAtlas.GetTileSize();
 
 	// Determine corner offsets for tiling
 	float NewU = 0.0f;
 	float NewV = 0.0f;
+
+	 float normalisedTileW = static_cast<float>(tileSize) / atlasWidth;
+	 float normalisedTileH = static_cast<float>(tileSize) / atlasHeight;
 
 	switch (cornerIdx) {
 		case 0: 
 			NewU = 0.0f;
 			NewV = 0.0f;           break; // bottom-left
 		case 1: 
-			NewU = quadWidth;
+			NewU = normalisedTileW;
 			NewV = 0.0f;         break; // bottom-right
 		case 2: 
-			NewU = quadWidth;
-			NewV = quadHeight ; break; // top-right
-
+			NewU = normalisedTileW;
+			NewV = normalisedTileH; break; // top-right
 		case 3: 
 			NewU = 0.0f;
-			NewV = quadHeight ; // top-left
+			NewV = normalisedTileH; // top-left
 	}
 
-	return { NewU + AtlasOffset.x, NewV + AtlasOffset.y };
+	return { NewU + AtlasOffset.x * normalisedTileW, NewV + AtlasOffset.y * normalisedTileH };
 }
 
 glm::vec3 GreedyMesher::GetDUVec(int faceDir) {

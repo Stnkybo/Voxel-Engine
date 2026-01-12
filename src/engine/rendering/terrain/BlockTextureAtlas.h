@@ -21,7 +21,7 @@ public:
 
     bool LoadFromFile(const std::string& path);
     void Bind(GLenum textureUnit = GL_TEXTURE0) const;
-    glm::vec2 GetUVOffset(uint8_t type, int face) const;
+    glm::vec2 GetUVTileOffset(uint8_t type, int face) const;
 
     float GetAtlasWidth() const;
 
