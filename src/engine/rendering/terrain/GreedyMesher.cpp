@@ -140,7 +140,7 @@ void GreedyMesher::AddQuad(ChunkMeshing::ChunkMesh& mesh,
 	const glm::vec3& normal,
 	const glm::vec3& duVec,
 	const glm::vec3& dvVec,
-	int width, int height,
+	int width, int height, // dimensions of quad surface
 	uint8_t blockType, int faceDir)
 {
 	// Compute world-space corners
@@ -150,14 +150,24 @@ void GreedyMesher::AddQuad(ChunkMeshing::ChunkMesh& mesh,
 	corners[2] = origin + duVec * float(width) + dvVec * float(height);
 	corners[3] = origin + dvVec * float(height);
 
+
 	// For each corner, compute the UV using the atlas
-	glm::vec2 uvs[4];
-	for (int i = 0; i < 4; ++i) {
-		uvs[i] = CalculateUVs(blockType, faceDir, i, width, height);
-	}
+	glm::vec2 uvs[4] = {
+	{ 0.0f,          0.0f           },
+	{ (float)width,  0.0f           },
+	{ (float)width,  (float)height  },
+	{ 0.0f,          (float)height  },
+	};
+
+	float atlasW = blockTextureAtlas.GetAtlasWidth();
+	float atlasH = blockTextureAtlas.GetAtlasHeight();
+	int tsize = blockTextureAtlas.GetTileSize();
+	glm::vec2 tileIdx = blockTextureAtlas.GetUVTileOffset(blockType, faceDir); // tile col/row
+	glm::vec2 normTileSize = { tsize / atlasW, tsize / atlasH };
+	glm::vec2 normTileOffset = { tileIdx.x * normTileSize.x, tileIdx.y * normTileSize.y };
 
 	for (int i = 0; i < 4; ++i)
-		mesh.vertices.push_back({ corners[i], normal, uvs[i] });
+		mesh.vertices.push_back({ corners[i], normal, uvs[i], normTileOffset, normTileSize });
 
 	unsigned int start = mesh.vertices.size() - 4;
 	mesh.indices.insert(mesh.indices.end(),
@@ -230,14 +240,14 @@ glm::vec2 GreedyMesher::CalculateUVs(
 	// Use public getters instead of private members
 	float atlasWidth = blockTextureAtlas.GetAtlasWidth();
 	float atlasHeight = blockTextureAtlas.GetAtlasHeight();
-	int tileSize = blockTextureAtlas.GetTileSize();
+	int tsize = blockTextureAtlas.GetTileSize();
 
 	// Determine corner offsets for tiling
 	float NewU = 0.0f;
 	float NewV = 0.0f;
 
-	 float normalisedTileW = static_cast<float>(tileSize) / atlasWidth;
-	 float normalisedTileH = static_cast<float>(tileSize) / atlasHeight;
+	 float normalisedTileW = static_cast<float>(tsize) / atlasWidth;
+	 float normalisedTileH = static_cast<float>(tsize) / atlasHeight;
 
 	switch (cornerIdx) {
 		case 0: 

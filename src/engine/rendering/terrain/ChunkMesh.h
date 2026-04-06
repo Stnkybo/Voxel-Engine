@@ -15,11 +15,13 @@ namespace ChunkMeshing {
         glm::vec3 Position;  // 3D position
         glm::vec3 Normal;    // Face direction (for lighting)
         glm::vec2 TexCoord;  // Texture coordinates
+        glm::vec2 tileOffset;  // atlas tile origin in normalized coords
+        glm::vec2 tileSize;    // atlas tile size in normalized coords
     };
     struct ChunkMesh {
         std::vector<Vertex> vertices;
         std::vector<uint32_t> indices;
-        GLuint VAO, VBO, EBO;
+        GLuint VAO = 0, VBO = 0, EBO = 0;
         bool gpuUploaded = false;
 
         void Clear() {
@@ -69,6 +71,14 @@ namespace ChunkMeshing {
             glEnableVertexAttribArray(2);
             glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, TexCoord));
 
+            // tileOffset
+            glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, tileOffset));
+            glEnableVertexAttribArray(3);
+
+            // tileSize
+            glVertexAttribPointer(4, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, tileSize));
+            glEnableVertexAttribArray(4);
+
             glBindVertexArray(0);
 
             gpuUploaded = true;
@@ -76,14 +86,16 @@ namespace ChunkMeshing {
 
 
         void Draw() const {
+            if (!gpuUploaded || VAO == 0 || indices.empty()) return;
             glBindVertexArray(VAO);
             glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, 0);
         }
 
         void DeleteGPUResources() {
-            glDeleteVertexArrays(1, &VAO);
-            glDeleteBuffers(1, &VBO);
-            glDeleteBuffers(1, &EBO);
+            if (VAO != 0) { glDeleteVertexArrays(1, &VAO); VAO = 0; }
+            if (VBO != 0) { glDeleteBuffers(1, &VBO); VBO = 0; }
+            if (EBO != 0) { glDeleteBuffers(1, &EBO); EBO = 0; }
+            gpuUploaded = false;
         }
     };
 

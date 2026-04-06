@@ -2,14 +2,18 @@
 
 in vec3 FragPos;
 in vec3 Normal;
-in vec2 TexCoord;
+
+in vec2 vUV;
+flat in vec2 vTileOffset;  // must match vertex shader qualifier exactly
+flat in vec2 vTileSize;
 
 out vec4 FragColor;
 
-uniform sampler2D uTexture;
+uniform sampler2D uAtlas; // Texture atlas
 uniform vec3 lightDir = normalize(vec3(1.0, -1.0, 1.0));
 uniform vec3 lightColor = vec3(1.0, 1.0, 1.0);
 uniform vec3 ambientColor = vec3(0.3, 0.3, 0.3);
+
 
 void main()
 {
@@ -21,13 +25,18 @@ void main()
     vec3 diffuse = diff * lightColor;
     vec3 ambient = ambientColor;
 
-    // Temp hardcoded
-	vec2 tileSize = vec2(1.0/1, 1.0/1);		// Each tile is 1/2 of the atlas
+    // UV stuff
+    vec2 tiledUV = fract(vUV);
 
-    vec2 coord = tileSize * fract(TexCoord);
+    vec2 texelSize = 1.0 / vec2(textureSize(uAtlas, 0));
+    vec2 halfTexel = 0.5 * texelSize;
+    tiledUV = clamp(tiledUV, halfTexel / vTileSize, 1.0 - halfTexel / vTileSize);
+
+    vec2 atlasUV = vTileOffset + tiledUV * vTileSize;
+
 
     // Sample texture (UVs can be >1 for tiling)
-    vec4 texColor = texture(uTexture, coord);
+    vec4 texColor = texture(uAtlas, atlasUV);
 
 
     // FragColor = vec4(TexCoord.x, TexCoord.y, 0.0, 1.0);

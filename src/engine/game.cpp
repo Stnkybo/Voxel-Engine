@@ -234,6 +234,8 @@ void Game::onStart() {
 
     m_boolDebugMenu = true;
 
+    glProvokingVertex(GL_FIRST_VERTEX_CONVENTION); // uses information from the first vertex for a plane
+
     ourShader = new Shader("./resources/shaders/modelShader.vert", "./resources/shaders/modelShader.frag");
     terrainShader = new Shader("./resources/shaders/terrainShader.vert", "./resources/shaders/terrainShader.frag");
 

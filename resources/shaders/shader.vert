@@ -3,9 +3,11 @@
 // Input attributes from the vertex buffer
 layout (location = 0) in vec3 aPos; // Position of the vertex
 layout (location = 1) in vec3 aNormal; // Normal (optional, if lighting is used)
+layout (location = 2) in vec2 aUV;  // UV coordinates to draw the correct texture from the atlas
 
 // Output to the fragment shader
 out vec4 vertexColor;
+out vec2 vUV;
 
 // Uniforms
 uniform mat4 model;        // Model matrix
