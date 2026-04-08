@@ -16,6 +16,7 @@ public:
     glm::vec3 velocity = {0.0f, 0.0f, 0.0f};
     float mass = 1.0f;
     bool affectedByGravity = true;
+    bool collisionsEnabled = true;
 
     PhysicsComponent(float mass_) : mass(mass_) {}
 };

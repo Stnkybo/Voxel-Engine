@@ -174,14 +174,13 @@ void Game::handleEvents() {
                     //reset player position
                     player->setPosition(glm::vec3(8.0f, 9.0f, 8.0f));
 
-                }if (keycode == SDLK_P) {
+                }if (keycode == SDLK_N) {
 
-                    //toggle Player gravity
-                    player->physics->affectedByGravity = !player->physics->affectedByGravity;
-                    player->physics->velocity = glm::vec3(0.0f);
-                    std::cout << "Player Gravity: " << player->physics->affectedByGravity << std::endl;
+                    //toggle Player Noclip
+                    player->toggleNoclip();
 
                 }
+                
             }
 
             break;
@@ -296,6 +295,7 @@ void Game::onStart() {
 
     // Make Physics
     physicsSystem.RegisterEntity(std::shared_ptr<Entity>(player));
+    player->physics->affectedByGravity = false;
 
 }
 

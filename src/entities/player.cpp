@@ -3,6 +3,7 @@
 //
 
 #include "player.h"
+#include <iostream>
 
 Player::Player(glm::vec3 positionIn): Entity(positionIn, {0.5f,2,0.5f}) {
     camera = new Camera(position + glm::vec3(0.0f, 0.8f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -46,5 +47,14 @@ glm::vec3 Player::getHead() const {
 
 AABB &Player::getBoundingBox() {
     return boundingBox;
+}
+
+void Player::toggleNoclip() {
+    // add noclip boolean
+    this->physics->affectedByGravity =! this->physics->affectedByGravity;
+    if (!this->physics->affectedByGravity)
+        this->physics->velocity = glm::vec3(0.0f);
+    std::cout << "Player Gravity: " << this->physics->affectedByGravity << std::endl;
+       
 }
 
