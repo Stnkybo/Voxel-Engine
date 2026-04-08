@@ -24,12 +24,13 @@ public:
 
     void updateDirtyChunks();
     void renderVisibleChunks(const Shader& shader);
+    
     GreedyMesher mesher;
+    std::vector<ChunkCoord> dirtyChunks;
 
 private:
     World() = default;
     std::unordered_map<ChunkCoord, Chunk*> chunkMap;
-    std::vector<ChunkCoord> dirtyChunks;
 };
 
 
