@@ -124,6 +124,24 @@ void Game::handleEvents() {
                 isRunning = false;
             break;
 
+            case SDL_EVENT_MOUSE_BUTTON_DOWN:
+
+                if (ev.button.button == SDL_BUTTON_LEFT) {
+                    // The left button was pressed or released
+                    // place block here
+                    player->m_selected_block_type = static_cast<BlockType>((static_cast<uint8_t>(player->m_selected_block_type) + 1) % BlockType.);
+                
+                    world->setBlock(0,10,0, player->m_selected_block_type);
+                    std::cout << "did the thing" << std::endl;
+                }
+                else if (ev.button.button == SDL_BUTTON_RIGHT) {
+                    // The right button was pressed or released
+                    std::cout << "selected blockType: " << static_cast<unsigned int>(world->getBlock(0, 10, 0)->type) << std::endl;
+                }
+
+                break;
+
+
             case SDL_EVENT_KEY_DOWN: {
                 const SDL_Keycode keycode = SDL_GetKeyFromScancode(ev.key.scancode, ev.key.mod, false);
                 if (keycode == SDLK_ESCAPE) {
@@ -292,6 +310,11 @@ void Game::onStart() {
         }
     }
 
+    // add test dirt
+    Voxel *v = world->getBlock(0, 15, 0);
+    setBlockType(*v, BlockType::DIRT);
+
+
 
     // Make Physics
     physicsSystem.RegisterEntity(std::shared_ptr<Entity>(player));
@@ -329,11 +352,10 @@ void Game::render() {
     // 2. Rendering
     world->renderVisibleChunks(*terrainShader);
 
-    // 3. Mark chunks dirty when modified
-    // if (playerModifiedBlock) {
-    //     ChunkCoord coord = getChunkCoord(modifiedBlockPos);
-    //     world.dirtyChunks.push_back(coord);
-    // }
+    // 3. Mark chunks dirty when modified and reupload geometry
+    world->updateDirtyChunks();
+ 
+
 
 
     // Text
