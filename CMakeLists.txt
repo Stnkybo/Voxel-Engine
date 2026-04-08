@@ -44,21 +44,23 @@ add_executable(${PROJECT_NAME}
 )
 
 # Copy Shaders
-add_custom_command(
-        TARGET ${PROJECT_NAME} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${CMAKE_SOURCE_DIR}/resources/shaders
-        $<TARGET_FILE_DIR:${PROJECT_NAME}>/resources/shaders
-        COMMENT "Copying Shaders to output directory"
+add_custom_target(copy_shaders ALL
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${CMAKE_SOURCE_DIR}/resources/shaders
+    $<TARGET_FILE_DIR:${PROJECT_NAME}>/resources/shaders
+    COMMENT "Copying Shaders to output directory"
 )
+
 # Copy Textures
-add_custom_command(
-        TARGET ${PROJECT_NAME} POST_BUILD
+add_custom_target(copy_textures ALL
         COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${CMAKE_SOURCE_DIR}/resources/textures
         $<TARGET_FILE_DIR:${PROJECT_NAME}>/resources/textures
         COMMENT "Copying Textures to output directory"
 )
+
+add_dependencies(copy_shaders ${PROJECT_NAME})
+add_dependencies(copy_textures ${PROJECT_NAME})
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
         find_package(Threads REQUIRED)
