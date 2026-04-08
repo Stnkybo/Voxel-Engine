@@ -17,6 +17,7 @@ public:
         return instance;
     }
     Voxel* getBlock(int x, int y, int z);
+    void setBlock(int x, int y, int z, BlockType blockType);
     void generateChunk(ChunkCoord coord);
     Chunk* getChunk(ChunkCoord coord);
     void removeChunk(ChunkCoord coord);

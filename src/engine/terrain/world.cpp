@@ -13,13 +13,32 @@ Voxel* World::getBlock(int x, int y, int z) {
     //get chunk if it exists
     Chunk* chunk = getChunk(chunk_coord);
     if (chunk != nullptr) {
-        int local_x = mod(x,CHUNK_SIZE_X);
-        int local_y = mod(y,CHUNK_SIZE_Y);
-        int local_z = mod(z,CHUNK_SIZE_Z);
-        return &chunk->at(local_x,local_y,local_z);
+		int local_x = mod(x, CHUNK_SIZE_X);
+		int local_y = mod(y, CHUNK_SIZE_Y);
+		int local_z = mod(z, CHUNK_SIZE_Z);
+		return &chunk->at(local_x, local_y, local_z);
     }
     // if no chunk data exist
     return nullptr;
+}
+
+void World::setBlock(int x, int y, int z, BlockType blockType) {
+	ChunkCoord chunk_coord = VoxelToChunkCoords(x, z);
+	//get chunk if it exists
+	Chunk* chunk = getChunk(chunk_coord);
+	if (chunk != nullptr) {
+		// find voxel data
+		int local_x = mod(x, CHUNK_SIZE_X);
+		int local_y = mod(y, CHUNK_SIZE_Y);
+		int local_z = mod(z, CHUNK_SIZE_Z);
+
+		chunk->at(local_x, local_y, local_z).type = static_cast<uint8_t>(blockType);
+
+		// mark chunk as dirty
+		dirtyChunks.push_back(chunk_coord);
+	}
+
+	return;
 }
 
 void World::generateChunk(ChunkCoord coord) {
