@@ -5,8 +5,8 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 #include "entity.h"
-#include "../engine/camera/camera.h"
 #include "../engine/terrain/voxel.h"
+#include "../engine/camera/camera.h"
 
 
 class Player : public Entity {
