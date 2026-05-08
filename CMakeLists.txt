@@ -41,6 +41,8 @@ add_executable(${PROJECT_NAME}
         src/engine/rendering/terrain/BlockTextureAtlas.h
         src/engine/physics/PhysicsSystem.cpp
         src/engine/physics/PhysicsSystem.h
+        src/engine/raycasting/raycast.cpp
+        src/engine/raycasting/raycast.h
 )
 
 # Copy Shaders
