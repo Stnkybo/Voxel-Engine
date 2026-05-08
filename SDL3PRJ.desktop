@@ -1,0 +1,10 @@
+#EXPERIMENT NOT FUNCTIONAL
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=SDL3PRJ
+Comment=Description of the app
+Exec=/opt/SDL3PRJ/SDL3PRJ
+Icon=/full/path/to/your/icon.png
+Terminal=true
+Categories=Game;

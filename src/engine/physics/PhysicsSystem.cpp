@@ -4,6 +4,7 @@
 
 #include "PhysicsSystem.h"
 
+#include <algorithm>
 #include <iostream>
 
 #include "../../entities/entity.h"
