@@ -16,15 +16,23 @@ public:
         static World instance;
         return instance;
     }
+
     Voxel* getBlock(int x, int y, int z);
+
+    const Voxel * getBlock(glm::ivec3 pos);
+
     void setBlock(int x, int y, int z, BlockType blockType);
+
     void generateChunk(ChunkCoord coord);
+
     Chunk* getChunk(ChunkCoord coord);
+
     void removeChunk(ChunkCoord coord);
 
     void updateDirtyChunks();
+
     void renderVisibleChunks(const Shader& shader);
-    
+
     GreedyMesher mesher;
     std::vector<ChunkCoord> dirtyChunks;
 

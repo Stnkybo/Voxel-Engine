@@ -239,7 +239,7 @@ void Game::processMouseMotion(const SDL_Event& event) const {
         const float xOffset = event.motion.xrel; // Relative x motion
         const float yOffset = event.motion.yrel; // Relative y motion
 
-        // Process mouse movement in the camera
+        // Process mouse movement in the camera, does not rotate player as player has no rotation
         player->camera->ProcessMouseMovement(xOffset, yOffset);
     }
 }

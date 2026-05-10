@@ -43,6 +43,8 @@ add_executable(${PROJECT_NAME}
         src/engine/physics/PhysicsSystem.h
         src/engine/raycasting/raycast.cpp
         src/engine/raycasting/raycast.h
+        src/engine/raycasting/raycast.cpp
+        src/engine/client/playerRaycaster.h
 )
 
 # Copy Shaders

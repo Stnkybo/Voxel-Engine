@@ -22,6 +22,20 @@ Voxel* World::getBlock(int x, int y, int z) {
 	return nullptr;
 }
 
+const Voxel * World::getBlock(glm::ivec3 pos) {
+	ChunkCoord chunk_coord = VoxelToChunkCoords(pos.x, pos.z);
+	//get chunk if it exists
+	Chunk* chunk = getChunk(chunk_coord);
+	if (chunk != nullptr) {
+		int local_x = mod(pos.x, CHUNK_SIZE_X);
+		int local_y = mod(pos.y, CHUNK_SIZE_Y);
+		int local_z = mod(pos.z, CHUNK_SIZE_Z);
+		return &chunk->at(local_x, local_y, local_z);
+	}
+	// if no chunk data exist
+	return nullptr;
+}
+
 void World::setBlock(int x, int y, int z, BlockType blockType) {
 	ChunkCoord chunk_coord = VoxelToChunkCoords(x, z);
 	//get chunk if it exists
@@ -71,6 +85,7 @@ void World::removeChunk(ChunkCoord coord) {
 }
 
 // Takes all chunks modified/dirty, recreates their meshes and reuploads/cleans them
+
 void World::updateDirtyChunks() {
 	for (ChunkCoord coord : dirtyChunks) {
 		if (auto it = chunkMap.find(coord); it != chunkMap.end()) {
