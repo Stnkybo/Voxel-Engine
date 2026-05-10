@@ -125,26 +125,32 @@ void Game::handleEvents() {
                 isRunning = false;
             break;
 
-            case SDL_EVENT_MOUSE_BUTTON_DOWN:
+            case SDL_EVENT_MOUSE_BUTTON_DOWN: {
+
+                auto blockraycast = playerVoxelInteractionRaycast(player->camera->Position, player->camera->Front, 5.0f, world);
 
                 if (ev.button.button == SDL_BUTTON_LEFT) {
                     // The left button was pressed or released
-                    // place block here
-
-                    auto blockraycast = playerVoxelInteractionRaycast(player->camera->Position, player->camera->Front, 5.0f, world);
+                    // destory block
 
                     if (blockraycast.hit) {
-                        world->setBlock(blockraycast.blockPosition, player->m_selected_block_type);
-                        std::cout << "did the thing" << std::endl;
+                        world->setBlock(blockraycast.blockPosition, BlockType::AIR);
+                        std::cout << "Destoryed Block" << std::endl;
+
 
                     }
                 }
                 else if (ev.button.button == SDL_BUTTON_RIGHT) {
                     // The right button was pressed or released
-                    player->m_selected_block_type = static_cast<BlockType>((static_cast<uint8_t>(player->m_selected_block_type) + 1) % 5 );
-                    std::cout << "selected blockType: " << static_cast<unsigned int>(world->getBlock(0, 10, 0)->type) << std::endl;
-                }
+                    // Place block
+                    if (blockraycast.hit) {
 
+                        world->setBlock(blockraycast.blockPosition + blockraycast.normal, player->m_selected_block_type);
+                        std::cout << "Placed Block" << std::endl;
+
+                    }
+                }
+            }
                 break;
 
 
@@ -198,10 +204,18 @@ void Game::handleEvents() {
                     //reset player position
                     player->setPosition(glm::vec3(8.0f, 9.0f, 8.0f));
 
-                }if (keycode == SDLK_N) {
+                }
+                if (keycode == SDLK_N) {
 
                     //toggle Player Noclip
                     player->toggleNoclip();
+
+                }
+                if (keycode == SDLK_1) {
+
+                    //Cycle Selected Block
+                    player->m_selected_block_type = static_cast<BlockType>((static_cast<uint8_t>(player->m_selected_block_type) + 1) % 5 );
+                    std::cout << "selected blockType: " << static_cast<unsigned int>(player->m_selected_block_type) << std::endl;
 
                 }
                 
@@ -404,6 +418,8 @@ void Game::imguiUI(const ImGuiIO& io) {
 
         ImGui::Text("Window Size: %d x %d", m_width, m_height);
         ImGui::Text("Cube Count %d ", m_cubes.size());
+
+        ImGui::Text("Selected Block Type %d ", static_cast<int>(player->m_selected_block_type));
 
         ImGui::Text("Player Head %.3f, %.3f, %.3f ", player->getHead().x, player->getHead().y, player->getHead().z);
         ImGui::Text("Player Pos %.3f, %.3f, %.3f ", player->getPosition().x, player->getPosition().y, player->getPosition().z);
