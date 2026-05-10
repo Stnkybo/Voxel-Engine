@@ -23,6 +23,8 @@ public:
 
     void setBlock(int x, int y, int z, BlockType blockType);
 
+    void setBlock(glm::ivec3 pos, BlockType blockType);
+
     void generateChunk(ChunkCoord coord);
 
     Chunk* getChunk(ChunkCoord coord);
@@ -32,6 +34,7 @@ public:
     void updateDirtyChunks();
 
     void renderVisibleChunks(const Shader& shader);
+
 
     GreedyMesher mesher;
     std::vector<ChunkCoord> dirtyChunks;

@@ -17,7 +17,7 @@ struct raycastResult {
 /**
  * This function is for raycasting from the player to the terrain to interact with specific voxels
  */
-raycastResult playerVoxelInteractionRaycast( glm::vec3 origin, glm::vec3 direction, float maxDistance, World *world) {
+inline raycastResult playerVoxelInteractionRaycast( glm::vec3 origin, glm::vec3 direction, float maxDistance, World *world) {
     //
     // take player head as origin and direction of camera as a vector
 
@@ -41,8 +41,9 @@ raycastResult playerVoxelInteractionRaycast( glm::vec3 origin, glm::vec3 directi
     while (true) {
 
         // check the voxel to see if the block is solid
+        const Voxel* currentVoxel = world->getBlock(currentPos);
             // if solid, mark as hit and calculate ray information
-        if (getBlockType(*world->getBlock(currentPos)) != BlockType::AIR) {
+        if (currentVoxel && getBlockType(*currentVoxel) != BlockType::AIR) {
             return raycastResult{
                 true,
                 currentPos,

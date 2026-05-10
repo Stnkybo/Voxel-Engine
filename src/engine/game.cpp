@@ -17,6 +17,7 @@
 
 #include "rendering/shader.h"
 #include "camera/camera.h"
+#include "client/playerRaycaster.h"
 #include "physics/collisions/worldCollision.h"
 #include "rendering/model.hpp"
 #include "terrain/world.h"
@@ -129,13 +130,18 @@ void Game::handleEvents() {
                 if (ev.button.button == SDL_BUTTON_LEFT) {
                     // The left button was pressed or released
                     // place block here
-                    player->m_selected_block_type = static_cast<BlockType>((static_cast<uint8_t>(player->m_selected_block_type) + 1) % 5 );
-                
-                    world->setBlock(0,10,0, player->m_selected_block_type);
-                    std::cout << "did the thing" << std::endl;
+
+                    auto blockraycast = playerVoxelInteractionRaycast(player->camera->Position, player->camera->Front, 5.0f, world);
+
+                    if (blockraycast.hit) {
+                        world->setBlock(blockraycast.blockPosition, player->m_selected_block_type);
+                        std::cout << "did the thing" << std::endl;
+
+                    }
                 }
                 else if (ev.button.button == SDL_BUTTON_RIGHT) {
                     // The right button was pressed or released
+                    player->m_selected_block_type = static_cast<BlockType>((static_cast<uint8_t>(player->m_selected_block_type) + 1) % 5 );
                     std::cout << "selected blockType: " << static_cast<unsigned int>(world->getBlock(0, 10, 0)->type) << std::endl;
                 }
 
