@@ -282,6 +282,7 @@ void Game::onStart() {
     player->camera->Zoom = FOV;
 
     world = &World::getInstance();
+    skybox = new Skybox();
 
     world->mesher.blockTextureAtlas.LoadFromFile("resources/textures/texture_atlas.png");
 
@@ -375,10 +376,10 @@ void Game::render() {
     // 3. Mark chunks dirty when modified and reupload geometry
     world->updateDirtyChunks();
  
+    skybox->drawSkybox(view, projection);
 
 
-
-    // Text
+    // UI
     // Start the Dear ImGui frame
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplSDL3_NewFrame();

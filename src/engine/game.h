@@ -13,6 +13,7 @@
 #include "rendering/shader.h"
 #include "../entities/player.h"
 #include "rendering/cube.h"
+#include "skybox/skybox.h"
 #include "terrain/world.h"
 
 
@@ -34,6 +35,7 @@ class Game {
 
     std::vector<std::unique_ptr<Cube>> m_cubes;
     Texture *terrainTexture{};
+    Skybox* skybox{};
     bool m_boolDebugMenu{};
     SDL_GLContext m_glContext;
     ImGuiIO* m_imguiIO;
