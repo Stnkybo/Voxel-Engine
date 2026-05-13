@@ -25,8 +25,9 @@ inline unsigned int loadCubemap(const std::vector<std::string> &faces)
         unsigned char *data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
         if (data)
         {
+            GLenum format = (nrChannels == 3) ? GL_RGB : GL_RGBA;
             glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
-                         0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data
+                         0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data
             );
             stbi_image_free(data);
         }
@@ -52,15 +53,15 @@ class Skybox {
     Shader *skyboxShader;
 
     Skybox() {
-        skyboxShader = new Shader("../../../resources/shaders/skyboxShader.vert", "../../../resources/shaders/skyboxShader.frag");
-        constexpr std::vector<std::string> faces;
+        skyboxShader = new Shader("resources/shaders/skyboxShader.vert", "resources/shaders/skyboxShader.frag");
+        const std::vector<std::string> faces =
         {
             "resources/textures/skyboxes/right.png",
             "resources/textures/skyboxes/left.png",
             "resources/textures/skyboxes/top.png",
             "resources/textures/skyboxes/bottom.png",
             "resources/textures/skyboxes/front.png",
-            "resources/textures/skyboxes/back.png";
+            "resources/textures/skyboxes/back.png"
         };
 
         float skyboxVertices[] = {
