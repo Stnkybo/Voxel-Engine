@@ -6,3 +6,6 @@
 /out
 /CMakeSettings.json
 /.idea/
+/CMakeUserPresets.json
+/build
+/CppProperties.json

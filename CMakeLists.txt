@@ -3,8 +3,6 @@ project(SDL3PRJ)
 
 set(CMAKE_CXX_STANDARD 23)
 
-# Load all Project Dependencies
-include(cmake/deps.cmake)
 
 add_executable(${PROJECT_NAME}
         src/main.cpp
@@ -46,6 +44,9 @@ add_executable(${PROJECT_NAME}
         src/engine/raycasting/raycast.cpp
         src/engine/client/playerRaycaster.h
 )
+
+# Load all Project Dependencies
+include(cmake/deps.cmake)
 
 # Copy Shaders
 add_custom_target(copy_shaders ALL
@@ -133,54 +134,53 @@ if(WIN32)
         )
     endif()
 
-    # Copy SDL3 DLL (check if it exists first)
-    if(EXISTS "${SDL3_BINARY_DIR}/SDL3.dll" OR EXISTS "${SDL3_BINARY_DIR}/SDL3d.dll")
-        if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-            set(SDL3_DLL_NAME "SDL3d.dll")
-        else()
-            set(SDL3_DLL_NAME "SDL3.dll")
-        endif()
-        
-        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy
-            "${SDL3_BINARY_DIR}/${SDL3_DLL_NAME}"
-            $<TARGET_FILE_DIR:${PROJECT_NAME}>
-            COMMENT "Copying ${SDL3_DLL_NAME} to output directory"
-        )
-    endif()
-
-    # Copy Glad DLL only if it exists (handle both static and shared linking)
-    get_target_property(GLAD_TYPE glad TYPE)
-    
-    if(GLAD_TYPE STREQUAL "SHARED_LIBRARY")
-        # Glad is built as shared library - copy the DLL
-        if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-            set(GLAD_DLL_NAME "gladd.dll")
-        else()
-            set(GLAD_DLL_NAME "glad.dll")
-        endif()
-        
-        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy
-            "${GLAD_BINARY_DIR}/${GLAD_DLL_NAME}"
-            $<TARGET_FILE_DIR:${PROJECT_NAME}>
-            COMMENT "Copying ${GLAD_DLL_NAME} to output directory"
-        )
-    else()
-        # Glad is built as static library - no need to copy DLL
-        message(STATUS "Glad is built as static library, no DLL to copy")
-    endif()
+   # # Copy SDL3 DLL (check if it exists first)
+   # if(EXISTS "${SDL3_BINARY_DIR}/SDL3.dll" OR EXISTS "${SDL3_BINARY_DIR}/SDL3d.dll")
+   #     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+   #         set(SDL3_DLL_NAME "SDL3d.dll")
+   #     else()
+   #         set(SDL3_DLL_NAME "SDL3.dll")
+   #     endif()
+   #     
+   #     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+   #         COMMAND ${CMAKE_COMMAND} -E copy
+   #         "${SDL3_BINARY_DIR}/${SDL3_DLL_NAME}"
+   #         $<TARGET_FILE_DIR:${PROJECT_NAME}>
+   #         COMMENT "Copying ${SDL3_DLL_NAME} to output directory"
+   #     )
+   # endif()
+   #
+   # # Copy Glad DLL only if it exists (handle both static and shared linking)
+   # get_target_property(GLAD_TYPE glad TYPE)
+   # 
+   # if(GLAD_TYPE STREQUAL "SHARED_LIBRARY")
+   #     # Glad is built as shared library - copy the DLL
+   #     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+   #         set(GLAD_DLL_NAME "gladd.dll")
+   #     else()
+   #         set(GLAD_DLL_NAME "glad.dll")
+   #     endif()
+   #     
+   #     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+   #         COMMAND ${CMAKE_COMMAND} -E copy
+   #         "${GLAD_BINARY_DIR}/${GLAD_DLL_NAME}"
+   #         $<TARGET_FILE_DIR:${PROJECT_NAME}>
+   #         COMMENT "Copying ${GLAD_DLL_NAME} to output directory"
+   #     )
+   # else()
+   #     # Glad is built as static library - no need to copy DLL
+   #     message(STATUS "Glad is built as static library, no DLL to copy")
+   # endif()
 endif()
 
-target_include_directories(${PROJECT_NAME} PRIVATE ${glm_SOURCE_DIR})
+#target_include_directories(${PROJECT_NAME} PRIVATE ${glm_SOURCE_DIR})
 
 target_link_libraries(${PROJECT_NAME}
         PRIVATE
-        assimp
-        glad
-        imgui
+        assimp::assimp
+        glad::glad
+        imgui::imgui
         SDL3::SDL3
-        stb_image
         OpenGL::GL
         $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:Threads::Threads>  # Only link if not MSVC
 )
