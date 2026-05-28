@@ -12,6 +12,9 @@ else()
     set(OPENGL_LIBRARIES OpenGL::OpenGL)
 endif()
 
+# Vulkan
+find_package(Vulkan REQUIRED)
+
 # -----------------------------
 # SDL3
 # -----------------------------

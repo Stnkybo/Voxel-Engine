@@ -132,6 +132,7 @@ target_link_libraries(${PROJECT_NAME}
         glad::glad
         imgui::imgui
         SDL3::SDL3
+        Vulkan::Vulkan
         OpenGL::GL
         $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:Threads::Threads>  # Only link if not MSVC
 )
