@@ -40,5 +40,5 @@ find_package(imgui CONFIG REQUIRED)
 # -----------------------------
 # stb_image
 # -----------------------------
-find_package(stb REQUIRED)
-target_include_directories(${PROJECT_NAME} PRIVATE ${stb_INCLUDE_DIR})
+find_package(Stb REQUIRED)
+target_include_directories(${PROJECT_NAME} PRIVATE ${Stb_INCLUDE_DIR})
