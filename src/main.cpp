@@ -4,14 +4,22 @@
 int main() {
     const auto game = new Game("Chunk Demo", WIDTH, HEIGHT);
 
-    game->onStart();
-    while (game->isRunning) {
-        game->handleEvents();
-        game->update();
-        game->render();
-
+    try {
+        game->initWindow();
+        game->initVulkan();
+        game->onStart();
+        while (game->isRunning) {
+            game->handleEvents();
+            game->update();
+            game->render();
+        }
+    } catch (const std::exception &e) {
+        std::cerr << e.what() << std::endl;
+        return EXIT_FAILURE;
     }
+
+
     game->clean();
 
-    return 0;
+    return EXIT_SUCCESS;
 }

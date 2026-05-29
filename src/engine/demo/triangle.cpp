@@ -3,8 +3,9 @@
 //
 
 #include "triangle.h"
-
+#include <vulkan/vulkan.h>
 #include <SDL3/SDL_render.h>
+
 
 Triangle::Triangle() {
     // center

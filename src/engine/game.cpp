@@ -2,8 +2,16 @@
 // Created by Lamad on 11/12/2024.
 //
 
+#if defined(__INTELLISENSE__) || !defined(USE_CPP20_MODULES)
+#define VULKAN_HPP_NO_CONSTRUCTORS
+#include <vulkan/vulkan_raii.hpp>
+#else
+import vulkan_hpp;
+#endif
+
 #include "game.h"
 #include <SDL3/SDL.h>
+#include <SDL3/SDL_vulkan.h>
 #include <glad/glad.h>
 #include <imgui.h>
 #include <imgui_impl_sdl3.h>
@@ -25,6 +33,10 @@
 void imguiUI(ImGuiIO& io);
 
 Game::Game(const char* title, const int width, const int height): m_imguiIO() {
+        m_title = title;
+        m_height = height;
+        m_width = width;
+    /*
     if constexpr (SDL_INIT_STATUS_INITIALIZED) {
         std::cout << "Initializing SDL - OK" << std::endl;
 
@@ -41,8 +53,6 @@ Game::Game(const char* title, const int width, const int height): m_imguiIO() {
         SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
         bool fuck = false;
-        m_height = height;
-        m_width = width;
         m_window = SDL_CreateWindow(title, m_width, m_height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 
         if (m_window == nullptr) {
@@ -97,7 +107,7 @@ Game::Game(const char* title, const int width, const int height): m_imguiIO() {
         std::cout << "OpenGL Version: " << glGetString(GL_VERSION) << std::endl;
         glEnable(GL_BLEND);
         glEnable(GL_DEPTH_TEST);
-    }
+    } */
 }
 
 Game::~Game() {
@@ -262,6 +272,36 @@ void Game::processMouseMotion(const SDL_Event& event) const {
         // Process mouse movement in the camera, does not rotate player as player has no rotation
         player->camera->ProcessMouseMovement(xOffset, yOffset);
     }
+}
+
+void Game::createVkInstance() {
+    auto extensions = m_VkContext.enumerateInstanceExtensionProperties();
+    std::cout << "Vulkan loader OK, extensions: " << extensions.size() << "\n";
+
+    vk::ApplicationInfo appInfo{.pApplicationName   = m_title,
+                                              .applicationVersion = VK_MAKE_VERSION(1, 0, 0),
+                                              .pEngineName        = "Stnk Engine",
+                                              .engineVersion      = VK_MAKE_VERSION(1, 0, 0),
+                                              .apiVersion         = vk::ApiVersion14};
+
+    // Get required Vulkan instance extensions using SDL.
+    uint32_t sdlVulkanExtensionCount = 0;
+    auto sdlVulkanExtensions = SDL_Vulkan_GetInstanceExtensions(&sdlVulkanExtensionCount);
+    if (!sdlVulkanExtensions) {
+        throw std::runtime_error("Failed to get SDL Vulkan extensions: " + std::string(SDL_GetError()));
+    }
+
+    vk::InstanceCreateInfo createInfo{
+        .pApplicationInfo        = &appInfo,
+        .enabledExtensionCount   = sdlVulkanExtensionCount,
+        .ppEnabledExtensionNames = sdlVulkanExtensions
+    };
+    m_VkInstance = vk::raii::Instance(m_VkContext, createInfo);
+}
+
+void Game::initVulkan() {
+    createVkInstance();
+
 }
 
 void Game::onStart() {
@@ -435,4 +475,11 @@ void Game::imguiUI(const ImGuiIO& io) {
         ImGui::End();
     }
 
+}
+
+void Game::initWindow() {
+    m_window = SDL_CreateWindow(m_title, m_width, m_height, SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE);
+    if (!m_window) {
+        throw std::runtime_error("Failed to create SDL window: " + std::string(SDL_GetError()));
+    }
 }

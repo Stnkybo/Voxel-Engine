@@ -7,6 +7,8 @@
 #include <imgui.h>
 #include <unordered_map>
 #include <SDL3/SDL.h>
+#include <vulkan/vulkan_raii.hpp>
+
 #include <memory>
 
 
@@ -62,6 +64,10 @@ public:
 
     void processMouseMotion(const SDL_Event &event) const;
 
+    void createVkInstance();
+
+    void initVulkan();
+
     void onStart();
 
     void update();
@@ -71,6 +77,13 @@ public:
     void clean() const;
 
     void imguiUI(const ImGuiIO& io);
+
+    void initWindow();
+
+private:
+    const char *m_title;
+    vk::raii::Context  m_VkContext;
+    vk::raii::Instance m_VkInstance{nullptr};
 };
 
 

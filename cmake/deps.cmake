@@ -14,6 +14,8 @@ endif()
 
 # Vulkan
 find_package(Vulkan REQUIRED)
+message(STATUS "Vulkan include dir: ${Vulkan_INCLUDE_DIRS}")
+target_include_directories(${PROJECT_NAME} PRIVATE ${Vulkan_INCLUDE_DIRS})
 
 # -----------------------------
 # SDL3
