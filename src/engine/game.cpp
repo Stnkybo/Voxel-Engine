@@ -9,7 +9,6 @@
 import vulkan_hpp;
 #endif
 
-#include "game.h"
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_vulkan.h>
 #include <glad/glad.h>
@@ -22,6 +21,9 @@ import vulkan_hpp;
 #include <ostream>
 
 #include "../config.h"
+
+#include "game.h"
+#include "rendering/backends/vulkanBackend.h"
 
 #include "rendering/shader.h"
 #include "camera/camera.h"
@@ -274,33 +276,11 @@ void Game::processMouseMotion(const SDL_Event& event) const {
     }
 }
 
-void Game::createVkInstance() {
-    auto extensions = m_VkContext.enumerateInstanceExtensionProperties();
-    std::cout << "Vulkan loader OK, extensions: " << extensions.size() << "\n";
 
-    vk::ApplicationInfo appInfo{.pApplicationName   = m_title,
-                                              .applicationVersion = VK_MAKE_VERSION(1, 0, 0),
-                                              .pEngineName        = "Stnk Engine",
-                                              .engineVersion      = VK_MAKE_VERSION(1, 0, 0),
-                                              .apiVersion         = vk::ApiVersion14};
-
-    // Get required Vulkan instance extensions using SDL.
-    uint32_t sdlVulkanExtensionCount = 0;
-    auto sdlVulkanExtensions = SDL_Vulkan_GetInstanceExtensions(&sdlVulkanExtensionCount);
-    if (!sdlVulkanExtensions) {
-        throw std::runtime_error("Failed to get SDL Vulkan extensions: " + std::string(SDL_GetError()));
-    }
-
-    vk::InstanceCreateInfo createInfo{
-        .pApplicationInfo        = &appInfo,
-        .enabledExtensionCount   = sdlVulkanExtensionCount,
-        .ppEnabledExtensionNames = sdlVulkanExtensions
-    };
-    m_VkInstance = vk::raii::Instance(m_VkContext, createInfo);
-}
 
 void Game::initVulkan() {
     createVkInstance();
+    setupDebugMessenger();
 
 }
 
@@ -311,7 +291,7 @@ void Game::onStart() {
 
     m_boolDebugMenu = true;
 
-    glProvokingVertex(GL_FIRST_VERTEX_CONVENTION); // uses information from the first vertex for a plane
+    // glProvokingVertex(GL_FIRST_VERTEX_CONVENTION); // uses information from the first vertex for a plane
 
     ourShader = new Shader("./resources/shaders/modelShader.vert", "./resources/shaders/modelShader.frag");
     terrainShader = new Shader("./resources/shaders/terrainShader.vert", "./resources/shaders/terrainShader.frag");
@@ -324,7 +304,7 @@ void Game::onStart() {
     world = &World::getInstance();
     skybox = new Skybox();
 
-    world->mesher.blockTextureAtlas.LoadFromFile("resources/textures/texture_atlas.png");
+    GreedyMesher::blockTextureAtlas.LoadFromFile("resources/textures/texture_atlas.png");
 
     // Generate some chunks
     ChunkCoord chunk_coords = {0,0};

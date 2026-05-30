@@ -64,6 +64,8 @@ public:
 
     void processMouseMotion(const SDL_Event &event) const;
 
+    void setupDebugMessenger();
+
     void createVkInstance();
 
     void initVulkan();
@@ -82,8 +84,10 @@ public:
 
 private:
     const char *m_title;
-    vk::raii::Context  m_VkContext;
-    vk::raii::Instance m_VkInstance{nullptr};
+    vk::raii::Context  m_vkContext;
+    vk::raii::Instance m_vkInstance{nullptr};
+    vk::raii::DebugUtilsMessengerEXT m_vkDebugMessenger = nullptr;
+
 };
 
 
