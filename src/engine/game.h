@@ -46,6 +46,8 @@ class Game {
     int penith_offset[3] = {0, 0, 0};
     World *world{};
 
+    void vkPickPhysicalDevice();
+
 public:
     unordered_map<std::string, bool> eventStates;
 
@@ -64,9 +66,9 @@ public:
 
     void processMouseMotion(const SDL_Event &event) const;
 
-    void setupDebugMessenger();
+    void vkSetupDebugMessenger();
 
-    void createVkInstance();
+    void vkCreateInstance();
 
     void initVulkan();
 
@@ -84,9 +86,12 @@ public:
 
 private:
     const char *m_title;
+
+    // Vulkan Backend Stuff
     vk::raii::Context  m_vkContext;
     vk::raii::Instance m_vkInstance{nullptr};
     vk::raii::DebugUtilsMessengerEXT m_vkDebugMessenger = nullptr;
+    vk::raii::PhysicalDevice m_vkPhysicalDevice = nullptr;
 
 };
 

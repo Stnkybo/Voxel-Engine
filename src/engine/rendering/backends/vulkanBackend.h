@@ -35,7 +35,7 @@ static VKAPI_ATTR vk::Bool32 VKAPI_CALL debugCallback(vk::DebugUtilsMessageSever
     return vk::False;
 }
 
-inline void Game::setupDebugMessenger()
+inline void Game::vkSetupDebugMessenger()
 {
     if (!enableValidationLayers)
         return;
@@ -72,7 +72,7 @@ inline std::vector<const char *> getRequiredInstanceExtensions()
     return extensions;
 }
 
-inline void Game::createVkInstance() {
+inline void Game::vkCreateInstance() {
 
     vk::ApplicationInfo appInfo{.pApplicationName   = m_title,
                                              .applicationVersion = VK_MAKE_VERSION(1, 0, 0),
@@ -125,5 +125,7 @@ inline void Game::createVkInstance() {
 
     std::cout << "VK instance created successfully" << std::endl;
 }
+
+
 
 #endif //SDL3PRJ_VULKANBACKEND_H
