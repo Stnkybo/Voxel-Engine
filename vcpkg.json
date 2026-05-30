@@ -1,13 +1,18 @@
 {
+  "name": "sdlprj",
+  "version": "0.1.0",
   "dependencies": [
     "assimp",
     "glad",
     "glm",
     {
       "name": "imgui",
-      "features": [ "sdl3-binding", "opengl3-binding" ]
+      "features": [ "sdl3-binding", "opengl3-binding", "vulkan-binding" ]
     },
     "stb",
-    "sdl3"
+    {
+      "name": "sdl3",
+      "features": [ "vulkan", "wayland", "ibus", "dbus"]
+    }
   ]
 }
