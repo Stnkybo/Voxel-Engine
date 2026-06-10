@@ -3,7 +3,6 @@
 //
 
 #if defined(__INTELLISENSE__) || !defined(USE_CPP20_MODULES)
-#define VULKAN_HPP_NO_CONSTRUCTORS
 #include <vulkan/vulkan_raii.hpp>
 #else
 import vulkan_hpp;
@@ -38,78 +37,6 @@ Game::Game(const char* title, const int width, const int height): m_imguiIO() {
         m_title = title;
         m_height = height;
         m_width = width;
-    /*
-    if constexpr (SDL_INIT_STATUS_INITIALIZED) {
-        std::cout << "Initializing SDL - OK" << std::endl;
-
-
-        // Set OpenGL version (e.g., 3.3 Core)
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 6);
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-
-        // Enable double buffering
-        SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-
-        // Set the depth buffer size (optional but recommended for 3D rendering)
-        SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-
-        bool fuck = false;
-        m_window = SDL_CreateWindow(title, m_width, m_height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
-
-        if (m_window == nullptr) {
-            std::cerr << "Failed to create window: " << SDL_GetError() << std::endl;
-            fuck = true;
-        }
-
-        // Create OpenGL Context
-        m_glContext = SDL_GL_CreateContext(m_window);
-        if (!m_glContext) {
-            std::cerr << "Failed to create OpenGL context: " << SDL_GetError() << std::endl;
-            SDL_DestroyWindow(m_window);
-            fuck = true;
-        }
-        // Setup Dear ImGui context
-        IMGUI_CHECKVERSION();
-        ImGui::CreateContext();
-        ImGuiIO &imguiIO = ImGui::GetIO();
-        (void) imguiIO;
-        imguiIO.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
-        imguiIO.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad; // Enable Gamepad Controls
-
-        m_imguiIO = &imguiIO;
-
-        // Setup Dear ImGui style
-        ImGui::StyleColorsDark();
-        //ImGui::StyleColorsLight();
-
-        // Setup Platform/Renderer backends
-        ImGui_ImplSDL3_InitForOpenGL(m_window, m_glContext);
-
-        //Might cause errors
-        ImGui_ImplOpenGL3_Init();
-
-        // Load OpenGL Functions using GLAD
-        if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(SDL_GL_GetProcAddress))) {
-            std::cerr << "Failed to initialize GLAD" << std::endl;
-            SDL_GL_DestroyContext(m_glContext);
-            SDL_DestroyWindow(m_window);
-            fuck = true;
-        }
-
-        if (!ImGui::CreateContext()) {
-            std::cerr << "Failed to create ImGui context" << std::endl;
-            fuck = true;
-        }
-
-        if (fuck) {
-            clean();
-        }
-
-        std::cout << "OpenGL Version: " << glGetString(GL_VERSION) << std::endl;
-        glEnable(GL_BLEND);
-        glEnable(GL_DEPTH_TEST);
-    } */
 }
 
 Game::~Game() {
@@ -439,7 +366,7 @@ void Game::imguiUI(const ImGuiIO& io) {
         ImGui::Begin("Debug Menu");
 
         ImGui::Text("Window Size: %d x %d", m_width, m_height);
-        ImGui::Text("Cube Count %d ", m_cubes.size());
+        ImGui::Text("Cube Count %ld ", m_cubes.size());
 
         ImGui::Text("Selected Block Type %d ", static_cast<int>(player->m_selected_block_type));
 
@@ -450,7 +377,7 @@ void Game::imguiUI(const ImGuiIO& io) {
         ImGui::Text("Player Speed %.2f", player->getMovementSpeed());
 
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-        ImGui::Text("Application TIME  (%d ms), Delta: (%.4f s)", SDL_GetTicks(), m_deltaTime);
+        ImGui::Text("Application TIME  (%ld ms), Delta: (%.4f s)", SDL_GetTicks(), m_deltaTime);
         if (ImGui::Button("Close Me"))
             m_boolDebugMenu = false;
         ImGui::End();
