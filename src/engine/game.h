@@ -48,6 +48,8 @@ class Game {
 
     void vkPickPhysicalDevice();
 
+    void vkCreateLogicalDevice();
+
 public:
     unordered_map<std::string, bool> eventStates;
 
@@ -92,6 +94,8 @@ private:
     vk::raii::Instance m_vkInstance{nullptr};
     vk::raii::DebugUtilsMessengerEXT m_vkDebugMessenger = nullptr;
     vk::raii::PhysicalDevice m_vkPhysicalDevice = nullptr;
+    vk::raii::Device m_vkDevice = nullptr;
+    vk::raii::Queue m_vkGraphicsQueue = nullptr;;
 
 };
 

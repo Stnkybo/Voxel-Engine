@@ -209,6 +209,7 @@ void Game::initVulkan() {
     vkCreateInstance();
     vkSetupDebugMessenger();
     vkPickPhysicalDevice();
+    vkCreateLogicalDevice();
 
 }
 
