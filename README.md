@@ -1,4 +1,4 @@
-# SDL3PRJ
+# SDL3PRJ (OUTDATED README)
 A Simple 3D Application Using SDL3 and OpenGL to Draw voxels to the screen
 
 ![img_1.png](README_Images/img_1.png)
