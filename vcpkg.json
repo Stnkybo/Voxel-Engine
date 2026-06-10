@@ -12,7 +12,12 @@
     "stb",
     {
       "name": "sdl3",
-      "features": [ "vulkan", "wayland", "ibus", "dbus"]
+      "features": [ "vulkan" ]
+    },
+    {
+      "name": "sdl3",
+      "features": [ "wayland", "ibus", "dbus" ],
+      "platform": "linux"
     }
   ]
 }
