@@ -3,6 +3,7 @@
 //
 
 #include <map>
+#include <SDL3/SDL_vulkan.h>
 
 #include "../../game.h"
 
@@ -138,4 +139,14 @@ void Game::vkCreateLogicalDevice() {
 
     m_vkDevice = vk::raii::Device(m_vkPhysicalDevice, deviceCreateInfo);
     m_vkGraphicsQueue = vk::raii::Queue(m_vkDevice, graphicsIndex, 0);
+}
+
+
+void Game::vkCreateSurface() {
+    VkSurfaceKHR _surface;
+    if (!SDL_Vulkan_CreateSurface(m_window, static_cast<VkInstance>(*m_vkInstance), nullptr, &_surface)) {
+        throw std::runtime_error("failed to create window surface: " + std::string(SDL_GetError()));
+    }
+    m_vkSurface = vk::raii::SurfaceKHR(m_vkInstance, _surface);
+    std::cout << "VK Surface created" << std::endl;
 }

@@ -208,6 +208,7 @@ void Game::processMouseMotion(const SDL_Event& event) const {
 void Game::initVulkan() {
     vkCreateInstance();
     vkSetupDebugMessenger();
+    vkCreateSurface();
     vkPickPhysicalDevice();
     vkCreateLogicalDevice();
 

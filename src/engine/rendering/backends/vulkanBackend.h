@@ -125,6 +125,4 @@ inline void Game::vkCreateInstance() {
     std::cout << "VK instance created successfully" << std::endl;
 }
 
-
-
 #endif //SDL3PRJ_VULKANBACKEND_H
