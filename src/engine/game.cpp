@@ -211,6 +211,7 @@ void Game::initVulkan() {
     vkCreateSurface();
     vkPickPhysicalDevice();
     vkCreateLogicalDevice();
+    vkCreateSwapchain();
 
 }
 

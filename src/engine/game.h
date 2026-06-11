@@ -25,7 +25,7 @@ class Game {
     std::shared_ptr<Player> player{};
 
     const double FRAME_TIME = 1.0f / 60.0f;
-    Uint64  m_lastTick = 0.0f;
+    Uint64 m_lastTick = 0.0f;
     Uint64 unprocessedTime = 0;
     double frameCounter = 0;
     int frames = 0;
@@ -35,12 +35,12 @@ class Game {
 
     bool drawWireframe = false;
 
-    std::vector<std::unique_ptr<Cube>> m_cubes;
+    std::vector<std::unique_ptr<Cube> > m_cubes;
     Texture *terrainTexture{};
-    Skybox* skybox{};
+    Skybox *skybox{};
     bool m_boolDebugMenu{};
     SDL_GLContext m_glContext;
-    ImGuiIO* m_imguiIO;
+    ImGuiIO *m_imguiIO;
 
     vector<Cube *> penith;
     int penith_offset[3] = {0, 0, 0};
@@ -52,11 +52,13 @@ class Game {
 
     void vkCreateSurface();
 
+    vk::Extent2D chooseSwapExtent(vk::SurfaceCapabilitiesKHR const &capabilities);
+
 public:
     unordered_map<std::string, bool> eventStates;
 
     PhysicsSystem physicsSystem;
-    float  m_deltaTime = 0;
+    float m_deltaTime = 0;
     bool isRunning = true;
     int m_width;
     int m_height;
@@ -74,6 +76,8 @@ public:
 
     void vkCreateInstance();
 
+    void vkCreateSwapchain();
+
     void initVulkan();
 
     void onStart();
@@ -84,7 +88,7 @@ public:
 
     void clean() const;
 
-    void imguiUI(const ImGuiIO& io);
+    void imguiUI(const ImGuiIO &io);
 
     void initWindow();
 
@@ -92,17 +96,19 @@ private:
     const char *m_title;
 
     // Vulkan Backend Stuff
-    vk::raii::Context  m_vkContext;
+    vk::raii::Context m_vkContext;
     vk::raii::Instance m_vkInstance{nullptr};
     vk::raii::DebugUtilsMessengerEXT m_vkDebugMessenger = nullptr;
     vk::raii::SurfaceKHR m_vkSurface = nullptr;
     vk::raii::PhysicalDevice m_vkPhysicalDevice = nullptr;
     vk::raii::Device m_vkDevice = nullptr;
-    vk::raii::Queue m_vkGraphicsQueue = nullptr;;
+    vk::raii::Queue m_vkGraphicsQueue = nullptr;
 
-
+    vk::raii::SwapchainKHR m_vkSwapChain = nullptr;
+    std::vector<vk::Image> m_vkSwapChainImages;
+    vk::SurfaceFormatKHR m_vkSwapChainSurfaceFormat;
+    vk::Extent2D m_vkSwapChainExtent;
 };
-
 
 
 #endif //GAME_H
