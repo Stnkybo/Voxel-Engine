@@ -78,6 +78,8 @@ public:
 
     void vkCreateSwapchain();
 
+    void vkCreateImageViews();
+
     void initVulkan();
 
     void onStart();
@@ -108,6 +110,8 @@ private:
     std::vector<vk::Image> m_vkSwapChainImages;
     vk::SurfaceFormatKHR m_vkSwapChainSurfaceFormat;
     vk::Extent2D m_vkSwapChainExtent;
+
+    std::vector<vk::raii::ImageView> m_vkSwapChainImageViews;
 };
 
 

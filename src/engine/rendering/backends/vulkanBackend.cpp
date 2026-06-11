@@ -234,4 +234,18 @@ void Game::vkCreateSwapchain() {
 
 };
 
+void Game::vkCreateImageViews() {
+    assert(m_vkSwapChainImageViews.empty());
+
+    vk::ImageViewCreateInfo imageViewCreateInfo{ .viewType         = vk::ImageViewType::e2D,
+                                                 .format           = m_vkSwapChainSurfaceFormat.format,
+                                                 .subresourceRange = { vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 } };
+
+    for (auto &image : m_vkSwapChainImages)
+    {
+        imageViewCreateInfo.image = image;
+        m_vkSwapChainImageViews.emplace_back( m_vkDevice, imageViewCreateInfo );
+    }
+}
+
 
