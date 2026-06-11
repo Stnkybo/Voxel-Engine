@@ -20,6 +20,15 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${Vulkan_INCLUDE_DIRS})
 target_compile_definitions(${PROJECT_NAME} PRIVATE
         VULKAN_HPP_NO_CONSTRUCTORS
 )
+# Slangc for vulkan shaders
+
+find_program(SLANGC_EXECUTABLE
+        NAMES slangc
+        HINTS $ENV{VULKAN_SDK}/bin
+        REQUIRED
+)
+
+
 
 # -----------------------------
 # SDL3
