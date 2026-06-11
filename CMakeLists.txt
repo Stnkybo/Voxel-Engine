@@ -53,6 +53,10 @@ add_executable(${PROJECT_NAME}
 # Load all Project Dependencies
 include(cmake/deps.cmake)
 
+# Compile Slang shaders
+include(cmake/SlangCompile.cmake)
+
+
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${CMAKE_SOURCE_DIR}/resources
