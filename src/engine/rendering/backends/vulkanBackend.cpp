@@ -248,4 +248,7 @@ void Game::vkCreateImageViews() {
     }
 }
 
+void Game::vkCreateGraphicsPipeline() {
+    
+}
 

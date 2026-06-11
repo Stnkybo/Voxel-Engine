@@ -213,6 +213,7 @@ void Game::initVulkan() {
     vkCreateLogicalDevice();
     vkCreateSwapchain();
     vkCreateImageViews();
+    vkCreateGraphicsPipeline();
 
 }
 

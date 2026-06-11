@@ -80,6 +80,8 @@ public:
 
     void vkCreateImageViews();
 
+    void vkCreateGraphicsPipeline();
+
     void initVulkan();
 
     void onStart();
