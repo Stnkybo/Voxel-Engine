@@ -82,6 +82,8 @@ public:
 
     void vkCreateGraphicsPipeline();
 
+    [[nodiscard]] vk::raii::ShaderModule vkCreateShaderModule(const std::vector<char> &code) const;
+
     void initVulkan();
 
     void onStart();
