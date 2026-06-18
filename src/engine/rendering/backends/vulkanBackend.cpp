@@ -320,10 +320,15 @@ void Game::vkCreateGraphicsPipeline() {
             .pColorBlendState = &colorBlending,
             .pDynamicState = &dynamicState,
             .layout = m_vkPipelineLayout,
-            .renderPass = nullptr
+            .renderPass = nullptr // null for dynamic rendering
         },
         {.colorAttachmentCount = 1, .pColorAttachmentFormats = &m_vkSwapChainSurfaceFormat.format}
     };
+
+    // Finally Create the pipeline
+    m_vkGraphicsPipeline = vk::raii::Pipeline(m_vkDevice, nullptr, pipelineCreateInfoChain.get<vk::GraphicsPipelineCreateInfo>());
+
+    std::cout << "Created Vulkan Graphics Pipeline" << std::endl;
 }
 
 [[nodiscard]] vk::raii::ShaderModule Game::vkCreateShaderModule(const std::vector<char> &code) const {

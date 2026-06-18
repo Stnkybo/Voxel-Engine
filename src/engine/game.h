@@ -118,6 +118,7 @@ private:
     std::vector<vk::raii::ImageView> m_vkSwapChainImageViews;
 
     vk::raii::PipelineLayout m_vkPipelineLayout = nullptr;
+    vk::raii::Pipeline m_vkGraphicsPipeline = nullptr; // The Holy Grail
 };
 
 
