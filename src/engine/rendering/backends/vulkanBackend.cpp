@@ -247,7 +247,6 @@ void Game::vkCreateImageViews() {
 }
 
 void Game::vkCreateGraphicsPipeline() {
-
     vk::raii::ShaderModule shaderModule = vkCreateShaderModule(readFile("resources/shaders/slang/slang.spv"));
 
     vk::PipelineShaderStageCreateInfo vertShaderStageInfo{
@@ -257,6 +256,74 @@ void Game::vkCreateGraphicsPipeline() {
         .stage = vk::ShaderStageFlagBits::eFragment, .module = shaderModule, .pName = "fragMain"
     };
     vk::PipelineShaderStageCreateInfo shaderStages[] = {vertShaderStageInfo, fragShaderStageInfo};
+    vk::PipelineVertexInputStateCreateInfo vertexInputInfo;
+
+    // Specify format for pipeline input, change to triangle strip for voxels
+    vk::PipelineInputAssemblyStateCreateInfo inputAssembly{.topology = vk::PrimitiveTopology::eTriangleList};
+
+    vk::PipelineViewportStateCreateInfo viewportState{.viewportCount = 1, .scissorCount = 1};
+
+
+    // Create rasterizer
+    vk::PipelineRasterizationStateCreateInfo rasterizer{
+        .depthClampEnable = vk::False,
+        .rasterizerDiscardEnable = vk::False,
+        .polygonMode = vk::PolygonMode::eFill,
+        .cullMode = vk::CullModeFlagBits::eBack,
+        .frontFace = vk::FrontFace::eClockwise,
+        .depthBiasEnable = vk::False,
+        .lineWidth = 1.0f
+    };
+
+    vk::PipelineMultisampleStateCreateInfo multisampling{
+        .rasterizationSamples = vk::SampleCountFlagBits::e1, .sampleShadingEnable = vk::False
+    };
+
+    // NEEDS COLOUR BLENDING
+    vk::PipelineColorBlendAttachmentState colorBlendAttachment{
+        .blendEnable = vk::False,
+        .colorWriteMask = vk::ColorComponentFlagBits::eR | vk::ColorComponentFlagBits::eG |
+                          vk::ColorComponentFlagBits::eB | vk::ColorComponentFlagBits::eA
+    };
+
+    vk::PipelineColorBlendStateCreateInfo colorBlending{
+        .logicOpEnable = vk::False, .logicOp = vk::LogicOp::eCopy, .attachmentCount = 1,
+        .pAttachments = &colorBlendAttachment
+    };
+
+    // Dynamic state stuff for window management
+    std::vector<vk::DynamicState> dynamicStates = {vk::DynamicState::eViewport, vk::DynamicState::eScissor};
+
+    vk::PipelineDynamicStateCreateInfo dynamicState{
+        .dynamicStateCount = static_cast<uint32_t>(dynamicStates.size()), .pDynamicStates = dynamicStates.data()
+    };
+
+
+    vk::PipelineLayoutCreateInfo pipelineLayoutInfo{.setLayoutCount = 0, .pushConstantRangeCount = 0};
+
+    m_vkPipelineLayout = vk::raii::PipelineLayout(m_vkDevice, pipelineLayoutInfo);
+
+
+    vk::PipelineRenderingCreateInfo pipelineRenderingCreateInfo{
+        .colorAttachmentCount = 1, .pColorAttachmentFormats = &m_vkSwapChainSurfaceFormat.format
+    };
+
+    vk::StructureChain<vk::GraphicsPipelineCreateInfo, vk::PipelineRenderingCreateInfo> pipelineCreateInfoChain = {
+        {
+            .stageCount = 2,
+            .pStages = shaderStages,
+            .pVertexInputState = &vertexInputInfo,
+            .pInputAssemblyState = &inputAssembly,
+            .pViewportState = &viewportState,
+            .pRasterizationState = &rasterizer,
+            .pMultisampleState = &multisampling,
+            .pColorBlendState = &colorBlending,
+            .pDynamicState = &dynamicState,
+            .layout = m_vkPipelineLayout,
+            .renderPass = nullptr
+        },
+        {.colorAttachmentCount = 1, .pColorAttachmentFormats = &m_vkSwapChainSurfaceFormat.format}
+    };
 }
 
 [[nodiscard]] vk::raii::ShaderModule Game::vkCreateShaderModule(const std::vector<char> &code) const {

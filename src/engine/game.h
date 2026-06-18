@@ -116,6 +116,8 @@ private:
     vk::Extent2D m_vkSwapChainExtent;
 
     std::vector<vk::raii::ImageView> m_vkSwapChainImageViews;
+
+    vk::raii::PipelineLayout m_vkPipelineLayout = nullptr;
 };
 
 
