@@ -103,17 +103,15 @@ void Game::vkCreateLogicalDevice() {
     // find the index of the first queue family that supports graphics
     std::vector<vk::QueueFamilyProperties> queueFamilyProperties = m_vkPhysicalDevice.getQueueFamilyProperties();
 
-    // get the first index into queueFamilyProperties which supports both graphics and present
-    uint32_t queueIndex = ~0;
     for (uint32_t qfpIndex = 0; qfpIndex < queueFamilyProperties.size(); qfpIndex++) {
         if ((queueFamilyProperties[qfpIndex].queueFlags & vk::QueueFlagBits::eGraphics) &&
             m_vkPhysicalDevice.getSurfaceSupportKHR(qfpIndex, *m_vkSurface)) {
             // found a queue family that supports both graphics and present
-            queueIndex = qfpIndex;
+            m_vkQueueIndex = qfpIndex;
             break;
         }
     }
-    if (queueIndex == ~0) {
+    if (m_vkQueueIndex == ~0) {
         throw std::runtime_error("Could not find a queue for graphics and present -> terminating");
     }
 
@@ -132,7 +130,7 @@ void Game::vkCreateLogicalDevice() {
     // create a Device
     float queuePriority = 0.5f;
     vk::DeviceQueueCreateInfo deviceQueueCreateInfo{
-        .queueFamilyIndex = queueIndex, .queueCount = 1, .pQueuePriorities = &queuePriority
+        .queueFamilyIndex = m_vkQueueIndex, .queueCount = 1, .pQueuePriorities = &queuePriority
     };
 
     vk::DeviceCreateInfo deviceCreateInfo{
@@ -144,7 +142,7 @@ void Game::vkCreateLogicalDevice() {
     };
 
     m_vkDevice = vk::raii::Device(m_vkPhysicalDevice, deviceCreateInfo);
-    m_vkGraphicsQueue = vk::raii::Queue(m_vkDevice, queueIndex, 0);
+    m_vkGraphicsQueue = vk::raii::Queue(m_vkDevice, m_vkQueueIndex, 0);
 }
 
 
@@ -326,7 +324,8 @@ void Game::vkCreateGraphicsPipeline() {
     };
 
     // Finally Create the pipeline
-    m_vkGraphicsPipeline = vk::raii::Pipeline(m_vkDevice, nullptr, pipelineCreateInfoChain.get<vk::GraphicsPipelineCreateInfo>());
+    m_vkGraphicsPipeline = vk::raii::Pipeline(m_vkDevice, nullptr,
+                                              pipelineCreateInfoChain.get<vk::GraphicsPipelineCreateInfo>());
 
     std::cout << "Created Vulkan Graphics Pipeline" << std::endl;
 }
@@ -337,4 +336,114 @@ void Game::vkCreateGraphicsPipeline() {
     };
     vk::raii::ShaderModule shaderModule{m_vkDevice, createInfo};
     return shaderModule;
+}
+
+void Game::vkCreateCommandPool() {
+    vk::CommandPoolCreateInfo poolInfo{
+        .flags = vk::CommandPoolCreateFlagBits::eResetCommandBuffer,
+        .queueFamilyIndex = m_vkQueueIndex
+    };
+
+    m_vkCommandPool = vk::raii::CommandPool(m_vkDevice, poolInfo);
+}
+
+void Game::vkCreateCommandBuffer() {
+    vk::CommandBufferAllocateInfo allocInfo{
+        .commandPool = m_vkCommandPool, .level = vk::CommandBufferLevel::ePrimary, .commandBufferCount = 1
+    };
+
+    m_vkCommandBuffer = std::move(vk::raii::CommandBuffers(m_vkDevice, allocInfo).front());
+}
+
+void Game::vkRecordCommandBuffer(uint32_t imageIndex) {
+    m_vkCommandBuffer.begin({});
+
+    // Before starting rendering, transition the swapchain image to vk::ImageLayout::eColorAttachmentOptimal
+    vkTransition_image_layout(
+        imageIndex,
+        vk::ImageLayout::eUndefined,
+        vk::ImageLayout::eColorAttachmentOptimal,
+        {}, // srcAccessMask (no need to wait for previous operations)
+        vk::AccessFlagBits2::eColorAttachmentWrite, // dstAccessMask
+        vk::PipelineStageFlagBits2::eColorAttachmentOutput, // srcStage
+        vk::PipelineStageFlagBits2::eColorAttachmentOutput // dstStage
+    );
+
+    // Create info for rendering
+    vk::ClearValue clearValue = vk::ClearValue{vk::ClearColorValue(std::array<float, 4>{0.0f, 0.0f, 0.0f, 1.0f})};
+
+    vk::RenderingAttachmentInfo attachmentInfo = {
+        .imageView = m_vkSwapChainImageViews[imageIndex],
+        .imageLayout = vk::ImageLayout::eColorAttachmentOptimal,
+        .loadOp = vk::AttachmentLoadOp::eClear,
+        .storeOp = vk::AttachmentStoreOp::eStore,
+        .clearValue = clearValue
+    };
+
+    vk::RenderingInfo renderingInfo = {
+        .renderArea = {.offset = {0, 0}, .extent = m_vkSwapChainExtent},
+        .layerCount = 1,
+        .colorAttachmentCount = 1,
+        .pColorAttachments = &attachmentInfo
+    };
+
+    // Add Render Commands to the Command buffer, set task for the GPU to do
+    m_vkCommandBuffer.beginRendering(renderingInfo);
+
+    m_vkCommandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, *m_vkGraphicsPipeline);
+
+    m_vkCommandBuffer.setViewport(0, vk::Viewport(0, 0, m_vkSwapChainExtent.width, m_vkSwapChainExtent.height, 0.0f, 1.0f));
+    m_vkCommandBuffer.setScissor(0, vk::Rect2D({0, 0}, m_vkSwapChainExtent));
+
+    m_vkCommandBuffer.draw(3, 1, 0, 0);
+    m_vkCommandBuffer.endRendering();
+
+
+    // After rendering, transition the swapchain image to vk::ImageLayout::ePresentSrcKHR
+    vkTransition_image_layout(
+        imageIndex,
+        vk::ImageLayout::eColorAttachmentOptimal,
+        vk::ImageLayout::ePresentSrcKHR,
+        vk::AccessFlagBits2::eColorAttachmentWrite,             // srcAccessMask
+        {},                                                     // dstAccessMask
+        vk::PipelineStageFlagBits2::eColorAttachmentOutput,     // srcStage
+        vk::PipelineStageFlagBits2::eBottomOfPipe               // dstStage
+    );
+
+    m_vkCommandBuffer.end();
+
+}
+
+void Game::vkTransition_image_layout(
+    uint32_t imageIndex,
+    vk::ImageLayout old_layout,
+    vk::ImageLayout new_layout,
+    vk::AccessFlags2 src_access_mask,
+    vk::AccessFlags2 dst_access_mask,
+    vk::PipelineStageFlags2 src_stage_mask,
+    vk::PipelineStageFlags2 dst_stage_mask) {
+    vk::ImageMemoryBarrier2 barrier = {
+        .srcStageMask = src_stage_mask,
+        .srcAccessMask = src_access_mask,
+        .dstStageMask = dst_stage_mask,
+        .dstAccessMask = dst_access_mask,
+        .oldLayout = old_layout,
+        .newLayout = new_layout,
+        .srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+        .dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+        .image = m_vkSwapChainImages[imageIndex],
+        .subresourceRange = {
+            .aspectMask = vk::ImageAspectFlagBits::eColor,
+            .baseMipLevel = 0,
+            .levelCount = 1,
+            .baseArrayLayer = 0,
+            .layerCount = 1
+        }
+    };
+    vk::DependencyInfo dependency_info = {
+        .dependencyFlags = {},
+        .imageMemoryBarrierCount = 1,
+        .pImageMemoryBarriers = &barrier
+    };
+    m_vkCommandBuffer.pipelineBarrier2(dependency_info);
 }

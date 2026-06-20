@@ -84,6 +84,16 @@ public:
 
     [[nodiscard]] vk::raii::ShaderModule vkCreateShaderModule(const std::vector<char> &code) const;
 
+    void vkCreateCommandPool();
+
+    void vkCreateCommandBuffer();
+
+    void vkRecordCommandBuffer(uint32_t imageIndex);
+
+    void vkTransition_image_layout(uint32_t imageIndex, vk::ImageLayout old_layout, vk::ImageLayout new_layout,
+                                   vk::AccessFlags2 src_access_mask, vk::AccessFlags2 dst_access_mask,
+                                   vk::PipelineStageFlags2 src_stage_mask, vk::PipelineStageFlags2 dst_stage_mask);
+
     void initVulkan();
 
     void onStart();
@@ -108,6 +118,7 @@ private:
     vk::raii::SurfaceKHR m_vkSurface = nullptr;
     vk::raii::PhysicalDevice m_vkPhysicalDevice = nullptr;
     vk::raii::Device m_vkDevice = nullptr;
+    uint32_t m_vkQueueIndex = ~0;
     vk::raii::Queue m_vkGraphicsQueue = nullptr;
 
     vk::raii::SwapchainKHR m_vkSwapChain = nullptr;
@@ -119,6 +130,9 @@ private:
 
     vk::raii::PipelineLayout m_vkPipelineLayout = nullptr;
     vk::raii::Pipeline m_vkGraphicsPipeline = nullptr; // The Holy Grail
+
+    vk::raii::CommandPool m_vkCommandPool = nullptr;
+    vk::raii::CommandBuffer m_vkCommandBuffer = nullptr;
 };
 
 

@@ -214,6 +214,8 @@ void Game::initVulkan() {
     vkCreateSwapchain();
     vkCreateImageViews();
     vkCreateGraphicsPipeline();
+    vkCreateCommandPool();
+    vkCreateCommandBuffer();
 
 }
 
