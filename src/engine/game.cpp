@@ -216,6 +216,7 @@ void Game::initVulkan() {
     vkCreateGraphicsPipeline();
     vkCreateCommandPool();
     vkCreateCommandBuffer();
+    vkCreateSyncObjects();
 
 }
 
@@ -313,6 +314,8 @@ void Game::update() {
 }
 
 void Game::render() {
+    drawFrame();
+
     // Render
     glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

@@ -94,11 +94,15 @@ public:
                                    vk::AccessFlags2 src_access_mask, vk::AccessFlags2 dst_access_mask,
                                    vk::PipelineStageFlags2 src_stage_mask, vk::PipelineStageFlags2 dst_stage_mask);
 
+    void vkCreateSyncObjects();
+
     void initVulkan();
 
     void onStart();
 
     void update();
+
+    void drawFrame();
 
     void render();
 
@@ -133,6 +137,10 @@ private:
 
     vk::raii::CommandPool m_vkCommandPool = nullptr;
     vk::raii::CommandBuffer m_vkCommandBuffer = nullptr;
+
+    vk::raii::Semaphore presentCompleteSemaphore = nullptr;
+    vk::raii::Semaphore renderFinishedSemaphore  = nullptr;
+    vk::raii::Fence     drawFence                = nullptr;
 };
 
 

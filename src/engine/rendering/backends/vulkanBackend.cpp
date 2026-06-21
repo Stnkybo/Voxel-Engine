@@ -447,3 +447,10 @@ void Game::vkTransition_image_layout(
     };
     m_vkCommandBuffer.pipelineBarrier2(dependency_info);
 }
+
+void Game::vkCreateSyncObjects() {
+    presentCompleteSemaphore = vk::raii::Semaphore(m_vkDevice, vk::SemaphoreCreateInfo());
+    renderFinishedSemaphore  = vk::raii::Semaphore(m_vkDevice, vk::SemaphoreCreateInfo());
+    drawFence                = vk::raii::Fence(m_vkDevice, {.flags = vk::FenceCreateFlagBits::eSignaled});
+}
+
