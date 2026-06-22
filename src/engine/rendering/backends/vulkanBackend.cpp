@@ -303,6 +303,7 @@ void Game::vkCreateGraphicsPipeline() {
     m_vkPipelineLayout = vk::raii::PipelineLayout(m_vkDevice, pipelineLayoutInfo);
 
 
+    // Create Render Pass info
     vk::PipelineRenderingCreateInfo pipelineRenderingCreateInfo{
         .colorAttachmentCount = 1, .pColorAttachmentFormats = &m_vkSwapChainSurfaceFormat.format
     };
@@ -323,10 +324,22 @@ void Game::vkCreateGraphicsPipeline() {
         },
         {.colorAttachmentCount = 1, .pColorAttachmentFormats = &m_vkSwapChainSurfaceFormat.format}
     };
+    
+    // This is not required by us yet
+    // vk::SubpassDependency dependency{
+    //     .srcSubpass = vk::SubpassExternal,
+    //     .dstSubpass = 0,
+    //     .srcStageMask = vk::PipelineStageFlagBits::eColorAttachmentOutput,
+    //     .dstStageMask = vk::PipelineStageFlagBits::eColorAttachmentOutput,
+    //     .srcAccessMask = vk::AccessFlagBits::eNone,
+    //     .dstAccessMask = vk::AccessFlagBits::eColorAttachmentWrite
+    // };
+
 
     // Finally Create the pipeline
-    m_vkGraphicsPipeline = vk::raii::Pipeline(m_vkDevice, nullptr,
-                                              pipelineCreateInfoChain.get<vk::GraphicsPipelineCreateInfo>());
+    m_vkGraphicsPipeline = vk
+            ::raii::Pipeline(m_vkDevice, nullptr,
+                             pipelineCreateInfoChain.get<vk::GraphicsPipelineCreateInfo>());
 
     std::cout << "Created Vulkan Graphics Pipeline" << std::endl;
 }
@@ -393,7 +406,8 @@ void Game::vkRecordCommandBuffer(uint32_t imageIndex) {
 
     m_vkCommandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, *m_vkGraphicsPipeline);
 
-    m_vkCommandBuffer.setViewport(0, vk::Viewport(0, 0, m_vkSwapChainExtent.width, m_vkSwapChainExtent.height, 0.0f, 1.0f));
+    m_vkCommandBuffer.setViewport(0, vk::Viewport(0, 0, m_vkSwapChainExtent.width, m_vkSwapChainExtent.height, 0.0f,
+                                                  1.0f));
     m_vkCommandBuffer.setScissor(0, vk::Rect2D({0, 0}, m_vkSwapChainExtent));
 
     m_vkCommandBuffer.draw(3, 1, 0, 0);
@@ -405,14 +419,13 @@ void Game::vkRecordCommandBuffer(uint32_t imageIndex) {
         imageIndex,
         vk::ImageLayout::eColorAttachmentOptimal,
         vk::ImageLayout::ePresentSrcKHR,
-        vk::AccessFlagBits2::eColorAttachmentWrite,             // srcAccessMask
-        {},                                                     // dstAccessMask
-        vk::PipelineStageFlagBits2::eColorAttachmentOutput,     // srcStage
-        vk::PipelineStageFlagBits2::eBottomOfPipe               // dstStage
+        vk::AccessFlagBits2::eColorAttachmentWrite, // srcAccessMask
+        {}, // dstAccessMask
+        vk::PipelineStageFlagBits2::eColorAttachmentOutput, // srcStage
+        vk::PipelineStageFlagBits2::eBottomOfPipe // dstStage
     );
 
     m_vkCommandBuffer.end();
-
 }
 
 void Game::vkTransition_image_layout(

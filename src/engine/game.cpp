@@ -310,6 +310,39 @@ void Game::update() {
     //PHYSICS
     physicsSystem.Update(m_deltaTime);
     worldCollision::resolveCollisions(*player, world);
+}
+
+void Game::drawFrame() {
+    auto fenceResult = m_vkDevice.waitForFences(*drawFence, vk::True, UINT64_MAX);
+    if (fenceResult != vk::Result::eSuccess) {
+        throw std::runtime_error("Failed to wait for fence!");
+    }
+    m_vkDevice.resetFences(*drawFence);
+    auto [result, imageIndex] = m_vkSwapChain.acquireNextImage(UINT64_MAX, *presentCompleteSemaphore, nullptr);
+
+    vkRecordCommandBuffer(imageIndex);
+
+    vk::PipelineStageFlags waitDestinationStageMask(vk::PipelineStageFlagBits::eColorAttachmentOutput);
+    const vk::SubmitInfo submitInfo{
+        .waitSemaphoreCount = 1,
+        .pWaitSemaphores = &*presentCompleteSemaphore,
+        .pWaitDstStageMask = &waitDestinationStageMask,
+        .commandBufferCount = 1,
+        .pCommandBuffers = &*m_vkCommandBuffer,
+        .signalSemaphoreCount = 1,
+        .pSignalSemaphores = &*renderFinishedSemaphore
+    };
+
+    m_vkGraphicsQueue.submit(submitInfo, *drawFence);
+
+    const vk::PresentInfoKHR presentInfoKHR{
+        .waitSemaphoreCount = 1,
+        .pWaitSemaphores    = &*renderFinishedSemaphore,
+        .swapchainCount     = 1,
+        .pSwapchains        = &*m_vkSwapChain,
+        .pImageIndices      = &imageIndex};
+
+    result = m_vkGraphicsQueue.presentKHR(presentInfoKHR);
 
 }
 

@@ -13,8 +13,9 @@ int main() {
         // game->onStart();
         while (game->isRunning) {
             game->handleEvents();
-            game->update();
-            game->render();
+            // game->update();
+            game->drawFrame();
+            // game->render();
         }
     } catch (const std::exception &e) {
         std::cerr << e.what() << std::endl;
