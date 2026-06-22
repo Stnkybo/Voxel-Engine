@@ -22,9 +22,9 @@
 #include "rendering/model.hpp"
 #include "terrain/world.h"
 
-void imguiUI(ImGuiIO& io);
+void imguiUI(ImGuiIO &io);
 
-Game::Game(const char* title, const int width, const int height): m_imguiIO() {
+Game::Game(const char *title, const int width, const int height) : m_imguiIO() {
     if constexpr (SDL_INIT_STATUS_INITIALIZED) {
         std::cout << "Initializing SDL - OK" << std::endl;
 
@@ -40,14 +40,14 @@ Game::Game(const char* title, const int width, const int height): m_imguiIO() {
         // Set the depth buffer size (optional but recommended for 3D rendering)
         SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
-        bool fuck = false;
+        bool oh_no = false;
         m_height = height;
         m_width = width;
         m_window = SDL_CreateWindow(title, m_width, m_height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 
         if (m_window == nullptr) {
             std::cerr << "Failed to create window: " << SDL_GetError() << std::endl;
-            fuck = true;
+            oh_no = true;
         }
 
         // Create OpenGL Context
@@ -55,7 +55,7 @@ Game::Game(const char* title, const int width, const int height): m_imguiIO() {
         if (!m_glContext) {
             std::cerr << "Failed to create OpenGL context: " << SDL_GetError() << std::endl;
             SDL_DestroyWindow(m_window);
-            fuck = true;
+            oh_no = true;
         }
         // Setup Dear ImGui context
         IMGUI_CHECKVERSION();
@@ -82,15 +82,15 @@ Game::Game(const char* title, const int width, const int height): m_imguiIO() {
             std::cerr << "Failed to initialize GLAD" << std::endl;
             SDL_GL_DestroyContext(m_glContext);
             SDL_DestroyWindow(m_window);
-            fuck = true;
+            oh_no = true;
         }
 
         if (!ImGui::CreateContext()) {
             std::cerr << "Failed to create ImGui context" << std::endl;
-            fuck = true;
+            oh_no = true;
         }
 
-        if (fuck) {
+        if (oh_no) {
             clean();
         }
 
@@ -105,29 +105,27 @@ Game::~Game() {
 }
 
 
-
 void Game::handleEvents() {
     SDL_Event ev;
     while (SDL_PollEvent(&ev) != 0) {
-
         // This Allows Imgui to handle events
         ImGui_ImplSDL3_ProcessEvent(&ev);
 
-        switch(ev.type) {
+        switch (ev.type) {
             case SDL_EVENT_WINDOW_RESIZED:
                 // Set Window Dimensions
                 SDL_GetWindowSizeInPixels(m_window, &m_width, &m_height);
-                glViewport(0, 0, m_width, m_height);  // Update the OpenGL viewport
+                glViewport(0, 0, m_width, m_height); // Update the OpenGL viewport
                 break;
 
 
             case SDL_EVENT_QUIT:
                 isRunning = false;
-            break;
+                break;
 
             case SDL_EVENT_MOUSE_BUTTON_DOWN: {
-
-                auto blockraycast = playerVoxelInteractionRaycast(player->camera->Position, player->camera->Front, 5.0f, world);
+                auto blockraycast = playerVoxelInteractionRaycast(player->camera->Position, player->camera->Front, 5.0f,
+                                                                  world);
 
                 if (ev.button.button == SDL_BUTTON_LEFT) {
                     // The left button was pressed or released
@@ -136,22 +134,18 @@ void Game::handleEvents() {
                     if (blockraycast.hit) {
                         world->setBlock(blockraycast.blockPosition, BlockType::AIR);
                         std::cout << "Destoryed Block" << std::endl;
-
-
                     }
-                }
-                else if (ev.button.button == SDL_BUTTON_RIGHT) {
+                } else if (ev.button.button == SDL_BUTTON_RIGHT) {
                     // The right button was pressed or released
                     // Place block
                     if (blockraycast.hit) {
-
-                        world->setBlock(blockraycast.blockPosition + blockraycast.normal, player->m_selected_block_type);
+                        world->setBlock(blockraycast.blockPosition + blockraycast.normal,
+                                        player->m_selected_block_type);
                         std::cout << "Placed Block" << std::endl;
-
                     }
                 }
             }
-                break;
+            break;
 
 
             case SDL_EVENT_KEY_DOWN: {
@@ -169,20 +163,12 @@ void Game::handleEvents() {
                             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); // disable wireframe gl
                             break;
                     }
-
-                    // swap to debug shader
-                    // Shader *tempShader = ourShader;
-                    // ourShader = otherShader;
-                    // otherShader = tempShader;
-
                 }
                 if (keycode == SDLK_TAB) {
-
                     // Toggle Mouse cursor
                     SDL_SetWindowRelativeMouseMode(m_window, !SDL_GetWindowRelativeMouseMode(m_window));
 
                     eventStates["MenuMode"] = !eventStates["MenuMode"];
-
                 }
 
                 if (keycode == SDLK_F3) {
@@ -200,25 +186,20 @@ void Game::handleEvents() {
                 }
 
                 if (keycode == SDLK_R) {
-
                     //reset player position
                     player->setPosition(glm::vec3(8.0f, 9.0f, 8.0f));
-
                 }
                 if (keycode == SDLK_N) {
-
                     //toggle Player Noclip
                     player->toggleNoclip();
-
                 }
                 if (keycode == SDLK_1) {
-
                     //Cycle Selected Block
-                    player->m_selected_block_type = static_cast<BlockType>((static_cast<uint8_t>(player->m_selected_block_type) + 1) % 5 );
-                    std::cout << "selected blockType: " << static_cast<unsigned int>(player->m_selected_block_type) << std::endl;
-
+                    player->m_selected_block_type = static_cast<BlockType>(
+                        (static_cast<uint8_t>(player->m_selected_block_type) + 1) % 5);
+                    std::cout << "selected blockType: " << static_cast<unsigned int>(player->m_selected_block_type) <<
+                            std::endl;
                 }
-                
             }
 
             break;
@@ -229,31 +210,26 @@ void Game::handleEvents() {
         if (!eventStates["MenuMode"]) {
             processMouseMotion(ev);
         }
-
-
-
     }
 
-        const auto* keyState = reinterpret_cast<const Uint8 *>(SDL_GetKeyboardState(nullptr));
+    const auto *keyState = reinterpret_cast<const Uint8 *>(SDL_GetKeyboardState(nullptr));
 
-        if (keyState[SDL_SCANCODE_W])
-            player->ProcessMovement(FORWARD, m_deltaTime);
-        if (keyState[SDL_SCANCODE_S])
-            player->ProcessMovement(BACKWARD, m_deltaTime);
-        if (keyState[SDL_SCANCODE_A])
-            player->ProcessMovement(LEFT, m_deltaTime);
-        if (keyState[SDL_SCANCODE_D])
-            player->ProcessMovement(RIGHT, m_deltaTime);
-        if (keyState[SDL_SCANCODE_LSHIFT]) {
-
-            player->setMovementSpeed(20.0f);
-        }
-        else {
-            player->setMovementSpeed(5.0f);
-        }
-
+    if (keyState[SDL_SCANCODE_W])
+        player->ProcessMovement(FORWARD, m_deltaTime);
+    if (keyState[SDL_SCANCODE_S])
+        player->ProcessMovement(BACKWARD, m_deltaTime);
+    if (keyState[SDL_SCANCODE_A])
+        player->ProcessMovement(LEFT, m_deltaTime);
+    if (keyState[SDL_SCANCODE_D])
+        player->ProcessMovement(RIGHT, m_deltaTime);
+    if (keyState[SDL_SCANCODE_LSHIFT]) {
+        player->setMovementSpeed(20.0f);
+    } else {
+        player->setMovementSpeed(5.0f);
+    }
 }
-void Game::processMouseMotion(const SDL_Event& event) const {
+
+void Game::processMouseMotion(const SDL_Event &event) const {
     // Mouse motion event
     if (event.type == SDL_EVENT_MOUSE_MOTION) {
         const float xOffset = event.motion.xrel; // Relative x motion
@@ -287,37 +263,36 @@ void Game::onStart() {
     world->mesher.blockTextureAtlas.LoadFromFile("resources/textures/texture_atlas.png");
 
     // Generate some chunks
-    ChunkCoord chunk_coords = {0,0};
+    ChunkCoord chunk_coords = {0, 0};
     world->generateChunk(chunk_coords);
 
     chunk_coords = {-3, -3};
     world->generateChunk(chunk_coords);
     for (int i = -1; i <= 1; i++) {
         for (int j = 1; j <= 3; j++) {
-
-            chunk_coords = {i,j};
+            chunk_coords = {i, j};
             world->generateChunk(chunk_coords);
         }
     }
 
-    auto modifyChunk = world->getChunk({-3,-3});
-    for (int x=0; x < CHUNK_SIZE_X; x++) {
-        for (int y=0; y < CHUNK_SIZE_Y; y++) {
-            for (int z=0; z < CHUNK_SIZE_Z; z++) {
+    auto modifyChunk = world->getChunk({-3, -3});
+    for (int x = 0; x < CHUNK_SIZE_X; x++) {
+        for (int y = 0; y < CHUNK_SIZE_Y; y++) {
+            for (int z = 0; z < CHUNK_SIZE_Z; z++) {
                 if (x < 5 && z < 2) {
-                    setBlockType(modifyChunk->at(x,y,z), BlockType::AIR);
+                    setBlockType(modifyChunk->at(x, y, z), BlockType::AIR);
                 }
                 if (x < 11 && z < 13) {
-                    setBlockType(modifyChunk->at(x,y,z), BlockType::DIRT);
+                    setBlockType(modifyChunk->at(x, y, z), BlockType::DIRT);
                 }
             }
         }
     }
     setBlockType(modifyChunk->at(15, 10, 15), BlockType::STONE);
-    
+
     // generate and modify for testing
-    world->generateChunk({ 3,3 });
-    modifyChunk = world->getChunk({3,3});
+    world->generateChunk({3, 3});
+    modifyChunk = world->getChunk({3, 3});
     for (int x = 0; x < CHUNK_SIZE_X; x++) {
         for (int y = 0; y < CHUNK_SIZE_Y; y++) {
             for (int z = 0; z < CHUNK_SIZE_Z; z++) {
@@ -336,16 +311,14 @@ void Game::onStart() {
     setBlockType(*v, BlockType::DIRT);
 
 
-
     // Make Physics
     physicsSystem.RegisterEntity(std::shared_ptr<Entity>(player));
     player->physics->affectedByGravity = false;
-
 }
 
 void Game::update() {
     const Uint64 currentTick = SDL_GetTicks();
-    m_deltaTime = (currentTick - m_lastTick) / 1000.0f;
+    m_deltaTime = static_cast<float>(currentTick - m_lastTick) / 1000.0f;
     m_lastTick = currentTick;
 
     // Update world (chunk loading/unloading)
@@ -354,7 +327,6 @@ void Game::update() {
     //PHYSICS
     physicsSystem.Update(m_deltaTime);
     worldCollision::resolveCollisions(*player, world);
-
 }
 
 void Game::render() {
@@ -366,7 +338,8 @@ void Game::render() {
 
     // Get camera matrices
     glm::mat4 view = player->camera->GetViewMatrix();
-    glm::mat4 projection = player->camera->GetProjectionMatrix(static_cast<float>(m_width) / static_cast<float>(m_height));
+    glm::mat4 projection = player->camera->GetProjectionMatrix(
+        static_cast<float>(m_width) / static_cast<float>(m_height));
     terrainShader->setMat4("projection", projection);
     terrainShader->setMat4("view", view);
 
@@ -375,7 +348,7 @@ void Game::render() {
 
     // 3. Mark chunks dirty when modified and reupload geometry
     world->updateDirtyChunks();
- 
+
     skybox->drawSkybox(view, projection);
 
 
@@ -385,8 +358,7 @@ void Game::render() {
     ImGui_ImplSDL3_NewFrame();
     ImGui::NewFrame();
 
-    if (m_boolDebugMenu)
-    {
+    if (m_boolDebugMenu) {
         imguiUI(*m_imguiIO);
     }
 
@@ -395,7 +367,7 @@ void Game::render() {
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
     if (!SDL_GL_SwapWindow(m_window)) {
-        cout << "SDL_GL_SwapWindow error: "<< SDL_GetError() << endl;
+        cout << "SDL_GL_SwapWindow error: " << SDL_GetError() << endl;
         isRunning = false;
     }
 }
@@ -411,28 +383,28 @@ void Game::clean() const {
     std::cout << "Cleaning up..." << std::endl;
 }
 
-void Game::imguiUI(const ImGuiIO& io) {
+void Game::imguiUI(const ImGuiIO &io) {
     {
         int fbWidth, fbHeight;
 
         ImGui::Begin("Debug Menu");
 
         ImGui::Text("Window Size: %d x %d", m_width, m_height);
-        ImGui::Text("Cube Count %llu ", m_cubes.size());
 
         ImGui::Text("Selected Block Type %d ", static_cast<int>(player->m_selected_block_type));
 
         ImGui::Text("Player Head %.3f, %.3f, %.3f ", player->getHead().x, player->getHead().y, player->getHead().z);
-        ImGui::Text("Player Pos %.3f, %.3f, %.3f ", player->getPosition().x, player->getPosition().y, player->getPosition().z);
-        ImGui::Text("Player Cam %.3f, %.3f, %.3f ", player->camera->Position.x, player->camera->Position.y, player->camera->Position.z);
+        ImGui::Text("Player Pos %.3f, %.3f, %.3f ", player->getPosition().x, player->getPosition().y,
+                    player->getPosition().z);
+        ImGui::Text("Player Cam %.3f, %.3f, %.3f ", player->camera->Position.x, player->camera->Position.y,
+                    player->camera->Position.z);
         ImGui::Text("Player Feet %.3f, %.3f, %.3f ", player->getFeet().x, player->getFeet().y, player->getFeet().z);
         ImGui::Text("Player Speed %.2f", player->getMovementSpeed());
 
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-        ImGui::Text("Application TIME  (%llu ms), Delta: (%.4f s)", SDL_GetTicks(), m_deltaTime);
+        ImGui::Text("Application TIME  (%lu ms), Delta: (%.4f s)", SDL_GetTicks(), m_deltaTime);
         if (ImGui::Button("Close Me"))
             m_boolDebugMenu = false;
         ImGui::End();
     }
-
 }
