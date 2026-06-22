@@ -135,11 +135,14 @@ private:
     vk::raii::Pipeline m_vkGraphicsPipeline = nullptr; // The Holy Grail
 
     vk::raii::CommandPool m_vkCommandPool = nullptr;
-    vk::raii::CommandBuffer m_vkCommandBuffer = nullptr;
+    std::vector<vk::raii::CommandBuffer> m_vkCommandBuffers;
 
-    vk::raii::Semaphore presentCompleteSemaphore = nullptr;
-    vk::raii::Semaphore renderFinishedSemaphore  = nullptr;
-    vk::raii::Fence     drawFence                = nullptr;
+    std::vector<vk::raii::Semaphore> presentCompleteSemaphores;
+    std::vector<vk::raii::Semaphore> renderFinishedSemaphores;
+    std::vector<vk::raii::Fence> inFlightFences;
+
+    uint32_t m_frameIndex = 0;
+
 };
 
 

@@ -2,6 +2,7 @@
 // Created by Lamad on 11/12/2024.
 //
 
+#include <complex>
 #if defined(__INTELLISENSE__) || !defined(USE_CPP20_MODULES)
 #include <vulkan/vulkan_raii.hpp>
 #else
@@ -14,7 +15,6 @@ import vulkan_hpp;
 #include <imgui.h>
 #include <imgui_impl_sdl3.h>
 #include <imgui_impl_opengl3.h>
-
 
 #include <iostream>
 #include <ostream>
@@ -289,51 +289,55 @@ void Game::update() {
 }
 
 void Game::drawFrame() {
-    auto fenceResult = m_vkDevice.waitForFences(*drawFence, vk::True, UINT64_MAX);
+    auto fenceResult = m_vkDevice.waitForFences(*inFlightFences[m_frameIndex], vk::True, UINT64_MAX);
     if (fenceResult != vk::Result::eSuccess) {
         throw std::runtime_error("Failed to wait for fence!");
     }
-    m_vkDevice.resetFences(*drawFence);
+    m_vkDevice.resetFences(*inFlightFences[m_frameIndex]);
 
-    auto [result, imageIndex] = m_vkSwapChain.acquireNextImage(UINT64_MAX, *presentCompleteSemaphore, nullptr);
+    auto [result, imageIndex] = m_vkSwapChain.acquireNextImage(
+        UINT64_MAX, *presentCompleteSemaphores[m_frameIndex], nullptr);
 
+    m_vkCommandBuffers[m_frameIndex].reset();
     vkRecordCommandBuffer(imageIndex);
 
-    m_vkGraphicsQueue.waitIdle();        // NOTE: for simplicity, wait for the queue to be idle before starting the frame
+    m_vkGraphicsQueue.waitIdle(); // NOTE: for simplicity, wait for the queue to be idle before starting the frame
     // In the next chapter you see how to use multiple frames in flight and fences to sync
 
     vk::PipelineStageFlags waitDestinationStageMask(vk::PipelineStageFlagBits::eColorAttachmentOutput);
     const vk::SubmitInfo submitInfo{
         .waitSemaphoreCount = 1,
-        .pWaitSemaphores = &*presentCompleteSemaphore,
+        .pWaitSemaphores = &*presentCompleteSemaphores[m_frameIndex],
         .pWaitDstStageMask = &waitDestinationStageMask,
         .commandBufferCount = 1,
-        .pCommandBuffers = &*m_vkCommandBuffer,
+        .pCommandBuffers = &*m_vkCommandBuffers[m_frameIndex],
         .signalSemaphoreCount = 1,
-        .pSignalSemaphores = &*renderFinishedSemaphore
+        .pSignalSemaphores = &*renderFinishedSemaphores[imageIndex]
     };
 
-    m_vkGraphicsQueue.submit(submitInfo, *drawFence);
+    m_vkGraphicsQueue.submit(submitInfo, *inFlightFences[m_frameIndex]);
+
 
     const vk::PresentInfoKHR presentInfoKHR{
         .waitSemaphoreCount = 1,
-        .pWaitSemaphores    = &*renderFinishedSemaphore,
-        .swapchainCount     = 1,
-        .pSwapchains        = &*m_vkSwapChain,
-        .pImageIndices      = &imageIndex};
+        .pWaitSemaphores = &*renderFinishedSemaphores[imageIndex],
+        .swapchainCount = 1,
+        .pSwapchains = &*m_vkSwapChain,
+        .pImageIndices = &imageIndex
+    };
 
     result = m_vkGraphicsQueue.presentKHR(presentInfoKHR);
-    switch (result)
-    {
+    switch (result) {
         case vk::Result::eSuccess:
             break;
         case vk::Result::eSuboptimalKHR:
             std::cout << "vk::Queue::presentKHR returned vk::Result::eSuboptimalKHR !\n";
             break;
         default:
-            break;        // an unexpected result is returned!
+            break; // an unexpected result is returned!
     }
 
+    m_frameIndex = (m_frameIndex + 1) % MAX_FRAMES_IN_FLIGHT;
 }
 
 void Game::render() {
@@ -382,9 +386,8 @@ void Game::render() {
 void Game::clean() const {
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplSDL3_Shutdown();
-    ImGui::DestroyContext();
-
-    {// vulkan specific
+    ImGui::DestroyContext(); {
+        // vulkan specific
         m_vkDevice.waitIdle();
     }
     SDL_GL_DestroyContext(m_glContext);

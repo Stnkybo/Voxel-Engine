@@ -15,6 +15,9 @@ import vulkan_hpp;
 
 #include "../../game.h"
 
+
+constexpr int MAX_FRAMES_IN_FLIGHT = 2;
+
 const std::vector<char const *> validationLayers = {
     "VK_LAYER_KHRONOS_validation"};
 

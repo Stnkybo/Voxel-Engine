@@ -6,6 +6,7 @@
 #include <SDL3/SDL_vulkan.h>
 
 #include "../../game.h"
+#include "./vulkanBackend.h"
 
 bool isDeviceSuitable(vk::raii::PhysicalDevice const &physicalDevice);
 
@@ -324,7 +325,7 @@ void Game::vkCreateGraphicsPipeline() {
         },
         {.colorAttachmentCount = 1, .pColorAttachmentFormats = &m_vkSwapChainSurfaceFormat.format}
     };
-    
+
     // This is not required by us yet
     // vk::SubpassDependency dependency{
     //     .srcSubpass = vk::SubpassExternal,
@@ -363,14 +364,16 @@ void Game::vkCreateCommandPool() {
 
 void Game::vkCreateCommandBuffer() {
     vk::CommandBufferAllocateInfo allocInfo{
-        .commandPool = m_vkCommandPool, .level = vk::CommandBufferLevel::ePrimary, .commandBufferCount = 1
+        .commandPool = m_vkCommandPool, .level = vk::CommandBufferLevel::ePrimary,
+        .commandBufferCount = MAX_FRAMES_IN_FLIGHT
     };
 
-    m_vkCommandBuffer = std::move(vk::raii::CommandBuffers(m_vkDevice, allocInfo).front());
+    m_vkCommandBuffers = vk::raii::CommandBuffers(m_vkDevice, allocInfo);
 }
 
 void Game::vkRecordCommandBuffer(uint32_t imageIndex) {
-    m_vkCommandBuffer.begin({});
+    auto &commandBuffer = m_vkCommandBuffers[m_frameIndex];
+    commandBuffer.begin({});
 
     // Before starting rendering, transition the swapchain image to vk::ImageLayout::eColorAttachmentOptimal
     vkTransition_image_layout(
@@ -402,16 +405,16 @@ void Game::vkRecordCommandBuffer(uint32_t imageIndex) {
     };
 
     // Add Render Commands to the Command buffer, set task for the GPU to do
-    m_vkCommandBuffer.beginRendering(renderingInfo);
+    commandBuffer.beginRendering(renderingInfo);
 
-    m_vkCommandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, *m_vkGraphicsPipeline);
+    commandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, *m_vkGraphicsPipeline);
 
-    m_vkCommandBuffer.setViewport(0, vk::Viewport(0, 0, m_vkSwapChainExtent.width, m_vkSwapChainExtent.height, 0.0f,
-                                                  1.0f));
-    m_vkCommandBuffer.setScissor(0, vk::Rect2D({0, 0}, m_vkSwapChainExtent));
+    commandBuffer.setViewport(0, vk::Viewport(0, 0, m_vkSwapChainExtent.width, m_vkSwapChainExtent.height, 0.0f,
+                                                   1.0f));
+    commandBuffer.setScissor(0, vk::Rect2D({0, 0}, m_vkSwapChainExtent));
 
-    m_vkCommandBuffer.draw(3, 1, 0, 0);
-    m_vkCommandBuffer.endRendering();
+    commandBuffer.draw(3, 1, 0, 0);
+    commandBuffer.endRendering();
 
 
     // After rendering, transition the swapchain image to vk::ImageLayout::ePresentSrcKHR
@@ -425,7 +428,7 @@ void Game::vkRecordCommandBuffer(uint32_t imageIndex) {
         vk::PipelineStageFlagBits2::eBottomOfPipe // dstStage
     );
 
-    m_vkCommandBuffer.end();
+    commandBuffer.end();
 }
 
 void Game::vkTransition_image_layout(
@@ -459,11 +462,18 @@ void Game::vkTransition_image_layout(
         .imageMemoryBarrierCount = 1,
         .pImageMemoryBarriers = &barrier
     };
-    m_vkCommandBuffer.pipelineBarrier2(dependency_info);
+    m_vkCommandBuffers[m_frameIndex].pipelineBarrier2(dependency_info);
 }
 
 void Game::vkCreateSyncObjects() {
-    presentCompleteSemaphore = vk::raii::Semaphore(m_vkDevice, vk::SemaphoreCreateInfo());
-    renderFinishedSemaphore = vk::raii::Semaphore(m_vkDevice, vk::SemaphoreCreateInfo());
-    drawFence = vk::raii::Fence(m_vkDevice, {.flags = vk::FenceCreateFlagBits::eSignaled});
+    assert(presentCompleteSemaphores.empty() && renderFinishedSemaphores.empty() && inFlightFences.empty());
+
+    for (size_t i = 0; i < m_vkSwapChainImages.size(); i++) {
+        renderFinishedSemaphores.emplace_back(m_vkDevice, vk::SemaphoreCreateInfo());
+    }
+
+    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+        presentCompleteSemaphores.emplace_back(m_vkDevice, vk::SemaphoreCreateInfo());
+        inFlightFences.emplace_back(m_vkDevice, vk::FenceCreateInfo{.flags = vk::FenceCreateFlagBits::eSignaled});
+    }
 }
