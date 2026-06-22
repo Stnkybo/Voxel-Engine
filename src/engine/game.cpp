@@ -294,9 +294,13 @@ void Game::drawFrame() {
         throw std::runtime_error("Failed to wait for fence!");
     }
     m_vkDevice.resetFences(*drawFence);
+
     auto [result, imageIndex] = m_vkSwapChain.acquireNextImage(UINT64_MAX, *presentCompleteSemaphore, nullptr);
 
     vkRecordCommandBuffer(imageIndex);
+
+    m_vkGraphicsQueue.waitIdle();        // NOTE: for simplicity, wait for the queue to be idle before starting the frame
+    // In the next chapter you see how to use multiple frames in flight and fences to sync
 
     vk::PipelineStageFlags waitDestinationStageMask(vk::PipelineStageFlagBits::eColorAttachmentOutput);
     const vk::SubmitInfo submitInfo{
@@ -319,6 +323,16 @@ void Game::drawFrame() {
         .pImageIndices      = &imageIndex};
 
     result = m_vkGraphicsQueue.presentKHR(presentInfoKHR);
+    switch (result)
+    {
+        case vk::Result::eSuccess:
+            break;
+        case vk::Result::eSuboptimalKHR:
+            std::cout << "vk::Queue::presentKHR returned vk::Result::eSuboptimalKHR !\n";
+            break;
+        default:
+            break;        // an unexpected result is returned!
+    }
 
 }
 
