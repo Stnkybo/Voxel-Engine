@@ -31,12 +31,12 @@ import vulkan_hpp;
 #include "rendering/model.hpp"
 #include "terrain/world.h"
 
-void imguiUI(ImGuiIO& io);
+void imguiUI(ImGuiIO &io);
 
-Game::Game(const char* title, const int width, const int height): m_imguiIO() {
-        m_title = title;
-        m_height = height;
-        m_width = width;
+Game::Game(const char *title, const int width, const int height) : m_imguiIO() {
+    m_title = title;
+    m_height = height;
+    m_width = width;
 }
 
 Game::~Game() {
@@ -44,165 +44,145 @@ Game::~Game() {
 }
 
 
-
 void Game::handleEvents() {
     SDL_Event ev;
     while (SDL_PollEvent(&ev) != 0) {
-
         // This Allows Imgui to handle events
         ImGui_ImplSDL3_ProcessEvent(&ev);
 
-        switch(ev.type) {
-            case SDL_EVENT_WINDOW_RESIZED:
-                // Set Window Dimensions
-                SDL_GetWindowSizeInPixels(m_window, &m_width, &m_height);
-                glViewport(0, 0, m_width, m_height);  // Update the OpenGL viewport
-                break;
-
-
-            case SDL_EVENT_QUIT:
-                isRunning = false;
-            break;
-
-            case SDL_EVENT_MOUSE_BUTTON_DOWN: {
-
-                auto blockraycast = playerVoxelInteractionRaycast(player->camera->Position, player->camera->Front, 5.0f, world);
-
-                if (ev.button.button == SDL_BUTTON_LEFT) {
-                    // The left button was pressed or released
-                    // destory block
-
-                    if (blockraycast.hit) {
-                        world->setBlock(blockraycast.blockPosition, BlockType::AIR);
-                        std::cout << "Destoryed Block" << std::endl;
-
-
-                    }
-                }
-                else if (ev.button.button == SDL_BUTTON_RIGHT) {
-                    // The right button was pressed or released
-                    // Place block
-                    if (blockraycast.hit) {
-
-                        world->setBlock(blockraycast.blockPosition + blockraycast.normal, player->m_selected_block_type);
-                        std::cout << "Placed Block" << std::endl;
-
-                    }
-                }
-            }
-                break;
-
-
-            case SDL_EVENT_KEY_DOWN: {
-                const SDL_Keycode keycode = SDL_GetKeyFromScancode(ev.key.scancode, ev.key.mod, false);
-                if (keycode == SDLK_ESCAPE) {
-                    isRunning = false;
-                }
-                if (keycode == SDLK_SPACE) {
-                    drawWireframe = !drawWireframe;
-                    switch (drawWireframe) {
-                        case true:
-                            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // wireframe gl
-                            break;
-                        case false:
-                            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); // disable wireframe gl
-                            break;
-                    }
-
-                    // swap to debug shader
-                    // Shader *tempShader = ourShader;
-                    // ourShader = otherShader;
-                    // otherShader = tempShader;
-
-                }
-                if (keycode == SDLK_TAB) {
-
-                    // Toggle Mouse cursor
-                    SDL_SetWindowRelativeMouseMode(m_window, !SDL_GetWindowRelativeMouseMode(m_window));
-
-                    eventStates["MenuMode"] = !eventStates["MenuMode"];
-
-                }
-
-                if (keycode == SDLK_F3) {
-                    //Enable window
-                    m_boolDebugMenu = !m_boolDebugMenu;
-                }
-
-                if (keycode == SDLK_F11) {
-                    //Toggle FullScreen
-                    static bool fullscreen = false;
-                    fullscreen = !fullscreen;
-                    if (!SDL_SetWindowFullscreen(m_window, fullscreen)) {
-                        SDL_Log("Failed to toggle fullscreen: %s", SDL_GetError());
-                    }
-                }
-
-                if (keycode == SDLK_R) {
-
-                    //reset player position
-                    player->setPosition(glm::vec3(8.0f, 9.0f, 8.0f));
-
-                }
-                if (keycode == SDLK_N) {
-
-                    //toggle Player Noclip
-                    player->toggleNoclip();
-
-                }
-                if (keycode == SDLK_1) {
-
-                    //Cycle Selected Block
-                    player->m_selected_block_type = static_cast<BlockType>((static_cast<uint8_t>(player->m_selected_block_type) + 1) % 5 );
-                    std::cout << "selected blockType: " << static_cast<unsigned int>(player->m_selected_block_type) << std::endl;
-
-                }
-                
-            }
-
-            break;
-            default: ;
-        }
+        // switch (ev.type) {
+        //     case SDL_EVENT_WINDOW_RESIZED:
+        //         // Set Window Dimensions
+        //         SDL_GetWindowSizeInPixels(m_window, &m_width, &m_height);
+        //         glViewport(0, 0, m_width, m_height); // Update the OpenGL viewport
+        //         break;
+        //
+        //
+        //     case SDL_EVENT_QUIT:
+        //         isRunning = false;
+        //         break;
+        //
+        //     case SDL_EVENT_MOUSE_BUTTON_DOWN: {
+        //         auto blockraycast = playerVoxelInteractionRaycast(player->camera->Position, player->camera->Front, 5.0f,
+        //                                                           world);
+        //
+        //         if (ev.button.button == SDL_BUTTON_LEFT) {
+        //             // The left button was pressed or released
+        //             // destory block
+        //
+        //             if (blockraycast.hit) {
+        //                 world->setBlock(blockraycast.blockPosition, BlockType::AIR);
+        //                 std::cout << "Destoryed Block" << std::endl;
+        //             }
+        //         } else if (ev.button.button == SDL_BUTTON_RIGHT) {
+        //             // The right button was pressed or released
+        //             // Place block
+        //             if (blockraycast.hit) {
+        //                 world->setBlock(blockraycast.blockPosition + blockraycast.normal,
+        //                                 player->m_selected_block_type);
+        //                 std::cout << "Placed Block" << std::endl;
+        //             }
+        //         }
+        //     }
+        //     break;
+        //
+        //
+        //     case SDL_EVENT_KEY_DOWN: {
+        //         const SDL_Keycode keycode = SDL_GetKeyFromScancode(ev.key.scancode, ev.key.mod, false);
+        //         if (keycode == SDLK_ESCAPE) {
+        //             isRunning = false;
+        //         }
+        //         if (keycode == SDLK_SPACE) {
+        //             drawWireframe = !drawWireframe;
+        //             switch (drawWireframe) {
+        //                 case true:
+        //                     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // wireframe gl
+        //                     break;
+        //                 case false:
+        //                     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); // disable wireframe gl
+        //                     break;
+        //             }
+        //
+        //             // swap to debug shader
+        //             // Shader *tempShader = ourShader;
+        //             // ourShader = otherShader;
+        //             // otherShader = tempShader;
+        //         }
+        //         if (keycode == SDLK_TAB) {
+        //             // Toggle Mouse cursor
+        //             SDL_SetWindowRelativeMouseMode(m_window, !SDL_GetWindowRelativeMouseMode(m_window));
+        //
+        //             eventStates["MenuMode"] = !eventStates["MenuMode"];
+        //         }
+        //
+        //         if (keycode == SDLK_F3) {
+        //             //Enable window
+        //             m_boolDebugMenu = !m_boolDebugMenu;
+        //         }
+        //
+        //         if (keycode == SDLK_F11) {
+        //             //Toggle FullScreen
+        //             static bool fullscreen = false;
+        //             fullscreen = !fullscreen;
+        //             if (!SDL_SetWindowFullscreen(m_window, fullscreen)) {
+        //                 SDL_Log("Failed to toggle fullscreen: %s", SDL_GetError());
+        //             }
+        //         }
+        //
+        //         if (keycode == SDLK_R) {
+        //             //reset player position
+        //             player->setPosition(glm::vec3(8.0f, 9.0f, 8.0f));
+        //         }
+        //         if (keycode == SDLK_N) {
+        //             //toggle Player Noclip
+        //             player->toggleNoclip();
+        //         }
+        //         if (keycode == SDLK_1) {
+        //             //Cycle Selected Block
+        //             player->m_selected_block_type = static_cast<BlockType>(
+        //                 (static_cast<uint8_t>(player->m_selected_block_type) + 1) % 5);
+        //             std::cout << "selected blockType: " << static_cast<unsigned int>(player->m_selected_block_type) <<
+        //                     std::endl;
+        //         }
+        //     }
+        //
+        //     break;
+        //     default: ;
+        // }
 
 
         if (!eventStates["MenuMode"]) {
             processMouseMotion(ev);
         }
-
-
-
     }
 
-        const auto* keyState = reinterpret_cast<const Uint8 *>(SDL_GetKeyboardState(nullptr));
+    const auto *keyState = reinterpret_cast<const Uint8 *>(SDL_GetKeyboardState(nullptr));
 
-        if (keyState[SDL_SCANCODE_W])
-            player->ProcessMovement(FORWARD, m_deltaTime);
-        if (keyState[SDL_SCANCODE_S])
-            player->ProcessMovement(BACKWARD, m_deltaTime);
-        if (keyState[SDL_SCANCODE_A])
-            player->ProcessMovement(LEFT, m_deltaTime);
-        if (keyState[SDL_SCANCODE_D])
-            player->ProcessMovement(RIGHT, m_deltaTime);
-        if (keyState[SDL_SCANCODE_LSHIFT]) {
-
-            player->setMovementSpeed(20.0f);
-        }
-        else {
-            player->setMovementSpeed(5.0f);
-        }
-
+    // if (keyState[SDL_SCANCODE_W])
+    //     player->ProcessMovement(FORWARD, m_deltaTime);
+    // if (keyState[SDL_SCANCODE_S])
+    //     player->ProcessMovement(BACKWARD, m_deltaTime);
+    // if (keyState[SDL_SCANCODE_A])
+    //     player->ProcessMovement(LEFT, m_deltaTime);
+    // if (keyState[SDL_SCANCODE_D])
+    //     player->ProcessMovement(RIGHT, m_deltaTime);
+    // if (keyState[SDL_SCANCODE_LSHIFT]) {
+    //     player->setMovementSpeed(20.0f);
+    // } else {
+    //     player->setMovementSpeed(5.0f);
+    // }
 }
-void Game::processMouseMotion(const SDL_Event& event) const {
+
+void Game::processMouseMotion(const SDL_Event &event) const {
     // Mouse motion event
     if (event.type == SDL_EVENT_MOUSE_MOTION) {
         const float xOffset = event.motion.xrel; // Relative x motion
         const float yOffset = event.motion.yrel; // Relative y motion
 
         // Process mouse movement in the camera, does not rotate player as player has no rotation
-        player->camera->ProcessMouseMovement(xOffset, yOffset);
+        // player->camera->ProcessMouseMovement(xOffset, yOffset);
     }
 }
-
 
 
 void Game::initVulkan() {
@@ -217,7 +197,6 @@ void Game::initVulkan() {
     vkCreateCommandPool();
     vkCreateCommandBuffer();
     vkCreateSyncObjects();
-
 }
 
 void Game::onStart() {
@@ -243,37 +222,36 @@ void Game::onStart() {
     GreedyMesher::blockTextureAtlas.LoadFromFile("resources/textures/texture_atlas.png");
 
     // Generate some chunks
-    ChunkCoord chunk_coords = {0,0};
+    ChunkCoord chunk_coords = {0, 0};
     world->generateChunk(chunk_coords);
 
     chunk_coords = {-3, -3};
     world->generateChunk(chunk_coords);
     for (int i = -1; i <= 1; i++) {
         for (int j = 1; j <= 3; j++) {
-
-            chunk_coords = {i,j};
+            chunk_coords = {i, j};
             world->generateChunk(chunk_coords);
         }
     }
 
-    auto modifyChunk = world->getChunk({-3,-3});
-    for (int x=0; x < CHUNK_SIZE_X; x++) {
-        for (int y=0; y < CHUNK_SIZE_Y; y++) {
-            for (int z=0; z < CHUNK_SIZE_Z; z++) {
+    auto modifyChunk = world->getChunk({-3, -3});
+    for (int x = 0; x < CHUNK_SIZE_X; x++) {
+        for (int y = 0; y < CHUNK_SIZE_Y; y++) {
+            for (int z = 0; z < CHUNK_SIZE_Z; z++) {
                 if (x < 5 && z < 2) {
-                    setBlockType(modifyChunk->at(x,y,z), BlockType::AIR);
+                    setBlockType(modifyChunk->at(x, y, z), BlockType::AIR);
                 }
                 if (x < 11 && z < 13) {
-                    setBlockType(modifyChunk->at(x,y,z), BlockType::DIRT);
+                    setBlockType(modifyChunk->at(x, y, z), BlockType::DIRT);
                 }
             }
         }
     }
     setBlockType(modifyChunk->at(15, 10, 15), BlockType::STONE);
-    
+
     // generate and modify for testing
-    world->generateChunk({ 3,3 });
-    modifyChunk = world->getChunk({3,3});
+    world->generateChunk({3, 3});
+    modifyChunk = world->getChunk({3, 3});
     for (int x = 0; x < CHUNK_SIZE_X; x++) {
         for (int y = 0; y < CHUNK_SIZE_Y; y++) {
             for (int z = 0; z < CHUNK_SIZE_Z; z++) {
@@ -292,11 +270,9 @@ void Game::onStart() {
     setBlockType(*v, BlockType::DIRT);
 
 
-
     // Make Physics
     physicsSystem.RegisterEntity(std::shared_ptr<Entity>(player));
     player->physics->affectedByGravity = false;
-
 }
 
 void Game::update() {
@@ -347,8 +323,6 @@ void Game::drawFrame() {
 }
 
 void Game::render() {
-    drawFrame();
-
     // Render
     glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -357,7 +331,8 @@ void Game::render() {
 
     // Get camera matrices
     glm::mat4 view = player->camera->GetViewMatrix();
-    glm::mat4 projection = player->camera->GetProjectionMatrix(static_cast<float>(m_width) / static_cast<float>(m_height));
+    glm::mat4 projection = player->camera->GetProjectionMatrix(
+        static_cast<float>(m_width) / static_cast<float>(m_height));
     terrainShader->setMat4("projection", projection);
     terrainShader->setMat4("view", view);
 
@@ -366,7 +341,7 @@ void Game::render() {
 
     // 3. Mark chunks dirty when modified and reupload geometry
     world->updateDirtyChunks();
- 
+
     skybox->drawSkybox(view, projection);
 
 
@@ -376,8 +351,7 @@ void Game::render() {
     ImGui_ImplSDL3_NewFrame();
     ImGui::NewFrame();
 
-    if (m_boolDebugMenu)
-    {
+    if (m_boolDebugMenu) {
         imguiUI(*m_imguiIO);
     }
 
@@ -386,7 +360,7 @@ void Game::render() {
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
     if (!SDL_GL_SwapWindow(m_window)) {
-        cout << "SDL_GL_SwapWindow error: "<< SDL_GetError() << endl;
+        cout << "SDL_GL_SwapWindow error: " << SDL_GetError() << endl;
         isRunning = false;
     }
 }
@@ -402,7 +376,7 @@ void Game::clean() const {
     std::cout << "Cleaning up..." << std::endl;
 }
 
-void Game::imguiUI(const ImGuiIO& io) {
+void Game::imguiUI(const ImGuiIO &io) {
     {
         int fbWidth, fbHeight;
 
@@ -414,8 +388,10 @@ void Game::imguiUI(const ImGuiIO& io) {
         ImGui::Text("Selected Block Type %d ", static_cast<int>(player->m_selected_block_type));
 
         ImGui::Text("Player Head %.3f, %.3f, %.3f ", player->getHead().x, player->getHead().y, player->getHead().z);
-        ImGui::Text("Player Pos %.3f, %.3f, %.3f ", player->getPosition().x, player->getPosition().y, player->getPosition().z);
-        ImGui::Text("Player Cam %.3f, %.3f, %.3f ", player->camera->Position.x, player->camera->Position.y, player->camera->Position.z);
+        ImGui::Text("Player Pos %.3f, %.3f, %.3f ", player->getPosition().x, player->getPosition().y,
+                    player->getPosition().z);
+        ImGui::Text("Player Cam %.3f, %.3f, %.3f ", player->camera->Position.x, player->camera->Position.y,
+                    player->camera->Position.z);
         ImGui::Text("Player Feet %.3f, %.3f, %.3f ", player->getFeet().x, player->getFeet().y, player->getFeet().z);
         ImGui::Text("Player Speed %.2f", player->getMovementSpeed());
 
@@ -425,7 +401,6 @@ void Game::imguiUI(const ImGuiIO& io) {
             m_boolDebugMenu = false;
         ImGui::End();
     }
-
 }
 
 void Game::initWindow() {
