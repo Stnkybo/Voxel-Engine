@@ -25,8 +25,8 @@ class Game {
     std::shared_ptr<Player> player{};
 
     const double FRAME_TIME = 1.0f / 60.0f;
-    Uint64 m_lastTick = 0.0f;
-    Uint64 unprocessedTime = 0;
+    uint64_t m_lastTick = 0.0f;
+    uint64_t unprocessedTime = 0;
     double frameCounter = 0;
     int frames = 0;
 

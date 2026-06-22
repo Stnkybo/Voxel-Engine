@@ -276,7 +276,7 @@ void Game::onStart() {
 }
 
 void Game::update() {
-    const Uint64 currentTick = SDL_GetTicks();
+    const uint64_t currentTick = SDL_GetTicks();
     m_deltaTime = static_cast<float>(currentTick - m_lastTick) / 1000.0f;
     m_lastTick = currentTick;
 
