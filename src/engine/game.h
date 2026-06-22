@@ -35,15 +35,12 @@ class Game {
 
     bool drawWireframe = false;
 
-    std::vector<std::unique_ptr<Cube> > m_cubes;
     Texture *terrainTexture{};
     Skybox *skybox{};
     bool m_boolDebugMenu{};
     SDL_GLContext m_glContext;
     ImGuiIO *m_imguiIO;
 
-    vector<Cube *> penith;
-    int penith_offset[3] = {0, 0, 0};
     World *world{};
 
     void vkPickPhysicalDevice();
