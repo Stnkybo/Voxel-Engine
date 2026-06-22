@@ -398,7 +398,7 @@ void Game::imguiUI(const ImGuiIO &io) {
         ImGui::Text("Player Speed %.2f", player->getMovementSpeed());
 
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-        ImGui::Text("Application TIME  (%llu ms), Delta: (%.4f s)", SDL_GetTicks(), m_deltaTime);
+        ImGui::Text("Application TIME  (%lu ms), Delta: (%.4f s)", SDL_GetTicks(), m_deltaTime);
         if (ImGui::Button("Close Me"))
             m_boolDebugMenu = false;
         ImGui::End();
