@@ -418,7 +418,7 @@ void Game::imguiUI(const ImGuiIO& io) {
         ImGui::Begin("Debug Menu");
 
         ImGui::Text("Window Size: %d x %d", m_width, m_height);
-        ImGui::Text("Cube Count %d ", m_cubes.size());
+        ImGui::Text("Cube Count %llu ", m_cubes.size());
 
         ImGui::Text("Selected Block Type %d ", static_cast<int>(player->m_selected_block_type));
 
@@ -429,7 +429,7 @@ void Game::imguiUI(const ImGuiIO& io) {
         ImGui::Text("Player Speed %.2f", player->getMovementSpeed());
 
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-        ImGui::Text("Application TIME  (%d ms), Delta: (%.4f s)", SDL_GetTicks(), m_deltaTime);
+        ImGui::Text("Application TIME  (%llu ms), Delta: (%.4f s)", SDL_GetTicks(), m_deltaTime);
         if (ImGui::Button("Close Me"))
             m_boolDebugMenu = false;
         ImGui::End();
