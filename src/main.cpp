@@ -1,3 +1,5 @@
+#include <imgui_impl_sdl3.h>
+
 #include "config.h"
 #include "engine/game.h"
 
@@ -7,7 +9,8 @@ int main() {
     try {
         game->initWindow();
         game->initVulkan();
-        game->onStart();
+        game->initImGui();
+        // game->onStart();
         while (game->isRunning) {
             game->handleEvents();
             game->update();

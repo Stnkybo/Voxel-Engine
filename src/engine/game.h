@@ -112,6 +112,8 @@ public:
 
     void initWindow();
 
+    void initImGui();
+
 private:
     const char *m_title;
 

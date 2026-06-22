@@ -401,3 +401,8 @@ void Game::initWindow() {
         throw std::runtime_error("Failed to create SDL window: " + std::string(SDL_GetError()));
     }
 }
+
+void Game::initImGui() {
+    ImGui::CreateContext();
+    ImGui_ImplSDL3_InitForVulkan(m_window);
+}
