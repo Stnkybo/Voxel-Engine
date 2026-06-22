@@ -370,6 +370,9 @@ void Game::clean() const {
     ImGui_ImplSDL3_Shutdown();
     ImGui::DestroyContext();
 
+    {// vulkan specific
+        m_vkDevice.waitIdle();
+    }
     SDL_GL_DestroyContext(m_glContext);
     SDL_DestroyWindow(m_window);
     SDL_Quit();
