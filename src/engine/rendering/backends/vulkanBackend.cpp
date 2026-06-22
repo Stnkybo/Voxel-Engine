@@ -477,3 +477,20 @@ void Game::vkCreateSyncObjects() {
         inFlightFences.emplace_back(m_vkDevice, vk::FenceCreateInfo{.flags = vk::FenceCreateFlagBits::eSignaled});
     }
 }
+
+void Game::vkRecreateSwapChain() {
+
+
+    m_vkDevice.waitIdle();
+
+    vkCleanupSwapChain();
+
+    vkCreateSwapchain();
+    vkCreateImageViews();
+}
+
+void Game::vkCleanupSwapChain() {
+    m_vkSwapChainImageViews.clear();
+    m_vkSwapChain = nullptr;
+
+}

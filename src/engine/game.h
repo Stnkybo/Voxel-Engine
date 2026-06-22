@@ -57,6 +57,7 @@ public:
     PhysicsSystem physicsSystem;
     float m_deltaTime = 0;
     bool isRunning = true;
+    bool isMinimized = false;
     int m_width;
     int m_height;
 
@@ -93,6 +94,10 @@ public:
 
     void vkCreateSyncObjects();
 
+    void vkRecreateSwapChain();
+
+    void vkCleanupSwapChain();
+
     void initVulkan();
 
     void onStart();
@@ -103,7 +108,7 @@ public:
 
     void render();
 
-    void clean() const;
+    void clean();
 
     void imguiUI(const ImGuiIO &io);
 
@@ -143,6 +148,7 @@ private:
 
     uint32_t m_frameIndex = 0;
 
+    bool m_framebufferResized = false;
 };
 
 

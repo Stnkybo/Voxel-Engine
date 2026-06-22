@@ -14,7 +14,15 @@ int main() {
         while (game->isRunning) {
             game->handleEvents();
             // game->update();
-            game->drawFrame();
+
+            if (!game->isMinimized) {
+                game->drawFrame();
+
+            }
+            else {
+                SDL_Delay(10);
+            }
+            
             // game->render();
         }
     } catch (const std::exception &e) {

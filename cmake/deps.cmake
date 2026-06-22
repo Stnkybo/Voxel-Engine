@@ -6,11 +6,11 @@ set(CMAKE_BUILD_TYPE "${CMAKE_BUILD_TYPE}" CACHE STRING "" FORCE)
 # OpenGL
 # -----------------------------
 find_package(OpenGL REQUIRED)
-if(WIN32)
+if (WIN32)
     set(OPENGL_LIBRARIES opengl32)
-else()
+else ()
     set(OPENGL_LIBRARIES OpenGL::OpenGL)
-endif()
+endif ()
 
 # Vulkan
 find_package(Vulkan REQUIRED)
@@ -19,6 +19,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${Vulkan_INCLUDE_DIRS})
 # enable aggregate mode
 target_compile_definitions(${PROJECT_NAME} PRIVATE
         VULKAN_HPP_NO_CONSTRUCTORS
+        VULKAN_HPP_HANDLE_ERROR_OUT_OF_DATE_AS_SUCCESS=1
 )
 # Slangc for vulkan shaders
 
@@ -27,7 +28,6 @@ find_program(SLANGC_EXECUTABLE
         HINTS $ENV{VULKAN_SDK}/bin
         REQUIRED
 )
-
 
 
 # -----------------------------
