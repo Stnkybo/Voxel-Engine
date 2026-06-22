@@ -91,6 +91,7 @@ bool isDeviceSuitable(vk::raii::PhysicalDevice const &physicalDevice) {
         vk::PhysicalDeviceExtendedDynamicStateFeaturesEXT>();
     bool supportsRequiredFeatures = features.template get<vk::PhysicalDeviceVulkan11Features>().shaderDrawParameters &&
                                     features.template get<vk::PhysicalDeviceVulkan13Features>().dynamicRendering &&
+                                    features.template get<vk::PhysicalDeviceVulkan13Features>().synchronization2 &&
                                     features.template get<vk::PhysicalDeviceExtendedDynamicStateFeaturesEXT>().
                                     extendedDynamicState;
 
@@ -123,7 +124,7 @@ void Game::vkCreateLogicalDevice() {
             featureChain = {
                 {}, // vk::PhysicalDeviceFeatures2
                 {.shaderDrawParameters = true}, // vk::PhysicalDeviceVulkan11Features
-                {.dynamicRendering = true}, // vk::PhysicalDeviceVulkan13Features
+                {.synchronization2 = true, .dynamicRendering = true}, // vk::PhysicalDeviceVulkan13Features
                 {.extendedDynamicState = true} // vk::PhysicalDeviceExtendedDynamicStateFeaturesEXT
             };
 
@@ -450,7 +451,6 @@ void Game::vkTransition_image_layout(
 
 void Game::vkCreateSyncObjects() {
     presentCompleteSemaphore = vk::raii::Semaphore(m_vkDevice, vk::SemaphoreCreateInfo());
-    renderFinishedSemaphore  = vk::raii::Semaphore(m_vkDevice, vk::SemaphoreCreateInfo());
-    drawFence                = vk::raii::Fence(m_vkDevice, {.flags = vk::FenceCreateFlagBits::eSignaled});
+    renderFinishedSemaphore = vk::raii::Semaphore(m_vkDevice, vk::SemaphoreCreateInfo());
+    drawFence = vk::raii::Fence(m_vkDevice, {.flags = vk::FenceCreateFlagBits::eSignaled});
 }
-
