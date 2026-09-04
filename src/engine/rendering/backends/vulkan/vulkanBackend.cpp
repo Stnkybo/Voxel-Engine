@@ -515,27 +515,19 @@ void Game::vkCleanupSwapChain() {
 
 void Game::vkCreateVertexBuffer()
 {
-    vk::BufferCreateInfo bufferInfo{.size        = sizeof(colorVertices[0]) * colorVertices.size(),
-                                .usage       = vk::BufferUsageFlagBits::eVertexBuffer,
-                                .sharingMode = vk::SharingMode::eExclusive};
-    vertexBuffer = vk::raii::Buffer(m_vkDevice, bufferInfo);
-
-    vk::MemoryRequirements memRequirements = vertexBuffer.getMemoryRequirements();
-    vk::MemoryAllocateInfo memoryAllocateInfo{
-        .allocationSize  = memRequirements.size,
-        .memoryTypeIndex = findMemoryType(memRequirements.memoryTypeBits, vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent)};
-
-    vertexBufferMemory =vk::raii::DeviceMemory(m_vkDevice, memoryAllocateInfo);
-
-    vertexBuffer.bindMemory( *vertexBufferMemory, 0);
+    vk::DeviceSize bufferSize = sizeof(colorVertices[0]) * colorVertices.size();
+    auto [stagingBuffer, stagingBufferMemory] = createBuffer(bufferSize, vk::BufferUsageFlagBits::eTransferSrc, vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent);
 
 
     // Fill Vertex Buffer
-    void* data = vertexBufferMemory.mapMemory(0, bufferInfo.size);
+    void* dataStaging  = stagingBufferMemory.mapMemory(0, bufferSize);
 
-    memcpy(data, colorVertices.data(), bufferInfo.size);
-    vertexBufferMemory.unmapMemory();
+    memcpy(dataStaging, colorVertices.data(), bufferSize);
+    stagingBufferMemory.unmapMemory();
 
+    std::tie(vertexBuffer, vertexBufferMemory) = createBuffer(bufferSize, vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eTransferDst, vk::MemoryPropertyFlagBits::eDeviceLocal);
+
+    copyBuffer(stagingBuffer, vertexBuffer, bufferSize);
 
 }
 
@@ -552,4 +544,28 @@ uint32_t Game::findMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlags prope
     }
 
     throw std::runtime_error("failed to find suitable memory type!");
+}
+
+std::pair<vk::raii::Buffer, vk::raii::DeviceMemory> Game::createBuffer(vk::DeviceSize size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties)
+{
+    vk::BufferCreateInfo   bufferInfo{.size = size, .usage = usage, .sharingMode = vk::SharingMode::eExclusive};
+    vk::raii::Buffer       buffer          = vk::raii::Buffer(m_vkDevice, bufferInfo);
+    vk::MemoryRequirements memRequirements = buffer.getMemoryRequirements();
+    vk::MemoryAllocateInfo allocInfo{.allocationSize = memRequirements.size, .memoryTypeIndex = findMemoryType(memRequirements.memoryTypeBits, properties)};
+    vk::raii::DeviceMemory bufferMemory = vk::raii::DeviceMemory(m_vkDevice, allocInfo);
+    buffer.bindMemory(*bufferMemory, 0);
+    return {std::move(buffer), std::move(bufferMemory)};
+}
+
+void Game::copyBuffer(vk::raii::Buffer & srcBuffer, vk::raii::Buffer & dstBuffer, vk::DeviceSize size)
+{
+    vk::CommandBufferAllocateInfo allocInfo{ .commandPool = m_vkCommandPool, .level = vk::CommandBufferLevel::ePrimary, .commandBufferCount = 1 };
+    vk::raii::CommandBuffer commandCopyBuffer = std::move(m_vkDevice.allocateCommandBuffers(allocInfo).front());
+
+    commandCopyBuffer.begin({.flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit});
+    commandCopyBuffer.copyBuffer(*srcBuffer, *dstBuffer, vk::BufferCopy(0, 0, size));
+    commandCopyBuffer.end();
+
+    m_vkGraphicsQueue.submit(vk::SubmitInfo{.commandBufferCount = 1, .pCommandBuffers = &*commandCopyBuffer}, nullptr);
+    m_vkGraphicsQueue.waitIdle();
 }
