@@ -98,6 +98,9 @@ public:
 
     void vkCleanupSwapChain();
 
+    void vkCreateVertexBuffer();
+    uint32_t findMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlags properties);
+
     void initVulkan();
 
     void onStart();
@@ -145,6 +148,9 @@ private:
     std::vector<vk::raii::Semaphore> presentCompleteSemaphores;
     std::vector<vk::raii::Semaphore> renderFinishedSemaphores;
     std::vector<vk::raii::Fence> inFlightFences;
+
+    vk::raii::Buffer vertexBuffer = nullptr;
+    vk::raii::DeviceMemory vertexBufferMemory = nullptr;
 
     uint32_t m_frameIndex = 0;
 

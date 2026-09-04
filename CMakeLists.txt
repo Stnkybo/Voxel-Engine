@@ -46,8 +46,10 @@ add_executable(${PROJECT_NAME}
         src/engine/raycasting/raycast.cpp
         src/engine/client/playerRaycaster.h
         src/engine/skybox/skybox.h
-        src/engine/rendering/backends/vulkanBackend.h
-        src/engine/rendering/backends/vulkanBackend.cpp
+        src/engine/rendering/backends/vulkan/vulkanBackend.h
+        src/engine/rendering/backends/vulkan/vulkanBackend.cpp
+        src/engine/rendering/backends/vulkan/colorVertex.h
+        src/engine/rendering/backends/vulkan/colorVertex.h
 )
 
 # Load all Project Dependencies

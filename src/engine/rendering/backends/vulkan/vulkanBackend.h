@@ -14,7 +14,7 @@ import vulkan_hpp;
 
 #include <SDL3/SDL_vulkan.h>
 
-#include "../../game.h"
+#include "../../../game.h"
 
 
 constexpr int MAX_FRAMES_IN_FLIGHT = 2;

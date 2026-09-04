@@ -22,7 +22,7 @@ import vulkan_hpp;
 #include "../config.h"
 
 #include "game.h"
-#include "rendering/backends/vulkanBackend.h"
+#include "rendering/backends/vulkan/vulkanBackend.h"
 
 #include "rendering/shader.h"
 #include "camera/camera.h"
@@ -204,6 +204,7 @@ void Game::initVulkan() {
     vkCreateImageViews();
     vkCreateGraphicsPipeline();
     vkCreateCommandPool();
+    vkCreateVertexBuffer();
     vkCreateCommandBuffer();
     vkCreateSyncObjects();
 }

@@ -23,7 +23,7 @@ function (add_slang_shader_target TARGET)
 endfunction()
 
 set(SHADER_SLANG_SOURCES
-        ${CMAKE_SOURCE_DIR}/resources/shaders/slang/vktriangle.slang
+        ${CMAKE_SOURCE_DIR}/resources/shaders/slang/vkshader.slang
 )
 add_slang_shader_target( slangShaders SOURCES ${SHADER_SLANG_SOURCES})
 add_dependencies(${PROJECT_NAME} slangShaders)

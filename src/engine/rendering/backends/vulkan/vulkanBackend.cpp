@@ -5,8 +5,9 @@
 #include <map>
 #include <SDL3/SDL_vulkan.h>
 
-#include "../../game.h"
-#include "./vulkanBackend.h"
+#include "../../../game.h"
+#include "vulkanBackend.h"
+#include "colorVertex.h"
 
 bool isDeviceSuitable(vk::raii::PhysicalDevice const &physicalDevice);
 
@@ -256,7 +257,15 @@ void Game::vkCreateGraphicsPipeline() {
         .stage = vk::ShaderStageFlagBits::eFragment, .module = shaderModule, .pName = "fragMain"
     };
     vk::PipelineShaderStageCreateInfo shaderStages[] = {vertShaderStageInfo, fragShaderStageInfo};
-    vk::PipelineVertexInputStateCreateInfo vertexInputInfo;
+
+    auto bindingDescription = colorVertex::getBindingDescription();
+    auto attributeDescriptions = colorVertex::getAttributeDescriptions();
+    vk::PipelineVertexInputStateCreateInfo vertexInputInfo{
+        .vertexBindingDescriptionCount = 1,
+        .pVertexBindingDescriptions = &bindingDescription,
+        .vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size()),
+        .pVertexAttributeDescriptions = attributeDescriptions.data()
+    };
 
     // Specify format for pipeline input, change to triangle strip for voxels
     vk::PipelineInputAssemblyStateCreateInfo inputAssembly{.topology = vk::PrimitiveTopology::eTriangleList};
@@ -409,11 +418,15 @@ void Game::vkRecordCommandBuffer(uint32_t imageIndex) {
 
     commandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, *m_vkGraphicsPipeline);
 
+
     commandBuffer.setViewport(0, vk::Viewport(0, 0, m_vkSwapChainExtent.width, m_vkSwapChainExtent.height, 0.0f,
                                                    1.0f));
     commandBuffer.setScissor(0, vk::Rect2D({0, 0}, m_vkSwapChainExtent));
 
-    commandBuffer.draw(3, 1, 0, 0);
+    // Set to draw the color verts in the vertex buffer
+    commandBuffer.bindVertexBuffers(0,*vertexBuffer, {0});
+    commandBuffer.draw(static_cast<glm::uint32_t>(colorVertices.size()), 1, 0, 0);
+
     commandBuffer.endRendering();
 
 
@@ -493,4 +506,45 @@ void Game::vkCleanupSwapChain() {
     m_vkSwapChainImageViews.clear();
     m_vkSwapChain = nullptr;
 
+}
+
+void Game::vkCreateVertexBuffer()
+{
+    vk::BufferCreateInfo bufferInfo{.size        = sizeof(colorVertices[0]) * colorVertices.size(),
+                                .usage       = vk::BufferUsageFlagBits::eVertexBuffer,
+                                .sharingMode = vk::SharingMode::eExclusive};
+    vertexBuffer = vk::raii::Buffer(m_vkDevice, bufferInfo);
+
+    vk::MemoryRequirements memRequirements = vertexBuffer.getMemoryRequirements();
+    vk::MemoryAllocateInfo memoryAllocateInfo{
+        .allocationSize  = memRequirements.size,
+        .memoryTypeIndex = findMemoryType(memRequirements.memoryTypeBits, vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent)};
+
+    vertexBufferMemory =vk::raii::DeviceMemory(m_vkDevice, memoryAllocateInfo);
+
+    vertexBuffer.bindMemory( *vertexBufferMemory, 0);
+
+
+    // Fill Vertex Buffer
+    void* data = vertexBufferMemory.mapMemory(0, bufferInfo.size);
+
+    memcpy(data, colorVertices.data(), bufferInfo.size);
+    vertexBufferMemory.unmapMemory();
+
+
+}
+
+uint32_t Game::findMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlags properties) {
+
+    vk::PhysicalDeviceMemoryProperties memProperties = m_vkPhysicalDevice.getMemoryProperties();
+
+    for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++)
+    {
+        if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties)
+        {
+            return i;
+        }
+    }
+
+    throw std::runtime_error("failed to find suitable memory type!");
 }
