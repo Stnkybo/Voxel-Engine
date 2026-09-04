@@ -36,10 +36,15 @@ void Game::vkPickPhysicalDevice() {
         // Rank Devices by type
         switch (deviceProperties.deviceType) {
             case vk::PhysicalDeviceType::eDiscreteGpu: qualityScore += 1000;
+                break;
             case vk::PhysicalDeviceType::eIntegratedGpu: qualityScore += 100;
+                break;
             case vk::PhysicalDeviceType::eVirtualGpu: qualityScore += 10;
+                break;
             case vk::PhysicalDeviceType::eCpu: qualityScore += 1;
+                break;
             default: qualityScore += 0;
+                break;
         }
 
         // Maximum possible size of textures affects graphics quality
