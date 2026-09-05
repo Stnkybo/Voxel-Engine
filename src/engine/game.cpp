@@ -205,6 +205,7 @@ void Game::initVulkan() {
     vkCreateGraphicsPipeline();
     vkCreateCommandPool();
     vkCreateVertexBuffer();
+    vkCreateIndexBuffer();
     vkCreateCommandBuffer();
     vkCreateSyncObjects();
 }

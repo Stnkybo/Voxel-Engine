@@ -99,6 +99,7 @@ public:
     void vkCleanupSwapChain();
 
     void vkCreateVertexBuffer();
+    void vkCreateIndexBuffer();
     uint32_t findMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlags properties);
     std::pair<vk::raii::Buffer, vk::raii::DeviceMemory> createBuffer(vk::DeviceSize size, vk::BufferUsageFlags usage,
                                                                      vk::MemoryPropertyFlags properties);

@@ -430,7 +430,9 @@ void Game::vkRecordCommandBuffer(uint32_t imageIndex) {
 
     // Set to draw the color verts in the vertex buffer
     commandBuffer.bindVertexBuffers(0,*vertexBuffer, {0});
-    commandBuffer.draw(static_cast<glm::uint32_t>(colorVertices.size()), 1, 0, 0);
+    commandBuffer.bindIndexBuffer(*indexBuffer, 0, vk::IndexType::eUint16);
+
+    commandBuffer.drawIndexed(static_cast<glm::uint32_t>(colorIndices.size()), 1, 0, 0,0);
 
     commandBuffer.endRendering();
 
@@ -528,6 +530,23 @@ void Game::vkCreateVertexBuffer()
     std::tie(vertexBuffer, vertexBufferMemory) = createBuffer(bufferSize, vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eTransferDst, vk::MemoryPropertyFlagBits::eDeviceLocal);
 
     copyBuffer(stagingBuffer, vertexBuffer, bufferSize);
+
+}
+void Game::vkCreateIndexBuffer()
+{
+    vk::DeviceSize bufferSize = sizeof(colorIndices[0]) * colorIndices.size();
+    auto [stagingBuffer, stagingBufferMemory] = createBuffer(bufferSize, vk::BufferUsageFlagBits::eTransferSrc, vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent);
+
+
+    // Fill Vertex Buffer
+    void* dataStaging  = stagingBufferMemory.mapMemory(0, bufferSize);
+
+    memcpy(dataStaging, colorIndices.data(), bufferSize);
+    stagingBufferMemory.unmapMemory();
+
+    std::tie(indexBuffer, indexBufferMemory) = createBuffer(bufferSize, vk::BufferUsageFlagBits::eIndexBuffer | vk::BufferUsageFlagBits::eTransferDst, vk::MemoryPropertyFlagBits::eDeviceLocal);
+
+    copyBuffer(stagingBuffer, indexBuffer, bufferSize);
 
 }
 
