@@ -104,6 +104,11 @@ public:
     std::pair<vk::raii::Buffer, vk::raii::DeviceMemory> createBuffer(vk::DeviceSize size, vk::BufferUsageFlags usage,
                                                                      vk::MemoryPropertyFlags properties);
     void copyBuffer(vk::raii::Buffer& srcBuffer, vk::raii::Buffer& dstBuffer, vk::DeviceSize size);
+    void vkCreateDescriptorSetLayout();
+    void vkCreateUniformBuffers();
+    void updateUniformBuffer(uint32_t currentImage);
+    void vkCreateDescriptorPool();
+    void vkCreateDescriptorSets();
 
     void initVulkan();
 
@@ -143,6 +148,7 @@ private:
 
     std::vector<vk::raii::ImageView> m_vkSwapChainImageViews;
 
+    vk::raii::DescriptorSetLayout m_vkDescriptorSetLayout = nullptr;
     vk::raii::PipelineLayout m_vkPipelineLayout = nullptr;
     vk::raii::Pipeline m_vkGraphicsPipeline = nullptr; // The Holy Grail
 
@@ -157,6 +163,14 @@ private:
     vk::raii::DeviceMemory vertexBufferMemory = nullptr;
     vk::raii::Buffer indexBuffer = nullptr;
     vk::raii::DeviceMemory indexBufferMemory = nullptr;
+
+    std::vector<vk::raii::Buffer>       uniformBuffers;
+    std::vector<vk::raii::DeviceMemory> uniformBuffersMemory;
+    std::vector<void *>                 uniformBuffersMapped;
+
+    vk::raii::DescriptorPool m_vkDescriptorPool = nullptr;
+    std::vector<vk::raii::DescriptorSet> m_vkDescriptorSets;
+
 
     uint32_t m_frameIndex = 0;
 

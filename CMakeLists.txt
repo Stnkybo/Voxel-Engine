@@ -50,6 +50,7 @@ add_executable(${PROJECT_NAME}
         src/engine/rendering/backends/vulkan/vulkanBackend.cpp
         src/engine/rendering/backends/vulkan/colorVertex.h
         src/engine/rendering/backends/vulkan/colorVertex.h
+        src/engine/rendering/backends/vulkan/UniformBufferObject.h
 )
 
 # Load all Project Dependencies

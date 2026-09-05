@@ -202,10 +202,14 @@ void Game::initVulkan() {
     vkCreateLogicalDevice();
     vkCreateSwapchain();
     vkCreateImageViews();
+    vkCreateDescriptorSetLayout();
     vkCreateGraphicsPipeline();
     vkCreateCommandPool();
     vkCreateVertexBuffer();
     vkCreateIndexBuffer();
+    vkCreateUniformBuffers();
+    vkCreateDescriptorPool();
+    vkCreateDescriptorSets();
     vkCreateCommandBuffer();
     vkCreateSyncObjects();
 }
@@ -322,6 +326,8 @@ void Game::drawFrame() {
     m_vkCommandBuffers[m_frameIndex].reset();
     vkRecordCommandBuffer(imageIndex);
 
+
+    updateUniformBuffer(m_frameIndex);
 
     vk::PipelineStageFlags waitDestinationStageMask(vk::PipelineStageFlagBits::eColorAttachmentOutput);
     const vk::SubmitInfo submitInfo{

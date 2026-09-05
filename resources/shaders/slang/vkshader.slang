@@ -1,23 +1,32 @@
-struct VertexInput {
+struct VSInput {
     float2 inPosition;
     float3 inColor;
 };
 
-struct VertexOutput {
+struct UniformBuffer {
+    float4x4 model;
+    float4x4 view;
+    float4x4 proj;
+};
+ConstantBuffer<UniformBuffer> ubo;
+
+struct VSOutput {
     float4 pos : SV_Position;
     float3 color;
 };
 
 [shader("vertex")]
-VertexOutput vertMain(VertexInput input) {
-    VertexOutput output;
-    output.pos = float4(input.inPosition, 0.0, 1.0);
+VSOutput vertMain(VSInput input) {
+    VSOutput output;
+
+    // multiply position by these matrices to get the correct screen space pos
+    output.pos = mul(ubo.proj, mul(ubo.view, mul(ubo.model, float4(input.inPosition, 0.0, 1.0))));
     output.color = input.inColor;
     return output;
 }
 
 [shader("fragment")]
-float4 fragMain(VertexOutput inVert) : SV_Target
+float4 fragMain(VSOutput inVert) : SV_Target
 {
     return float4(inVert.color, 1.0);
 }
